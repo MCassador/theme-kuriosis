@@ -1,0 +1,11 @@
+{
+  "sections": {
+    "gallery_builder_app": {
+      "type": "gallery-builder-app",
+      "settings": {}
+    }
+  },
+  "order": [
+    "gallery_builder_app"
+  ]
+}

@@ -454,7 +454,60 @@
                  form="{{ product_form_id }}"
                  {% if option.selected_value == value %}checked{% endif %}
           >
-          <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}" class="material-option-box">
+          {% comment %} Resolve redirect URL for this material using metafields:
+            SOLUÇÃO SIMPLIFICADA: Use metafields diretos por material
+            - No produto ORIGINAL, crie metafields: 
+              * custom.material_redirect_400g_cotton_canvas (Product reference) → aponta para "Product 1 (Canvas)"
+              * custom.material_redirect_225g_fine_art_paper (Product reference) → aponta para outro produto se tiver
+            - O handle do material é usado para construir o nome do metafield
+          {% endcomment %}
+          {% assign material_redirect_url = '' %}
+          {% assign material_handle = value | handleize | replace: '-', '_' %}
+          {% assign metafield_key = 'material_redirect_' | append: material_handle %}
+          
+          {% comment %} Try accessing metafield with dynamic key {% endcomment %}
+          {% assign redirect_product_metafield = product.metafields.custom[metafield_key] %}
+          
+          {% if redirect_product_metafield != blank %}
+            {% assign redirect_product = redirect_product_metafield.value | default: redirect_product_metafield %}
+            {% if redirect_product != blank %}
+              {% if redirect_product.url != blank %}
+                {% assign material_redirect_url = redirect_product.url %}
+              {% endif %}
+            {% endif %}
+          {% endif %}
+          
+          {% comment %} DEBUG: Uncomment to see what's being searched in browser console {% endcomment %}
+          {% comment %}
+          <script>
+            console.log('🔍 Liquid Debug - Material:', {{ value | json }}, 'Handle:', {{ material_handle | json }}, 'Key:', {{ metafield_key | json }}, 'URL:', {{ material_redirect_url | json }});
+          </script>
+          {% endcomment %}
+          
+          {% comment %} Fallback: Try the list method if direct metafield doesn't exist {% endcomment %}
+          {% if material_redirect_url == '' %}
+            {% assign material_products_metafield = product.metafields.custom.material_products %}
+            {% if material_products_metafield != blank %}
+              {% assign material_products_list = material_products_metafield.value | default: material_products_metafield %}
+              {% if material_products_list != blank %}
+                {% for mat_prod in material_products_list %}
+                  {% if mat_prod != blank and mat_prod.url != blank %}
+                    {% assign mat_prod_material_name_metafield = mat_prod.metafields.custom.material_name %}
+                    {% if mat_prod_material_name_metafield != blank %}
+                      {% assign mat_name_value = mat_prod_material_name_metafield.value | default: mat_prod_material_name_metafield | strip %}
+                      {% assign option_value = value | strip %}
+                      {% if mat_name_value == option_value %}
+                        {% assign material_redirect_url = mat_prod.url %}
+                        {% break %}
+                      {% endif %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+              {% endif %}
+            {% endif %}
+          {% endif %}
+
+          <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}" class="material-option-box" data-material-name="{{ value | escape }}"{% if material_redirect_url != '' %} data-material-product-url="{{ material_redirect_url }}"{% endif %}>
               <span class="material-title">{{ value }}</span>
               {% if matching_variant %}
                 {% if option.name == 'Size' %}
@@ -513,5 +566,6 @@
           </label>
       {% endfor %}
   </fieldset>
+  <script src="{{ 'material-redirect.js' | asset_url }}" defer></script>
 {% endcase %}
 

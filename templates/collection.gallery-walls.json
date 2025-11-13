@@ -1,0 +1,30 @@
+{
+  "sections": {
+    "main-collection-banner": {
+      "type": "main-collection-banner",
+      "settings": {
+        "show_collection_image": false,
+        "show_collection_description": false,
+        "show_subcollections": false,
+        "make_heading_uppercase": false,
+        "overlay_color": "#000000",
+        "overlay_opacity": 0
+      }
+    },
+    "gallery-walls-collection": {
+      "type": "gallery-walls-collection",
+      "settings": {
+        "full_width": true,
+        "show_title": true,
+        "show_description": true,
+        "products_per_page": 24,
+        "columns_desktop": 3
+      }
+    }
+  },
+  "order": [
+    "main-collection-banner",
+    "gallery-walls-collection"
+  ]
+}
+

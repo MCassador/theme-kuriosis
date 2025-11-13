@@ -1,0 +1,295 @@
+{% comment %}
+  Gallery Cart Integration Snippet
+  Handles the integration between gallery builder and cart functionality
+{% endcomment %}
+
+<script>
+  // Gallery Cart Integration
+  window.GalleryCartIntegration = {
+    // Add gallery items to cart
+    addGalleryToCart: async function(galleryData) {
+      try {
+        const items = this.prepareCartItems(galleryData);
+        
+        const response = await fetch('{{ routes.cart_add_url }}', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+          },
+          body: JSON.stringify({
+            items: items
+          })
+        });
+
+        if (response.ok) {
+          const result = await response.json();
+          this.updateCartUI(result);
+          this.showNotification('Gallery added to cart successfully!', 'success');
+          return result;
+        } else {
+          throw new Error('Failed to add items to cart');
+        }
+      } catch (error) {
+        console.error('Error adding gallery to cart:', error);
+        this.showNotification('Error adding gallery to cart. Please try again.', 'error');
+        throw error;
+      }
+    },
+
+    // Prepare cart items from gallery data
+    prepareCartItems: function(galleryData) {
+      const items = [];
+      
+      galleryData.frames.forEach((frame, index) => {
+        if (frame.product) {
+          items.push({
+            id: frame.product.id,
+            quantity: 1,
+            properties: {
+              'Gallery Position': `Frame ${index + 1}`,
+              'Frame Size': frame.size,
+              'Frame Type': frame.frameName || 'No frame',
+              'Gallery Wall': 'Custom Gallery',
+              'Gallery ID': galleryData.id || 'gallery_' + Date.now()
+            }
+          });
+        }
+      });
+      
+      return items;
+    },
+
+    // Update cart UI elements
+    updateCartUI: function(cartData) {
+      // Update cart count
+      const cartCountElements = document.querySelectorAll('.cart-count, #cart-count, [data-cart-count]');
+      cartCountElements.forEach(element => {
+        element.textContent = cartData.item_count || 0;
+      });
+
+      // Update cart drawer if it exists
+      if (window.theme && window.theme.cartDrawer) {
+        window.theme.cartDrawer.refresh();
+      }
+
+      // Trigger cart update event
+      document.dispatchEvent(new CustomEvent('cart:updated', {
+        detail: { cart: cartData }
+      }));
+    },
+
+    // Show notification
+    showNotification: function(message, type = 'info') {
+      // Use existing notification system if available
+      if (window.theme && window.theme.showNotification) {
+        window.theme.showNotification(message, type);
+        return;
+      }
+
+      // Fallback notification
+      const notification = document.createElement('div');
+      notification.className = `gallery-notification gallery-notification--${type}`;
+      notification.style.cssText = `
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        padding: 1rem 1.5rem;
+        border-radius: 8px;
+        color: white;
+        font-weight: 500;
+        z-index: 10000;
+        max-width: 300px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        transform: translateX(100%);
+        transition: transform 0.3s ease;
+      `;
+      
+      const colors = {
+        success: '#28a745',
+        error: '#dc3545',
+        info: '#17a2b8',
+        warning: '#ffc107'
+      };
+      
+      notification.style.backgroundColor = colors[type] || colors.info;
+      notification.style.color = type === 'warning' ? '#000' : '#fff';
+      notification.textContent = message;
+      
+      document.body.appendChild(notification);
+      
+      // Show notification
+      setTimeout(() => {
+        notification.style.transform = 'translateX(0)';
+      }, 100);
+
+      // Hide notification after 3 seconds
+      setTimeout(() => {
+        notification.style.transform = 'translateX(100%)';
+        setTimeout(() => {
+          document.body.removeChild(notification);
+        }, 300);
+      }, 3000);
+    },
+
+    // Save gallery configuration
+    saveGallery: function(galleryData) {
+      try {
+        const savedGalleries = this.getSavedGalleries();
+        const galleryId = galleryData.id || 'gallery_' + Date.now();
+        
+        savedGalleries[galleryId] = {
+          ...galleryData,
+          id: galleryId,
+          savedAt: new Date().toISOString(),
+          name: galleryData.name || 'My Gallery ' + (Object.keys(savedGalleries).length + 1)
+        };
+        
+        localStorage.setItem('kuriosis_saved_galleries', JSON.stringify(savedGalleries));
+        this.showNotification('Gallery saved successfully!', 'success');
+        return galleryId;
+      } catch (error) {
+        console.error('Error saving gallery:', error);
+        this.showNotification('Error saving gallery. Please try again.', 'error');
+        throw error;
+      }
+    },
+
+    // Load saved galleries
+    getSavedGalleries: function() {
+      try {
+        const saved = localStorage.getItem('kuriosis_saved_galleries');
+        return saved ? JSON.parse(saved) : {};
+      } catch (error) {
+        console.error('Error loading saved galleries:', error);
+        return {};
+      }
+    },
+
+    // Load specific gallery
+    loadGallery: function(galleryId) {
+      try {
+        const savedGalleries = this.getSavedGalleries();
+        const gallery = savedGalleries[galleryId];
+        
+        if (gallery) {
+          this.showNotification('Gallery loaded successfully!', 'success');
+          return gallery;
+        } else {
+          throw new Error('Gallery not found');
+        }
+      } catch (error) {
+        console.error('Error loading gallery:', error);
+        this.showNotification('Error loading gallery. Please try again.', 'error');
+        throw error;
+      }
+    },
+
+    // Delete saved gallery
+    deleteGallery: function(galleryId) {
+      try {
+        const savedGalleries = this.getSavedGalleries();
+        delete savedGalleries[galleryId];
+        localStorage.setItem('kuriosis_saved_galleries', JSON.stringify(savedGalleries));
+        this.showNotification('Gallery deleted successfully!', 'success');
+        return true;
+      } catch (error) {
+        console.error('Error deleting gallery:', error);
+        this.showNotification('Error deleting gallery. Please try again.', 'error');
+        throw error;
+      }
+    },
+
+    // Share gallery
+    shareGallery: function(galleryData) {
+      try {
+        const shareData = {
+          title: galleryData.name || 'My Gallery',
+          text: 'Check out my custom gallery wall!',
+          url: window.location.href + '?gallery=' + (galleryData.id || 'shared')
+        };
+
+        if (navigator.share) {
+          navigator.share(shareData);
+        } else {
+          // Fallback: copy to clipboard
+          navigator.clipboard.writeText(shareData.url).then(() => {
+            this.showNotification('Gallery link copied to clipboard!', 'success');
+          });
+        }
+      } catch (error) {
+        console.error('Error sharing gallery:', error);
+        this.showNotification('Error sharing gallery. Please try again.', 'error');
+      }
+    },
+
+    // Calculate gallery total
+    calculateTotal: function(galleryData) {
+      let total = 0;
+      
+      galleryData.frames.forEach(frame => {
+        if (frame.product) {
+          // Extract price from product data
+          const price = parseFloat(frame.product.price.replace(/[^0-9.]/g, '')) || 0;
+          total += price;
+        }
+        
+        // Add frame price if available
+        if (frame.framePrice) {
+          total += frame.framePrice / 100; // Convert cents to dollars
+        }
+      });
+      
+      return total;
+    },
+
+    // Format money
+    formatMoney: function(amount) {
+      const moneyFormat = {{ shop.money_format | json }};
+      return moneyFormat.replace('{{amount}}', amount.toFixed(2));
+    }
+  };
+
+  // Initialize gallery cart integration
+  document.addEventListener('DOMContentLoaded', function() {
+    // Add event listeners for gallery builder integration
+    document.addEventListener('gallery:addToCart', function(event) {
+      window.GalleryCartIntegration.addGalleryToCart(event.detail);
+    });
+
+    document.addEventListener('gallery:save', function(event) {
+      window.GalleryCartIntegration.saveGallery(event.detail);
+    });
+
+    document.addEventListener('gallery:load', function(event) {
+      window.GalleryCartIntegration.loadGallery(event.detail.id);
+    });
+
+    document.addEventListener('gallery:share', function(event) {
+      window.GalleryCartIntegration.shareGallery(event.detail);
+    });
+  });
+</script>
+
+<style>
+  .gallery-notification {
+    font-family: 'Proza Libre', sans-serif;
+  }
+  
+  .gallery-notification--success {
+    background-color: #28a745 !important;
+  }
+  
+  .gallery-notification--error {
+    background-color: #dc3545 !important;
+  }
+  
+  .gallery-notification--info {
+    background-color: #17a2b8 !important;
+  }
+  
+  .gallery-notification--warning {
+    background-color: #ffc107 !important;
+    color: #000 !important;
+  }
+</style>

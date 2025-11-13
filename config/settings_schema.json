@@ -943,6 +943,12 @@
 				"info": "Name of the Variant."
 			},
 			{
+				"type": "image_picker",
+				"id": "new_frame_image",
+				"label": "New Frame Image",
+				"info": "Upload an image for the 'New' frame option (only available for 400g Cotton Canvas)."
+			},
+			{
 				"type": "select",
 				"id": "frame_image_size",
 				"label": "Framing Variant Image Size",

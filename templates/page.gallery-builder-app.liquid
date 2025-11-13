@@ -1,0 +1,98 @@
+{% comment %}
+  Template para simular o app de Gallery Builder
+  Este template simula os endpoints de save/load/delete das galerias
+{% endcomment %}
+
+{% if request.headers['X-Requested-With'] == 'XMLHttpRequest' %}
+  {% comment %} Handle AJAX requests {% endcomment %}
+  {% if request.method == 'POST' and request.path contains '/save' %}
+    {% comment %} Save gallery data {% endcomment %}
+    {% assign gallery_data = request.body | parse_json %}
+    
+    {% comment %} Simulate saving to customer metafields {% endcomment %}
+    {% assign customer_id = customer.id | default: 'guest_' | append: request.headers['X-Forwarded-For'] | default: 'unknown' %}
+    
+    <script>
+      // Simulate saving to localStorage for now
+      (function() {
+        try {
+          const galleryData = {{ gallery_data | json }};
+          const savedGalleries = JSON.parse(localStorage.getItem('kuriosis_saved_galleries') || '{}');
+          const galleryId = 'gallery_' + Date.now();
+          
+          savedGalleries[galleryId] = {
+            id: galleryId,
+            name: galleryData.name,
+            data: galleryData,
+            createdAt: new Date().toISOString(),
+            updatedAt: new Date().toISOString()
+          };
+          
+          localStorage.setItem('kuriosis_saved_galleries', JSON.stringify(savedGalleries));
+          
+          // Return success response
+          document.write(JSON.stringify({ success: true, id: galleryId }));
+        } catch (error) {
+          document.write(JSON.stringify({ success: false, error: error.message }));
+        }
+      })();
+    </script>
+    
+  {% elsif request.method == 'GET' and request.path contains '/load' %}
+    {% comment %} Load galleries {% endcomment %}
+    <script>
+      // Simulate loading from localStorage
+      (function() {
+        try {
+          const savedGalleries = JSON.parse(localStorage.getItem('kuriosis_saved_galleries') || '{}');
+          document.write(JSON.stringify({ success: true, galleries: savedGalleries }));
+        } catch (error) {
+          document.write(JSON.stringify({ success: false, galleries: {} }));
+        }
+      })();
+    </script>
+    
+  {% elsif request.method == 'DELETE' and request.path contains '/delete' %}
+    {% comment %} Delete gallery {% endcomment %}
+    {% assign gallery_id = request.query.gallery_id %}
+    
+    <script>
+      // Simulate deleting from localStorage
+      (function() {
+        try {
+          const savedGalleries = JSON.parse(localStorage.getItem('kuriosis_saved_galleries') || '{}');
+          const galleryId = '{{ gallery_id }}';
+          
+          if (savedGalleries[galleryId]) {
+            delete savedGalleries[galleryId];
+            localStorage.setItem('kuriosis_saved_galleries', JSON.stringify(savedGalleries));
+            document.write(JSON.stringify({ success: true }));
+          } else {
+            document.write(JSON.stringify({ success: false, error: 'Gallery not found' }));
+          }
+        } catch (error) {
+          document.write(JSON.stringify({ success: false, error: error.message }));
+        }
+      })();
+    </script>
+    
+  {% else %}
+    <script>
+      document.write(JSON.stringify({ success: false, error: 'Invalid request' }));
+    </script>
+  {% endif %}
+{% else %}
+  {% comment %} Regular page request {% endcomment %}
+  <!DOCTYPE html>
+  <html>
+  <head>
+    <title>Gallery Builder App</title>
+    <meta charset="utf-8">
+  </head>
+  <body>
+    <h1>Gallery Builder App</h1>
+    <p>This is the Gallery Builder App endpoint.</p>
+    <p>Use AJAX requests to interact with the API.</p>
+  </body>
+  </html>
+{% endif %}

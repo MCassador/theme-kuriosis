@@ -200,6 +200,112 @@
 
           
     </fieldset>
+    {%- comment -%} Buscar produto do framing service de múltiplas formas {%- endcomment -%}
+    {%- assign framing_service_product = null -%}
+    {%- assign framing_service_handle = null -%}
+    {%- assign framing_service_variant_id = null -%}
+    {%- assign framing_service_price = null -%}
+    
+    {%- comment -%} 1. Tentar por collection se configurada {%- endcomment -%}
+    {%- if section.settings.framing_service_collection and collections[section.settings.framing_service_collection] -%}
+      {%- assign framing_service_products = collections[section.settings.framing_service_collection].products -%}
+      {%- if framing_service_products.size > 0 -%}
+        {%- for service_product in framing_service_products -%}
+          {%- if service_product.title contains 'Framing Service' or service_product.title contains 'framing service' or service_product.handle == 'product-options' or service_product.handle == 'framing-service' -%}
+            {%- assign framing_service_product = service_product -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endfor -%}
+        {%- unless framing_service_product -%}
+          {%- assign framing_service_product = framing_service_products.first -%}
+        {%- endunless -%}
+      {%- endif -%}
+    {%- endif -%}
+    
+    {%- comment -%} 2. Tentar collections conhecidas {%- endcomment -%}
+    {%- unless framing_service_product -%}
+      {%- assign known_collections = 'Services,services,framing-services,Framing Services' | split: ',' -%}
+      {%- for collection_name in known_collections -%}
+        {%- if collections[collection_name] and collections[collection_name].products.size > 0 -%}
+          {%- for service_product in collections[collection_name].products -%}
+            {%- if service_product.title contains 'Framing' or service_product.handle contains 'framing' or service_product.handle contains 'service' -%}
+              {%- assign framing_service_product = service_product -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if framing_service_product -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endunless -%}
+    
+    {%- comment -%} 3. Tentar buscar pelo handle - PRIORIDADE para 'product-options' {%- endcomment -%}
+    {%- unless framing_service_product -%}
+      {%- assign possible_handles = 'product-options,framing-service,framing-service-product,framing,services' | split: ',' -%}
+      {%- for handle_name in possible_handles -%}
+        {%- if all_products[handle_name] -%}
+          {%- assign framing_service_product = all_products[handle_name] -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+    {%- endunless -%}
+    
+    {%- comment -%} 4. Tentar buscar em TODAS as collections procurando por produtos com "framing" ou "service" no título/handle {%- endcomment -%}
+    {%- unless framing_service_product -%}
+      {%- for collection in collections -%}
+        {%- unless collection.handle == 'frontpage' or collection.handle == 'all' -%}
+          {%- for prod in collection.products limit: 50 -%}
+            {%- if prod.title contains 'Framing Service' or prod.title contains 'framing service' or prod.handle == 'product-options' or prod.handle == 'framing-service' -%}
+              {%- assign framing_service_product = prod -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+          {%- if framing_service_product -%}
+            {%- break -%}
+          {%- endif -%}
+        {%- endunless -%}
+      {%- endfor -%}
+    {%- endunless -%}
+    
+    {%- comment -%} Se encontrou produto, extrair dados {%- endcomment -%}
+    {%- if framing_service_product and framing_service_product.available -%}
+      {%- assign framing_service_handle = framing_service_product.handle -%}
+      {%- assign framing_service_variant_id = framing_service_product.selected_or_first_available_variant.id -%}
+      {%- assign framing_service_price = framing_service_product.selected_or_first_available_variant.price -%}
+    {%- else -%}
+      {%- comment -%} Última tentativa: usar handle padrão 'product-options' diretamente {%- endcomment -%}
+      {%- if all_products['product-options'] -%}
+        {%- assign framing_service_product = all_products['product-options'] -%}
+        {%- if framing_service_product.available -%}
+          {%- assign framing_service_handle = framing_service_product.handle -%}
+          {%- assign framing_service_variant_id = framing_service_product.selected_or_first_available_variant.id -%}
+          {%- assign framing_service_price = framing_service_product.selected_or_first_available_variant.price -%}
+        {%- else -%}
+          {%- assign framing_service_handle = 'product-options' -%}
+        {%- endif -%}
+      {%- else -%}
+        {%- assign framing_service_handle = 'product-options' -%}
+      {%- endif -%}
+    {%- endif -%}
+    
+    {%- comment -%} SEMPRE renderizar o checkbox - se não encontrar produto, aparecerá sem preço {%- endcomment -%}
+    <div class="framing-service-add-option" id="framing-service-add-wrapper" style="display: none; margin-top: 15px; padding-top: 15px; border-top: 1px solid var(--color-border, #E2E2E2); text-align: center;"
+         {% if framing_service_handle %}data-framing-service-handle="{{ framing_service_handle }}"{% endif %}
+         {% if framing_service_variant_id %}data-framing-service-variant-id="{{ framing_service_variant_id }}"{% endif %}
+         {% if framing_service_price %}data-framing-service-price="{{ framing_service_price }}"{% endif %}>
+      <label style="display: flex; align-items: center; justify-content: center; cursor: pointer; gap: 8px;">
+        <input type="checkbox" id="add-framing-service" name="add-framing-service" style="margin: 0; cursor: pointer;">
+        <span style="font-size: 1rem; color: #000000; font-weight: 700;">
+          <span>Add Framing Service to cart</span>
+          <span class="framing-service-price-display" style="color: #000000; margin-left: 5px; font-weight: 700;"></span>
+        </span>
+      </label>
+      <div style="font-size: 0.875rem; color: #333333; margin-top: 10px; text-align: center; line-height: 1.6; max-width: 500px; margin-left: auto; margin-right: auto;">
+        Let us handle the framing and save time for you.<br>
+        <span style="color: #555555; margin-top: 6px; display: block;">This is a one-time service per order — no matter how many frames you include, you'll only be charged once.</span>
+      </div>
+    </div>
   </div>
   
   <script>
@@ -299,47 +405,7 @@
           // Capture the main product title via Liquid
           const mainProductTitle = "{{ product.title | escape }}";
           
-          const addItemsToCart = (items) => {
-            if (window.Shopify && window.Shopify.theme && window.Shopify.theme.cart) {
-              window.Shopify.theme.cart.addItems(items)
-                .then(() => {
-                  if (window.Shopify.theme.cart.drawer && typeof window.Shopify.theme.cart.drawer.open === 'function') {
-                    window.Shopify.theme.cart.drawer.open();
-                  } else {
-                    openCartDrawer();
-                  }
-                })
-                .catch(error => {
-                  console.error('Error using Shopify theme cart API:', error);
-                  addItemsFallback(items);
-                });
-            } else {
-              addItemsFallback(items);
-            }
-          };
-          
-          const addItemsFallback = (items) => {
-            fetch('/cart/add.js', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'Accept': 'application/json'
-              },
-              body: JSON.stringify({ items })
-            })
-            .then(response => {
-              if (!response.ok) throw new Error('Failed to add items');
-              return response.json();
-            })
-            .then(() => openCartDrawer())
-            .catch(error => {
-              console.error('Error adding items:', error);
-              clearTimeout(loadingTimeout);
-              addToCartBtn.classList.remove('loading');
-              alert('There was an error adding the items to your cart. Please try again.');
-            });
-          };
-          
+          // ========== DEFINIR TODAS AS FUNÇÕES ANTES DE USAR ==========
           const openCartDrawer = () => {
             clearTimeout(loadingTimeout);
             addToCartBtn.classList.remove('loading');
@@ -381,16 +447,91 @@
             }
           };
           
-          // When a frame is selected, add two items.
-          // The second item (frame) gets a property note with the main product title.
-          const randomId = Math.random().toString(36).substring(2, 10); // Generate a random ID
-          const itemsToAdd = [
-            { id: mainProductVariantId, quantity, properties: { "I_ID": randomId } },
-            { id: frameVariantId, quantity, properties: { "{{ 'products.facets.from' | t }}": mainProductTitle, "I_ID": randomId } }
-          ];
+          const addItemsFallback = (items) => {
+            fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({ items })
+            })
+            .then(response => {
+              if (!response.ok) throw new Error('Failed to add items');
+              return response.json();
+            })
+            .then(() => openCartDrawer())
+            .catch(error => {
+              console.error('Error adding items:', error);
+              clearTimeout(loadingTimeout);
+              addToCartBtn.classList.remove('loading');
+              alert('There was an error adding the items to your cart. Please try again.');
+            });
+          };
 
-          console.log('Adding items:', itemsToAdd);
-          addItemsToCart(itemsToAdd);
+          function addItemsToCart(items) {
+            if (window.Shopify && window.Shopify.theme && window.Shopify.theme.cart) {
+              window.Shopify.theme.cart.addItems(items)
+                .then(() => {
+                  if (window.Shopify.theme.cart.drawer && typeof window.Shopify.theme.cart.drawer.open === 'function') {
+                    window.Shopify.theme.cart.drawer.open();
+                  } else {
+                    openCartDrawer();
+                  }
+                })
+                .catch(error => {
+                  console.error('Error using Shopify theme cart API:', error);
+                  addItemsFallback(items);
+                });
+            } else {
+              addItemsFallback(items);
+            }
+          }
+          // ========== FIM DAS DEFINIÇÕES DE FUNÇÕES ==========
+          
+          // --- FRAMING SERVICE CHECKBOX: ADICIONE aqui ---
+          const addFramingServiceCheckbox = document.getElementById('add-framing-service');
+          let itemsToAdd = [
+            { id: mainProductVariantId, quantity, properties: { "I_ID": Math.random().toString(36).substring(2, 10) } },
+            { id: frameVariantId, quantity, properties: { "{{ 'products.facets.from' | t }}": mainProductTitle, "I_ID": Math.random().toString(36).substring(2, 10) } }
+          ];
+          if (addFramingServiceCheckbox && addFramingServiceCheckbox.checked) {
+            // Buscar variant ID do atributo data (passado via Liquid)
+            var checkboxWrapper = document.getElementById('framing-service-add-wrapper');
+            if (!checkboxWrapper) {
+              console.warn('Framing service wrapper not found');
+              addItemsToCart(itemsToAdd);
+              return;
+            }
+            
+            var framingServiceVariantId = checkboxWrapper.getAttribute('data-framing-service-variant-id');
+            
+            if (framingServiceVariantId) {
+              // Usar o variant ID diretamente do atributo data (passado via Liquid - SEMPRE funciona se produto encontrado)
+              console.log('Adding framing service to cart with variant ID:', framingServiceVariantId);
+              itemsToAdd.push({ 
+                id: parseInt(framingServiceVariantId, 10), 
+                quantity: 1, 
+                properties: { 
+                  "I_ID": Math.random().toString(36).substring(2, 10) 
+                } 
+              });
+              addItemsToCart(itemsToAdd);
+            } else {
+              // Se não houver variant ID, produto não está configurado corretamente
+              console.warn('Framing service variant ID not available - product may not be found or configured');
+              console.warn('Available data attributes:', {
+                handle: checkboxWrapper.getAttribute('data-framing-service-handle'),
+                variantId: checkboxWrapper.getAttribute('data-framing-service-variant-id'),
+                price: checkboxWrapper.getAttribute('data-framing-service-price')
+              });
+              // Adicionar ao carrinho sem o framing service
+              addItemsToCart(itemsToAdd);
+            }
+          } else {
+            addItemsToCart(itemsToAdd);
+          }
+          
         });
       };
       
@@ -684,10 +825,25 @@
        * Calculates the combined price by adding the main product price (in cents)
        * and the effective frame price (in cents), then updates the price element and sale badge.
        */
-      function updateCombinedPrice() {
+      window.updateCombinedPrice = function updateCombinedPrice() {
         var framePriceCents = getSelectedFramePriceCents();
         var combinedPriceCents = mainPriceCents + framePriceCents;
-        console.log("Combined price (cents):", combinedPriceCents);
+        
+        // Adicionar preço do framing service se checkbox estiver marcado
+        var framingServiceCheckbox = document.getElementById('add-framing-service');
+        var framingServicePriceCents = 0;
+        if (framingServiceCheckbox && framingServiceCheckbox.checked) {
+          var checkboxWrapper = document.getElementById('framing-service-add-wrapper');
+          if (checkboxWrapper) {
+            var framingServicePrice = checkboxWrapper.getAttribute('data-framing-service-price');
+            if (framingServicePrice) {
+              framingServicePriceCents = parseInt(framingServicePrice, 10);
+              combinedPriceCents += framingServicePriceCents;
+            }
+          }
+        }
+        
+        console.log("Combined price (cents):", combinedPriceCents, "Frame:", framePriceCents, "Framing Service:", framingServicePriceCents);
         
         // Update all price elements including add-to-cart button prices
         var priceElements = document.querySelectorAll('.price.proza-libre ins span.amount, .price.in-add-button .amount');
@@ -708,8 +864,8 @@
         // Update all compare-at price elements including add-to-cart button prices
         var compareAtElements = document.querySelectorAll('.price.proza-libre del span.amount, .price.in-add-button del .amount');
         if (mainCompareAtCents > mainPriceCents) {
-          // For sale, add frame price to compare-at (if desired).
-          var combinedCompareAtCents = mainCompareAtCents + framePriceCents;
+          // For sale, add frame price and framing service price to compare-at (if desired).
+          var combinedCompareAtCents = mainCompareAtCents + framePriceCents + framingServicePriceCents;
           console.log("Combined compare-at (cents):", combinedCompareAtCents);
           compareAtElements.forEach(function(compareAtEl) {
             if (compareAtEl && typeof formatMoney === 'function' && window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) {
@@ -793,6 +949,9 @@
         }
         updateCombinedPrice();
       });
+      
+      // Listen for framing service checkbox changes
+      document.addEventListener('framing-service:change', updateCombinedPrice);
         
       // Additionally, if a main variant selector exists, update when it changes.
       var mainVariantSelect = document.querySelector('select[name="id"]');
@@ -826,5 +985,95 @@
         
       // Update the price on page load.
       document.addEventListener('DOMContentLoaded', updateCombinedPrice);
+      
+      // Listen for framing service checkbox changes
+      var framingServiceCheckbox = document.getElementById('add-framing-service');
+      if (framingServiceCheckbox) {
+        framingServiceCheckbox.addEventListener('change', updateCombinedPrice);
+      }
     })();
   </script>
+
+<script>
+(function(){
+  // Exibe/oculta checkbox + atualiza preço real
+  function updateFramingServiceCheckbox() {
+    var selectedFrame = document.querySelector('input[name="frame-collection"]:checked');
+    var checkboxWrapper = document.getElementById('framing-service-add-wrapper');
+    var priceDisplay = document.querySelector('.framing-service-price-display');
+    
+    // Verificar se elementos existem
+    if (!checkboxWrapper || !priceDisplay) {
+      return;
+    }
+    
+    if (selectedFrame && selectedFrame.value !== 'no-frame') {
+      // SEMPRE mostrar o checkbox quando frame estiver selecionado
+      checkboxWrapper.style.display = 'block';
+      
+      // Tentar usar preço do atributo data (passado via Liquid - mais confiável)
+      var priceFromData = checkboxWrapper.getAttribute('data-framing-service-price');
+      
+      if (priceFromData) {
+        // Usar o preço diretamente do atributo data (já vem formatado corretamente do Shopify)
+        var price = parseInt(priceFromData, 10);
+        
+        // Formatar o preço usando as funções do Shopify (suporta múltiplas moedas automaticamente)
+        if (typeof formatMoney === 'function' && window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) {
+          priceDisplay.innerHTML = '<span class="money">' + formatMoney(price, window.theme.settings.money_with_currency_format) + '</span>';
+        } else if (window.Shopify && Shopify.formatMoney) {
+          priceDisplay.innerHTML = '<span class="money">' + Shopify.formatMoney(price, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || "{{ shop.money_format }}") + '</span>';
+        } else {
+          {% if settings.currency_code_enabled %}
+            priceDisplay.innerHTML = '<span class="money">{{ cart.currency.symbol }}' + (price / 100).toFixed(2).replace('.', ',') + '</span>';
+          {% else %}
+            priceDisplay.innerHTML = '<span class="money">{{ cart.currency.symbol }}' + (price / 100).toFixed(2).replace('.', ',') + '</span>';
+          {% endif %}
+        }
+      } else {
+        // Se não houver preço, mostrar checkbox sem preço
+        priceDisplay.textContent = '';
+      }
+    } else {
+      // Ocultar checkbox se nenhum frame estiver selecionado
+      checkboxWrapper.style.display = 'none';
+      var checkbox = document.getElementById('add-framing-service');
+      if (checkbox) checkbox.checked = false;
+    }
+  }
+  document.querySelectorAll('input[name="frame-collection"]').forEach(function(input){
+    input.addEventListener('change', updateFramingServiceCheckbox);
+  });
+  
+  // Adicionar listener no checkbox para atualizar preço quando mudar
+  function attachFramingServiceListener() {
+    var framingServiceCheckbox = document.getElementById('add-framing-service');
+    if (framingServiceCheckbox && !framingServiceCheckbox.hasAttribute('data-listener-attached')) {
+      framingServiceCheckbox.setAttribute('data-listener-attached', 'true');
+      framingServiceCheckbox.addEventListener('change', function() {
+        // Chamar updateCombinedPrice se estiver disponível no escopo global
+        if (typeof updateCombinedPrice === 'function') {
+          updateCombinedPrice();
+        } else {
+          // Disparar evento customizado para o script de preço capturar
+          document.dispatchEvent(new CustomEvent('framing-service:change'));
+        }
+      });
+    }
+  }
+  
+  // Tentar anexar listener imediatamente e também quando o checkbox for exibido
+  document.addEventListener('DOMContentLoaded', function() {
+    updateFramingServiceCheckbox();
+    attachFramingServiceListener();
+    // Observar quando o checkbox aparece no DOM
+    var observer = new MutationObserver(function() {
+      attachFramingServiceListener();
+    });
+    var checkboxWrapper = document.getElementById('framing-service-add-wrapper');
+    if (checkboxWrapper) {
+      observer.observe(checkboxWrapper, { childList: true, subtree: true });
+    }
+  });
+})();
+</script>

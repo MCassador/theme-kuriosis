@@ -1,0 +1,119 @@
+{{ 'gallery-walls-collection.css' | asset_url | stylesheet_tag }}
+{{ 'gallery-walls-collection.js' | asset_url | script_tag }}
+
+{%- liquid
+  assign columns_desktop = section.settings.columns_desktop | default: 3
+  assign show_title = section.settings.show_title
+  assign show_description = section.settings.show_description
+-%}
+
+<div class="gallery-walls-collection section-spacing">
+  <div class="row{% if section.settings.full_width %} full-width-row{% endif %}">
+    <div class="small-12 columns">
+      
+      {%- if show_title and section.settings.title != blank -%}
+        <div class="gallery-walls-collection-header">
+          <h1 class="gallery-walls-collection-title">{{ section.settings.title }}</h1>
+          
+          {%- if show_description and section.settings.description != blank -%}
+            <div class="gallery-walls-collection-description">
+              {{ section.settings.description }}
+            </div>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      {%- if section.blocks.size > 0 -%}
+        <div class="gallery-walls-grid" data-columns="{{ columns_desktop }}">
+          {%- for block in section.blocks -%}
+            {%- if block.settings.collection != blank -%}
+              {%- assign collection_item = collections[block.settings.collection] -%}
+              {%- if collection_item != blank -%}
+                <div {{ block.shopify_attributes }}>
+                  {%- render 'gallery-wall-collection-card', collection: collection_item, block: block -%}
+                </div>
+              {%- endif -%}
+            {%- endif -%}
+          {%- endfor -%}
+        </div>
+      {%- else -%}
+        <div class="gallery-walls-empty">
+          <p>No gallery wall collections configured. Add collections using the section blocks.</p>
+        </div>
+      {%- endif -%}
+      
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Gallery Walls Collection",
+  "settings": [
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Make section full width",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Gallery Walls"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_title",
+      "label": "Show title",
+      "default": true
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_description",
+      "label": "Show description",
+      "default": true
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "label": "Columns on desktop",
+      "min": 2,
+      "max": 4,
+      "step": 1,
+      "default": 3
+    }
+  ],
+  "blocks": [
+    {
+      "type": "gallery_wall_collection",
+      "name": "Gallery Wall Collection",
+      "settings": [
+        {
+          "type": "collection",
+          "id": "collection",
+          "label": "Select Collection",
+          "info": "Select a collection that contains gallery wall combo products"
+        },
+        {
+          "type": "image_picker",
+          "id": "main_image",
+          "label": "Main Image",
+          "info": "Main lifestyle image of the gallery wall. If not set, will use collection's featured image or first product image."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gallery Walls Collection"
+    }
+  ]
+}
+{% endschema %}
+

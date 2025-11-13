@@ -1,0 +1,1465 @@
+{{- 'gallery-wall-builder.css' | asset_url | stylesheet_tag -}}
+{{- 'shopify-native-tracking.js' | asset_url | script_tag -}}
+{{- 'enhanced-shopify-analytics.js' | asset_url | script_tag -}}
+
+<script>
+  // Gallery Builder Configuration
+  window.galleryBuilderConfig = {
+    cartAddUrl: '{{ routes.cart_add_url }}',
+    cartUrl: '{{ routes.cart_url }}',
+    moneyFormat: {{ shop.money_format | json }},
+    productCollection: '{{ section.settings.product_collection }}',
+    frameCollection: '{{ section.settings.frame_collection }}',
+    framingServiceCollection: '{{ section.settings.framing_service_collection | default: "Services" }}',
+    debugFramingService: {{ section.settings.framing_service_collection | json }}
+  };
+  
+  // Gallery Builder Translations - English Only
+  window.galleryBuilderTranslations = {
+    select_layout: "Select Layout",
+    select_products: "Select Products", 
+    select_frames: "Select Frames",
+    review_order: "Review Order",
+    all_products: "All Products",
+    add_to_gallery: "Add to Gallery",
+    previous: "Previous",
+    next: "Next",
+    preview: "Preview",
+    reset: "Reset",
+    subtotal: "Subtotal",
+    frames: "Frames",
+    total: "Total",
+    add_to_cart: "Add to Cart",
+    please_select_frame: "Please select a frame first",
+    frame_selected: "Frame selected!",
+    product_added: "Product added!",
+    gallery_added_to_cart: "Gallery added to cart!",
+    error_adding_to_cart: "Error adding to cart",
+    please_add_products: "Please add products"
+  };
+</script>
+
+<!-- Mobile Device Detection and Overlay -->
+<div class="rotateDeviceOverlay" id="rotateDeviceOverlay" bis_skin_checked="1">
+  <div class="iconContainer" bis_skin_checked="1">
+    <i class="fa fa-repeat"></i>
+    <p>Turn your device</p>
+  </div>
+</div>
+
+<!-- Share Modal -->
+<div class="modalContainer" id="shareModal" style="display: none;">
+  <div class="modalBG" id="shareModalBG"></div>
+  <div class="modal shareModal">
+    <div class="close" id="closeShareModal">&times;</div>
+    <div class="title">Share Gallery</div>
+    <div class="link">
+      <span class="linkheading">Gallery Link</span>
+      <input type="text" id="shareLinkInput" readonly>
+      <button class="button" id="copyShareLink">Copy Link</button>
+    </div>
+    <div class="shareImage">
+      <img id="shareImagePreview" src="" alt="Gallery Preview">
+    </div>
+  </div>
+</div>
+
+<div class="mobileFullscreenOverlay" id="mobileFullscreenOverlay" bis_skin_checked="1">
+  <div class="fullscreenContainer" bis_skin_checked="1">
+    <div class="fullscreenIcon" bis_skin_checked="1">
+      <i class="fa fa-expand"></i>
+    </div>
+    <p>Click for fullscreen</p>
+  </div>
+</div>
+
+{%- style -%}
+  .gallery-builder-header .checkout-btn {
+    background-color: {{ section.settings.checkout_button_color | default: '#FB6B00' }} !important;
+    color: {{ section.settings.checkout_button_text_color | default: '#ffffff' }} !important;
+    border-color: {{ section.settings.checkout_button_color | default: '#FB6B00' }} !important;
+  }
+  
+  .gallery-builder-header .checkout-btn:hover {
+    background-color: {{ section.settings.checkout_button_hover_color | default: '#218838' }} !important;
+    border-color: {{ section.settings.checkout_button_hover_color | default: '#218838' }} !important;
+  }
+  
+  .gallery-builder-header .thb-item-count {
+    background-color: {{ section.settings.cart_counter_color | default: 'rgba(255, 255, 255, 0.2)' }} !important;
+  }
+  
+  /* Frame Color Settings */
+  .gallery-frame {
+    border-color: {{ section.settings.frame_border_color | default: '#e0e0e0' }} !important;
+    border-width: {{ section.settings.frame_border_width | default: 2 }}px !important;
+  }
+  
+  .gallery-frame.selected {
+    border-color: {{ section.settings.selected_frame_color | default: '#fb6b00' }} !important;
+  }
+  
+  .gallery-frame:not(.has-frame) {
+    border-color: {{ section.settings.default_frame_color | default: '#E2E2E2' }} !important;
+  }
+  
+  /* Mobile - Ajustar botões SAVED GALLERY, SAVE, SHARE, CREATE NEW */
+  /* RESPONSIVO: Botões diminuem progressivamente conforme o tamanho do celular */
+  
+  /* Breakpoint 1: Telas grandes mobile/tablet (até 1060px OU altura <= 500px) */
+  @media (max-width: 1060px), (max-height: 500px) {
+    .gallery-builder-header .header-actions .saved-galleries-dropdown .dropdown-toggle,
+    .gallery-builder-header .header-actions #save-gallery-btn,
+    .gallery-builder-header .header-actions #share-gallery-btn,
+    .gallery-builder-header .header-actions #create-new-btn {
+      padding: 8px 12px !important;
+      font-size: 14px !important;
+      min-width: auto !important;
+      line-height: 1.4 !important;
+    }
+    
+    .gallery-builder-header .header-actions {
+      gap: 10px !important;
+    }
+    
+    .gallery-builder-header .btn-header {
+      padding: 8px 12px !important;
+      font-size: 14px !important;
+      line-height: 1.4 !important;
+      white-space: nowrap !important;
+    }
+    
+    .gallery-builder-header .btn-header i {
+      font-size: 12px !important;
+      margin: 0 4px !important;
+    }
+    
+    .gallery-builder-header {
+      padding-left: 20px !important;
+      padding-right: 20px !important;
+      justify-content: flex-start !important; /* Remove space-between para alinhar à esquerda */
+    }
+    
+    /* Alinhar logo na mesma posição horizontal do step-title */
+    /* Sidebar tem padding de 16px, step-number tem 24px + margin-right 8px = 32px */
+    /* Então o texto do step-title começa em 16px + 32px = 48px da esquerda da sidebar */
+    /* Como o header está em padding-left: 20px, o logo precisa de 48px - 20px = 28px de margin-left */
+    .gallery-builder-header .logo {
+      margin-left: 28px !important; /* Alinha com início do texto "SELECT BACKGROUND" */
+      margin-right: auto !important; /* Empurra botões para direita */
+      flex-shrink: 0 !important;
+    }
+    
+    .gallery-builder-header .cart-actions .checkout-btn {
+      display: none !important;
+    }
+  }
+  
+  /* Breakpoint 2: Telas médias mobile (até 768px) */
+  @media (max-width: 768px) {
+    .gallery-builder-header .header-actions .saved-galleries-dropdown .dropdown-toggle,
+    .gallery-builder-header .header-actions #save-gallery-btn,
+    .gallery-builder-header .header-actions #share-gallery-btn,
+    .gallery-builder-header .header-actions #create-new-btn {
+      padding: 6px 10px !important;
+      font-size: 12px !important;
+    }
+    
+    .gallery-builder-header .header-actions {
+      gap: 8px !important;
+    }
+    
+    .gallery-builder-header .btn-header {
+      padding: 6px 10px !important;
+      font-size: 12px !important;
+    }
+    
+    .gallery-builder-header .btn-header i {
+      font-size: 10px !important;
+      margin: 0 3px !important;
+    }
+    
+    .gallery-builder-header {
+      padding-left: 15px !important;
+      padding-right: 15px !important;
+      justify-content: flex-start !important;
+    }
+    
+    .gallery-builder-header .logo {
+      margin-left: 33px !important; /* 48px - 15px = 33px */
+      margin-right: auto !important;
+    }
+    
+    .gallery-builder-header .cart-total {
+      font-size: 12px !important;
+    }
+  }
+  
+  /* Breakpoint 3: Telas pequenas mobile (até 480px) */
+  @media (max-width: 480px) {
+    .gallery-builder-header .header-actions .saved-galleries-dropdown .dropdown-toggle,
+    .gallery-builder-header .header-actions #save-gallery-btn,
+    .gallery-builder-header .header-actions #share-gallery-btn,
+    .gallery-builder-header .header-actions #create-new-btn {
+      padding: 5px 8px !important;
+      font-size: 10px !important;
+    }
+    
+    .gallery-builder-header .header-actions {
+      gap: 6px !important;
+    }
+    
+    .gallery-builder-header .btn-header {
+      padding: 5px 8px !important;
+      font-size: 10px !important;
+    }
+    
+    .gallery-builder-header .btn-header i {
+      font-size: 9px !important;
+      margin: 0 2px !important;
+    }
+    
+    .gallery-builder-header {
+      padding-left: 10px !important;
+      padding-right: 10px !important;
+      justify-content: flex-start !important;
+    }
+    
+    .gallery-builder-header .logo {
+      margin-left: 38px !important; /* 48px - 10px = 38px */
+      margin-right: auto !important;
+      font-size: 18px !important;
+    }
+    
+    .gallery-builder-header .cart-total {
+      font-size: 10px !important;
+    }
+    
+    /* Esconder texto dos botões em telas muito pequenas, manter apenas ícones */
+    .gallery-builder-header .btn-header:not(.cart-btn) {
+      min-width: 32px !important;
+      padding: 5px !important;
+    }
+    
+    .gallery-builder-header .btn-header:not(.cart-btn) span:not(.thb-item-count) {
+      display: none !important;
+    }
+  }
+  
+  /* Breakpoint 4: Telas muito pequenas (até 360px) */
+  @media (max-width: 360px) {
+    .gallery-builder-header .header-actions .saved-galleries-dropdown .dropdown-toggle,
+    .gallery-builder-header .header-actions #save-gallery-btn,
+    .gallery-builder-header .header-actions #share-gallery-btn,
+    .gallery-builder-header .header-actions #create-new-btn {
+      padding: 4px 6px !important;
+      font-size: 9px !important;
+    }
+    
+    .gallery-builder-header .header-actions {
+      gap: 4px !important;
+    }
+    
+    .gallery-builder-header .btn-header {
+      padding: 4px 6px !important;
+      font-size: 9px !important;
+    }
+    
+    .gallery-builder-header .btn-header i {
+      font-size: 8px !important;
+      margin: 0 2px !important;
+    }
+    
+    .gallery-builder-header {
+      padding-left: 8px !important;
+      padding-right: 8px !important;
+      justify-content: flex-start !important;
+    }
+    
+    .gallery-builder-header .logo {
+      margin-left: 40px !important; /* 48px - 8px = 40px */
+      margin-right: auto !important;
+      font-size: 16px !important;
+    }
+    
+    .gallery-builder-header .cart-total {
+      font-size: 9px !important;
+      display: none !important; /* Esconder valor do carrinho em telas muito pequenas */
+    }
+    
+    /* Botões apenas com ícones em telas muito pequenas */
+    .gallery-builder-header .btn-header:not(.cart-btn) {
+      min-width: 28px !important;
+      padding: 4px !important;
+    }
+  }
+  
+  /* Botões de navegação lado a lado no mobile */
+  @media (max-width: 1060px), (max-height: 500px) {
+    .builder-navigation {
+      display: flex !important;
+      flex-direction: row !important;
+      gap: 0.5rem !important;
+      padding: 0.5rem 0.75rem 0.75rem 0.75rem !important;
+      margin-top: 0 !important;
+      margin-bottom: 0 !important;
+      position: fixed !important;
+      bottom: 0 !important; /* Colar na parte inferior */
+      left: 0 !important;
+      right: 0 !important;
+      width: 100% !important;
+      max-width: 320px !important; /* Largura da sidebar */
+      background: white !important;
+      z-index: 1000 !important;
+      border-top: 1px solid #e0e0e0 !important;
+      box-shadow: 0 -2px 8px rgba(0,0,0,0.1) !important;
+    }
+    
+    .builder-navigation .btn-nav {
+      display: flex !important;
+      align-items: center !important;
+      justify-content: center !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      flex: 1 !important;
+      padding: 12px 16px !important;
+      min-height: 44px !important;
+      height: auto !important;
+    }
+    
+    .builder-navigation .btn-prev {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      order: 0 !important; /* PREVIOUS primeiro */
+    }
+    
+    .builder-navigation .btn-next {
+      display: flex !important;
+      visibility: visible !important;
+      opacity: 1 !important;
+      order: 1 !important; /* NEXT depois */
+    }
+    
+    .builder-navigation .btn-prev:disabled {
+      opacity: 0.6 !important;
+    }
+    
+    /* Ajustar sidebar para que os botões não cubram conteúdo */
+    .gallery-builder-sidebar {
+      display: flex !important;
+      flex-direction: column !important;
+      padding-bottom: 70px !important; /* Espaço para os botões fixos */
+    }
+    
+    .builder-step {
+      flex: 1 !important;
+      overflow-y: auto !important;
+      padding-bottom: 10px !important;
+    }
+  }
+{%- endstyle -%}
+
+<div class="gallery-wall-builder section-spacing{% if section.settings.disable_top_spacing %} section-spacing--disable-top{% endif %}{% if section.settings.disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}">
+  <!-- Header like Desenio -->
+  <div class="gallery-builder-header">
+    <div class="logo">
+      {% if section.settings.logo %}
+        <a class="logolink" href="{{ routes.root_url }}">
+          <img
+            src="{{ section.settings.logo | image_url }}"
+            class="logoimg"
+            alt="{{ section.settings.logo.alt | default: shop.name | escape }}"
+            width="{{ section.settings.logo.width }}"
+            height="{{ section.settings.logo.height }}"
+          >
+        </a>
+      {% else %}
+        <a class="logolink text-logo" href="{{ routes.root_url }}">
+          Kuriosis
+        </a>
+      {% endif %}
+    </div>
+    <div class="header-actions">
+      <div class="saved-galleries-dropdown">
+        <button class="btn-header dropdown-toggle" id="saved-galleries-btn">
+          <i class="fas fa-bookmark"></i>
+          SAVED GALLERY
+          <i class="fas fa-chevron-down"></i>
+        </button>
+        <div class="saved-galleries-menu" id="saved-galleries-menu">
+          <div class="saved-galleries-list" id="saved-galleries-list">
+            <div class="empty-saved-galleries">No saved galleries yet</div>
+          </div>
+        </div>
+      </div>
+      <button class="btn-header" id="save-gallery-btn">SAVE</button>
+      <button class="btn-header" id="share-gallery-btn">SHARE</button>
+      <button class="btn-header" id="create-new-btn">CREATE NEW</button>
+      <div class="cart-actions">
+        <button class="btn-header cart-btn" id="cart-drawer-toggle" type="button" aria-label="Open cart drawer">
+          <div class="thb-secondary-item-icon">
+            {%- render 'svg-icons' with 'cart' %}
+            {% if section.settings.show_cart_counter %}
+              <span class="thb-item-count proza-libre">{%- if cart.item_count > 99 -%}{%- render 'svg-icons' with 'thb-asterisk' -%}{%- else -%}{{ cart.item_count }}{%- endif -%}</span>
+            {% endif %}
+          </div>
+          <span class="cart-total" id="cart-total-amount">{{ cart.total_price | money }}</span>
+        </button>
+
+        <a class="btn-header checkout-btn" href="{{ routes.cart_url }}">
+          {{ section.settings.checkout_button_text | default: 'CHECKOUT' }}
+        </a>
+      </div>
+    </div>
+  </div>
+  
+  <div class="row">
+    <div class="small-12 columns">
+      
+
+      <!-- Builder Interface -->
+      <div class="gallery-builder-interface">
+        
+        <!-- Sidebar -->
+        <div class="gallery-builder-sidebar">
+          <!-- Step Indicator -->
+          <div class="step-indicator">
+            <div class="step" data-step="1">1</div>
+            <div class="step" data-step="2">2</div>
+            <div class="step" data-step="3">3</div>
+            <div class="step" data-step="4">4</div>
+          </div>
+          
+              <!-- Step 1: Background Selection -->
+              <div class="builder-step active" data-step="1">
+                <h3 class="step-title">
+                  <span class="step-number">1</span>
+                  SELECT BACKGROUND
+                </h3>
+                
+                <div class="background-selection">
+                  <div class="background-options">
+                    <div class="background-option selected" data-background="grey">
+                      <div class="background-preview" style="background-image: url('{% if section.settings.background_grey %}{{ section.settings.background_grey | img_url: '1344x768' }}{% else %}{{ 'room-grey.jpg' | asset_url }}{% endif %}');"></div>
+                      <span class="background-name">{{ section.settings.background_grey_name | default: 'Grey Room' }}</span>
+                    </div>
+                    <div class="background-option" data-background="white">
+                      <div class="background-preview" style="background-image: url('{% if section.settings.background_white %}{{ section.settings.background_white | img_url: '1344x768' }}{% else %}{{ 'room-white.jpg' | asset_url }}{% endif %}');"></div>
+                      <span class="background-name">{{ section.settings.background_white_name | default: 'White Room' }}</span>
+                    </div>
+                    <div class="background-option" data-background="blue">
+                      <div class="background-preview" style="background-image: url('{% if section.settings.background_blue %}{{ section.settings.background_blue | img_url: '1344x768' }}{% else %}{{ 'room-blue.jpg' | asset_url }}{% endif %}');"></div>
+                      <span class="background-name">{{ section.settings.background_blue_name | default: 'Blue Room' }}</span>
+                    </div>
+                    <div class="background-option" data-background="pink">
+                      <div class="background-preview" style="background-image: url('{% if section.settings.background_pink %}{{ section.settings.background_pink | img_url: '1344x768' }}{% else %}{{ 'room-pink.jpg' | asset_url }}{% endif %}');"></div>
+                      <span class="background-name">{{ section.settings.background_pink_name | default: 'Pink Room' }}</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Step 2: Product Selection -->
+              <div class="builder-step" data-step="2">
+                <h3 class="step-title">
+                  <span class="step-number">2</span>
+                  SELECT PRODUCTS
+                </h3>
+            
+            <!-- Product Filters -->
+            <div class="product-filters">
+              <div class="filter-tabs">
+                <button class="filter-tab active" data-filter="all">All Products</button>
+                <button class="filter-tab filter-toggle" id="show-filter-btn">
+                  <span>Show Filter</span>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <circle cx="11" cy="11" r="8"></circle>
+                    <path d="m21 21-4.35-4.35"></path>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Product Grid -->
+            <div class="product-grid">
+              {% for product in collections[section.settings.product_collection].products limit: 20 %}
+                {%- liquid
+                  # Get size options and pricing data
+                  assign size_option_index = 0
+                  assign has_size_option = false
+                  assign size_options = ''
+                  assign price_data = '{}'
+                  assign variant_id_data = '{}'
+                  assign available_sizes = ''
+                  
+                  # Get material options and pricing data
+                  assign material_option_index = 0
+                  assign has_material_option = false
+                  assign material_options = ''
+                  assign available_materials = ''
+                  assign material_price_data = '{}'
+                  assign material_variant_id_data = '{}'
+                  
+                  # Find size option
+                  for option in product.options_with_values
+                    if option.name == 'Size'
+                      assign size_option_index = forloop.index0
+                      assign has_size_option = true
+                      assign size_options = option.values | join: ','
+                    endif
+                  endfor
+                  
+                  # Find material option
+                  for option in product.options_with_values
+                    if option.name == 'Material'
+                      assign material_option_index = forloop.index0
+                      assign has_material_option = true
+                      assign material_options = option.values | join: ','
+                      break
+                    endif
+                  endfor
+                  
+                  # Build complete variant map with unique size+material combinations
+                  assign all_variants_map = ''
+                  assign processed_combinations = ''
+                  
+                  for variant in product.variants
+                    if variant.available
+                      assign size_value = variant.options[size_option_index] | default: 'Unknown'
+                      assign material_value = variant.options[material_option_index] | default: 'Unknown'
+                      
+                      # Create unique combination key to avoid duplicates
+                      assign combination_key = size_value | append: '###' | append: material_value
+                      
+                      # Only process if not already processed
+                      unless processed_combinations contains combination_key
+                        # Add to available sizes (only once)
+                        if has_size_option and size_value != 'Unknown'
+                          unless available_sizes contains size_value
+                            if available_sizes != ''
+                              assign available_sizes = available_sizes | append: ','
+                            endif
+                            assign available_sizes = available_sizes | append: size_value
+                          endunless
+                        endif
+                        
+                        # Add to available materials (only once)
+                        if has_material_option and material_value != 'Unknown'
+                          unless available_materials contains material_value
+                            if available_materials != ''
+                              assign available_materials = available_materials | append: ','
+                            endif
+                            assign available_materials = available_materials | append: material_value
+                          endunless
+                        endif
+                        
+                        # Build variant map entry: "size|material:price|variantId"
+                        assign formatted_price = variant.price | divided_by: 100.0 | round: 2
+                        assign variant_entry = size_value | append: '|' | append: material_value | append: ':' | append: formatted_price | append: '|' | append: variant.id
+                        
+                        if all_variants_map != ''
+                          assign all_variants_map = all_variants_map | append: ';'
+                        endif
+                        assign all_variants_map = all_variants_map | append: variant_entry
+                        
+                        # Mark this combination as processed
+                        if processed_combinations != ''
+                          assign processed_combinations = processed_combinations | append: '||'
+                        endif
+                        assign processed_combinations = processed_combinations | append: combination_key
+                      endunless
+                    endif
+                  endfor
+                -%}
+                <div class="product-item" 
+                     data-product-id="{{ product.id }}" 
+                     data-product-handle="{{ product.handle }}"
+                     data-product-title="{{ product.title | escape }}"
+                     data-product-price="{{ product.price | money }}"
+                     data-product-price-raw="{{ product.price }}"
+                     data-product-image="{% if product.images.size > 2 %}{%- assign last_index = product.images.size | minus: 1 -%}{{ product.images[last_index] | img_url: '600x600' }}{% else %}{{ product.featured_image | img_url: '600x600' }}{% endif %}"
+                     data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                     data-product-size="{{ product.selected_or_first_available_variant.option1 | default: 'Unknown' }}"
+                     data-product-material="{{ product.selected_or_first_available_variant.option2 | default: 'Unknown' }}"
+                     data-collections="{% for collection in product.collections %}{{ collection.handle }}{% unless forloop.last %},{% endunless %}{% endfor %}"
+                     data-has-size="{{ has_size_option }}"
+                     data-size-options="{{ size_options }}"
+                     data-available-sizes="{{ available_sizes }}"
+                     data-has-material="{{ has_material_option }}"
+                     data-material-options="{{ material_options }}"
+                     data-available-materials="{{ available_materials }}"
+                     data-all-variants="{{ all_variants_map }}"
+                     draggable="true">
+                  
+                  <div class="product-image">
+                    {% if product.images.size > 2 %}
+                      {%- assign last_index = product.images.size | minus: 1 -%}
+                      <img src="{{ product.images[last_index] | img_url: '400x400' }}" 
+                           alt="{{ product.title | escape }}"
+                           loading="lazy">
+                    {% elsif product.featured_image %}
+                      <img src="{{ product.featured_image | img_url: '400x400' }}" 
+                           alt="{{ product.title | escape }}"
+                           loading="lazy">
+                    {% else %}
+                      <div class="placeholder-image">{{ 'product-1' | placeholder_svg_tag }}</div>
+                    {% endif %}
+                    <div class="product-overlay">
+                      <button class="btn-add-to-gallery" data-product-id="{{ product.id }}">
+                        Add to Gallery
+                      </button>
+                    </div>
+                  </div>
+                  
+                  <div class="product-info">
+                    <h4 class="product-title">{{ product.title }}</h4>
+                    <span class="product-price">{{ product.price | money }}</span>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+        <!-- Step 3: Frame Selection -->
+        <div class="builder-step" data-step="3">
+          <h3 class="step-title">
+            <span class="step-number">3</span>
+            SELECT FRAMES
+          </h3>
+          
+          <!-- Selected Product Display -->
+          <div class="selected-product-display" id="selected-product-display" style="display: none;">
+            <div class="selected-product-preview">
+              <img id="selected-product-image" src="" alt="Selected Product" style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px;">
+              <div class="selected-product-info">
+                <h4 id="selected-product-title"></h4>
+                <p id="selected-product-size"></p>
+              </div>
+            </div>
+          </div>
+          
+          <!-- Frame Selection Grid -->
+          <div class="frame-selection-grid">
+            {% comment %} Usar a coleção selecionada no admin {% endcomment %}
+            {% if section.settings.frame_collection and collections[section.settings.frame_collection] %}
+              {% assign frame_products = collections[section.settings.frame_collection].products %}
+              
+              {% if frame_products.size > 0 %}
+                {% for frame_product in frame_products limit: 9 %}
+                  {% comment %} Buscar imagem do frame configurada no admin usando Frame Handle {% endcomment %}
+                  {% comment %} Lógica: busca block onde block.settings.frame_id corresponde ao frame_product.handle {% endcomment %}
+                  {% comment %} Normaliza handles para fazer match (hífen/underscore, case-insensitive) {% endcomment %}
+                  {% assign frame_image = null %}
+                  {% assign product_handle_normalized = frame_product.handle | downcase | replace: '-', '_' %}
+                  {% for block in section.blocks %}
+                    {% if block.type == 'frame_option' %}
+                      {% assign block_handle_normalized = block.settings.frame_id | downcase | replace: '-', '_' %}
+                      {% if block_handle_normalized == product_handle_normalized %}
+                        {% if block.settings.frame_image %}
+                          {% assign frame_image = block.settings.frame_image %}
+                          {% break %}
+                        {% endif %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+                  
+                  {% comment %} Se não encontrou frame_image no block, usar featured_image do produto como fallback {% endcomment %}
+                  {% if frame_image == null %}
+                    {% assign frame_image = frame_product.featured_image %}
+                  {% endif %}
+                  
+                  <div class="frame-option" data-frame="{{ frame_product.handle }}" data-product-id="{{ frame_product.id }}" {% if frame_image %}data-frame-image="{{ frame_image | img_url: 'master' }}"{% endif %}>
+                    <div class="frame-preview">
+                      {% if frame_image %}
+                        {% comment %} Usar frame_image do block configurado no admin (prioridade), ou featured_image do produto (fallback) {% endcomment %}
+                        <img src="{{ frame_image | img_url: '150x150' }}" alt="{{ frame_product.title }}" data-full-image="{{ frame_image | img_url: 'master' }}" style="width: 110% !important; height: 110% !important; object-fit: cover !important; position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); border-radius: 0;">
+                      {% else %}
+                        {% comment %} Fallback: cor padrão se não tiver nenhuma imagem {% endcomment %}
+                        <div class="frame-sample" style="background-color: #E2E2E2; width: 100%; height: 100%; display: flex; align-items: center; justify-content: center; color: white; font-size: 12px;">
+                          {{ frame_product.title }}
+                        </div>
+                      {% endif %}
+                    </div>
+                    <span class="frame-name">{{ frame_product.title }}</span>
+                    <div class="frame-variants" style="display: none;">
+                      {% for variant in frame_product.variants limit: 3 %}
+                        <div class="frame-variant" data-variant-id="{{ variant.id }}" data-size="{{ variant.option1 }}">
+                          <span class="variant-size">{{ variant.option1 }}</span>
+                          <span class="variant-price">{{ variant.price | money }}</span>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endfor %}
+              {% else %}
+                <div class="no-frames-message">
+                  <p>No frames found in the selected collection. Please add frame products to the collection.</p>
+                </div>
+              {% endif %}
+            {% else %}
+              <div class="no-frames-message">
+                <p>Please select a frame collection in the theme settings.</p>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+              <!-- Step 4: Review & Add to Cart -->
+              <div class="builder-step" data-step="4">
+                <h3 class="step-title">
+                  <span class="step-number">4</span>
+                  REVIEW ORDER
+                </h3>
+            
+            <div class="order-summary">
+              <div class="summary-items" id="gallery-summary-items">
+                <!-- Items will be populated by JavaScript -->
+              </div>
+              
+              <!-- Framing Service Selection -->
+              {% if section.settings.framing_service_collection and collections[section.settings.framing_service_collection] %}
+                {% assign framing_service_products = collections[section.settings.framing_service_collection].products %}
+                
+                {% if framing_service_products.size > 0 %}
+                  <div class="framing-service-section" id="framing-service-section" style="display: none;">
+                    <h4>Framing Service</h4>
+                    <div class="framing-service-options">
+                      {% for service_product in framing_service_products limit: 3 %}
+                        <div class="framing-service-option" data-service-id="{{ service_product.id }}" data-service-variant-id="{{ service_product.selected_or_first_available_variant.id }}" data-service-price="{{ service_product.price | money }}">
+                          <div class="service-preview">
+                            {% if service_product.featured_image %}
+                              <img src="{{ service_product.featured_image | img_url: '100x100' }}" alt="{{ service_product.title }}" style="width: 100%; height: 100%; object-fit: cover;">
+                            {% else %}
+                              <div style="background-color: #f0f0f0; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #666;">SERVICE</div>
+                            {% endif %}
+                          </div>
+                          <div class="service-info">
+                            <div class="service-title">{{ service_product.title }}</div>
+                            <div class="service-price">{{ service_product.price | money }}</div>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+                  </div>
+                {% endif %}
+              {% endif %}
+              
+              <div class="summary-total">
+                <div class="total-line">
+                  <span>Subtotal:</span>
+                  <span id="gallery-subtotal">€0.00</span>
+                </div>
+                <div class="total-line">
+                  <span>Frames:</span>
+                  <span id="gallery-frames-total">€0.00</span>
+                </div>
+                <div class="total-line" id="framing-service-total-line" style="display: none;">
+                  <span>Framing Service:</span>
+                  <span id="gallery-framing-service">€0.00</span>
+                </div>
+                <div class="total-line total-final">
+                  <span>Total:</span>
+                  <span id="gallery-total">€0.00</span>
+                </div>
+              </div>
+              
+              <button class="btn-add-to-cart" id="add-gallery-to-cart" disabled>
+                Add to Cart
+              </button>
+            </div>
+          </div>
+
+              <!-- Navigation - Inside Sidebar like Desenio -->
+              <div class="builder-navigation">
+                <button class="btn-nav btn-next" id="btn-next">
+                  NEXT
+                </button>
+                <button class="btn-nav btn-prev" id="btn-prev" disabled>
+                  PREVIOUS
+                </button>
+              </div>
+            </div>
+
+        <!-- Canvas Area -->
+        <div class="gallery-builder-canvas">
+          <div class="canvas-container" id="gallery-canvas">
+            <div class="room-background" 
+                 id="room-background"
+                 data-background-grey="{% if section.settings.background_grey %}{{ section.settings.background_grey | img_url: '1344x768' }}{% endif %}"
+                 data-background-white="{% if section.settings.background_white %}{{ section.settings.background_white | img_url: '1344x768' }}{% endif %}"
+                 data-background-blue="{% if section.settings.background_blue %}{{ section.settings.background_blue | img_url: '1344x768' }}{% endif %}"
+                 data-background-pink="{% if section.settings.background_pink %}{{ section.settings.background_pink | img_url: '1344x768' }}{% endif %}"
+                 style="background-image: url('{% if section.settings.room_image %}{{ section.settings.room_image | img_url: '1344x768' }}{% elsif section.settings.background_grey %}{{ section.settings.background_grey | img_url: '1344x768' }}{% else %}https://images.unsplash.com/photo-1586023492125-27b2c045efd7?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2016&q=80{% endif %}');">
+                  <!-- Gallery Wall Area -->
+                  <div class="gallery-wall-area" id="gallery-wall-area">
+                    <!-- Empty - frames will be added by user -->
+                    <div class="startPanel">
+                      <div class="topHeading">STEP-BY-STEP</div>
+                      <div class="heading">Create the perfect gallery wall</div>
+                      <div class="text">Use our new tool to find designs and frames that match each other.</div>
+                      <div class="startButton" onclick="startGalleryBuilder()">START HERE</div>
+                    </div>
+                  </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Filter Sidebar - Desenio Style -->
+<div class="filter-sidebar" id="filter-sidebar">
+  <div class="filter-sidebar-header">
+    <h3>3. SELECT DESIGNS</h3>
+    <button class="filter-sidebar-close" id="close-filter-sidebar">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  
+  <div class="filter-sidebar-tabs">
+    <button class="filter-sidebar-tab active" data-filter="all">ALL PRODUCTS</button>
+    <button class="filter-sidebar-tab" id="hide-filter-sidebar">
+      <span>HIDE FILTER</span>
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  
+  <div class="filter-sidebar-content">
+    <div class="filter-section">
+      <div class="filter-section-header">
+        <h4>Category</h4>
+      </div>
+      <div class="filter-options">
+        <button class="filter-option" data-category="all">
+          <span>All Posters</span>
+        </button>
+        <button class="filter-option" data-category="art">
+          <span>Art</span>
+        </button>
+        <button class="filter-option" data-category="nature">
+          <span>Nature</span>
+        </button>
+        <button class="filter-option" data-category="vintage">
+          <span>Vintage</span>
+        </button>
+        <button class="filter-option" data-category="abstract">
+          <span>Abstract</span>
+        </button>
+        <button class="filter-option" data-category="botanical">
+          <span>Botanical</span>
+        </button>
+        <button class="filter-option" data-category="typography">
+          <span>Typography</span>
+        </button>
+        <button class="filter-option" data-category="illustration">
+          <span>Illustration</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+  window.galleryBuilderConfig = {
+    collections: {
+      {% for collection in collections %}
+        '{{ collection.handle }}': {
+          title: {{ collection.title | json }},
+          products: [
+            {% for product in collection.products limit: 10 %}
+              {
+                id: {{ product.id }},
+                title: {{ product.title | json }},
+                handle: {{ product.handle | json }},
+                price: {{ product.price | money | json }},
+                image: {% if product.images.size > 2 %}{%- assign last_index = product.images.size | minus: 1 -%}{{ product.images[last_index] | img_url: '600x600' | json }}{% else %}{{ product.featured_image | img_url: '600x600' | json }}{% endif %},
+                url: {{ product.url | json }}
+              }{% unless forloop.last %},{% endunless %}
+            {% endfor %}
+          ]
+        }{% unless forloop.last %},{% endunless %}
+      {% endfor %}
+    },
+    currency: {{ shop.currency | json }},
+    moneyFormat: {{ shop.money_format | json }},
+    cartUrl: {{ routes.cart_url | json }},
+    cartAddUrl: {{ routes.cart_add_url | json }}
+  };
+</script>
+
+<!-- Save Gallery Wall Modal -->
+<div class="save-gallery-modal" id="save-gallery-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>SAVE PICTURE WALL</h2>
+      <button class="close-modal" id="close-save-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="form-group">
+        <label for="gallery-name">Name</label>
+        <input type="text" id="gallery-name" placeholder="Enter gallery name..." maxlength="50">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-save" id="confirm-save">SAVE</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Save Success Modal with Add to Cart Option -->
+<div class="save-success-modal" id="save-success-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>Gallery Saved Successfully!</h2>
+      <button class="close-modal" id="close-success-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="success-icon">✓</div>
+      <p class="success-message">Your gallery "<span id="saved-gallery-name"></span>" has been saved successfully!</p>
+      <p class="cart-question">Would you like to add all items to your cart?</p>
+      <div class="gallery-summary" id="gallery-summary">
+        <!-- Gallery items will be populated here -->
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-continue" id="continue-editing">Continue Editing</button>
+      <button class="btn-add-to-cart" id="add-gallery-to-cart">Add to Cart</button>
+    </div>
+  </div>
+</div>
+
+<!-- Saved Gallery Walls Modal - DESENIO STYLE -->
+<div class="saved-galleries-modal" id="saved-galleries-modal">
+  <div class="modal-content">
+    <div class="modal-header">
+      <h2>SAVED GALLERY WALLS</h2>
+      <button class="close-modal" id="close-saved-modal">&times;</button>
+    </div>
+    <div class="modal-body">
+      <div class="savedWallsPicker active" id="savedWallsPicker">
+        <div class="listing slick-initialized slick-slider" id="savedWallsScroller">
+          <div aria-live="polite" class="slick-list draggable">
+            <div class="slick-track" role="listbox" id="saved-galleries-list">
+              <!-- Saved galleries will be loaded here -->
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{{ 'gallery-wall-builder.js' | asset_url | script_tag }}
+
+{% schema %}
+{
+  "name": "Gallery Wall Builder",
+  "class": "gallery-wall-builder-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Create Your Gallery Wall"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Design your perfect gallery wall with our curated collection of art prints and premium frames."
+    },
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Product Collection",
+      "info": "Select the collection of products to use in the gallery builder",
+      "default": "All-Posters"
+    },
+    {
+      "type": "collection",
+      "id": "frame_collection",
+      "label": "Frame Collection",
+      "info": "Select the collection of frames to display in Step 4",
+      "default": "Frames"
+    },
+    {
+      "type": "collection",
+      "id": "framing_service_collection",
+      "label": "Framing Service Collection",
+      "info": "Select the collection containing framing service products to automatically add in Step 5",
+      "default": "Services"
+    },
+    {
+      "type": "image_picker",
+      "id": "room_image",
+      "label": "Room Background Image",
+      "info": "Image of a room to use as background for the gallery preview"
+    },
+    {
+      "type": "header",
+      "content": "Background Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_grey",
+      "label": "Grey Room Background",
+      "info": "Upload image for grey room background"
+    },
+    {
+      "type": "text",
+      "id": "background_grey_name",
+      "label": "Grey Room Name",
+      "default": "Grey Room"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_white",
+      "label": "White Room Background",
+      "info": "Upload image for white room background"
+    },
+    {
+      "type": "text",
+      "id": "background_white_name",
+      "label": "White Room Name",
+      "default": "White Room"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_blue",
+      "label": "Blue Room Background",
+      "info": "Upload image for blue room background"
+    },
+    {
+      "type": "text",
+      "id": "background_blue_name",
+      "label": "Blue Room Name",
+      "default": "Blue Room"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_pink",
+      "label": "Pink Room Background",
+      "info": "Upload image for pink room background"
+    },
+    {
+      "type": "text",
+      "id": "background_pink_name",
+      "label": "Pink Room Name",
+      "default": "Pink Room"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_top_spacing",
+      "default": false,
+      "label": "Remove top spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_bottom_spacing",
+      "default": false,
+      "label": "Remove bottom spacing"
+    },
+    {
+      "type": "header",
+      "content": "Checkout Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_button_text",
+      "label": "Checkout Button Text",
+      "default": "CHECKOUT",
+      "info": "Text displayed on the checkout button"
+    },
+    {
+      "type": "color",
+      "id": "checkout_button_color",
+      "label": "Checkout Button Color",
+      "default": "#FB6B00",
+      "info": "Background color of the checkout button"
+    },
+    {
+      "type": "color",
+      "id": "checkout_button_text_color",
+      "label": "Checkout Button Text Color",
+      "default": "#ffffff",
+      "info": "Text color of the checkout button"
+    },
+    {
+      "type": "color",
+      "id": "checkout_button_hover_color",
+      "label": "Checkout Button Hover Color",
+      "default": "#218838",
+      "info": "Background color when hovering over the checkout button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_counter",
+      "label": "Show Cart Counter",
+      "default": true,
+      "info": "Display the number of items in the cart"
+    },
+    {
+      "type": "color",
+      "id": "cart_counter_color",
+      "label": "Cart Counter Color",
+      "default": "rgba(255, 255, 255, 0.2)",
+      "info": "Background color of the cart counter badge"
+    },
+    {
+      "type": "header",
+      "content": "Frame Color Settings"
+    },
+    {
+      "type": "color",
+      "id": "default_frame_color",
+      "label": "Default Frame Color",
+      "default": "#E2E2E2",
+      "info": "Default color for gallery frames when no specific frame is selected"
+    },
+    {
+      "type": "color",
+      "id": "selected_frame_color",
+      "label": "Selected Frame Color",
+      "default": "#fb6b00",
+      "info": "Color for selected frames in the gallery"
+    },
+    {
+      "type": "color",
+      "id": "frame_border_color",
+      "label": "Frame Border Color",
+      "default": "#e0e0e0",
+      "info": "Border color for gallery frames"
+    },
+    {
+      "type": "range",
+      "id": "frame_border_width",
+      "label": "Frame Border Width",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 2,
+      "unit": "px",
+      "info": "Width of the frame border in pixels"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "layout",
+      "name": "Gallery Layout",
+      "settings": [
+        {
+          "type": "text",
+          "id": "layout_id",
+          "label": "Layout ID",
+          "default": "layout_1"
+        },
+        {
+          "type": "text",
+          "id": "layout_name",
+          "label": "Layout Name",
+          "default": "Classic Grid"
+        },
+        {
+          "type": "textarea",
+          "id": "layout_data",
+          "label": "Layout Data (JSON)",
+          "default": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":440,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]",
+          "info": "JSON array defining frame positions and sizes"
+        }
+      ]
+    },
+    {
+      "type": "frame_option",
+      "name": "Frame Image",
+      "settings": [
+        {
+          "type": "text",
+          "id": "frame_id",
+          "label": "Frame Handle",
+          "info": "Enter the handle of the frame product from Frame Collection (e.g., oak-frame, black-frame). Must match the product handle exactly."
+        },
+        {
+          "type": "image_picker",
+          "id": "frame_image",
+          "label": "Frame Image",
+          "info": "Upload the frame image. The product will be displayed inside this frame image."
+        }
+      ]
+    }
+  ],
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Gallery Wall Builder"
+    },
+    {
+      "type": "textarea",
+      "id": "description",
+      "label": "Description",
+      "default": "Design your perfect gallery wall with our curated collection of art prints and premium frames."
+    },
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Product Collection",
+      "info": "Select the collection of products to use in the gallery builder"
+    },
+    {
+      "type": "collection",
+      "id": "frame_collection",
+      "label": "Frame Collection",
+      "info": "Select the collection of frames to display in Step 4"
+    },
+    {
+      "type": "collection",
+      "id": "framing_service_collection",
+      "label": "Framing Service Collection",
+      "info": "Select the collection containing framing service products to automatically add in Step 5"
+    },
+    {
+      "type": "image_picker",
+      "id": "room_image",
+      "label": "Room Background Image",
+      "info": "Image of a room to use as background for the gallery preview"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_grey",
+      "label": "Grey Room Background",
+      "info": "Upload image for grey room background"
+    },
+    {
+      "type": "text",
+      "id": "background_grey_name",
+      "label": "Grey Room Name",
+      "default": "Grey Room"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_white",
+      "label": "White Room Background",
+      "info": "Upload image for white room background"
+    },
+    {
+      "type": "text",
+      "id": "background_white_name",
+      "label": "White Room Name",
+      "default": "White Room"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_blue",
+      "label": "Blue Room Background",
+      "info": "Upload image for blue room background"
+    },
+    {
+      "type": "text",
+      "id": "background_blue_name",
+      "label": "Blue Room Name",
+      "default": "Blue Room"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_pink",
+      "label": "Pink Room Background",
+      "info": "Upload image for pink room background"
+    },
+    {
+      "type": "text",
+      "id": "background_pink_name",
+      "label": "Pink Room Name",
+      "default": "Pink Room"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_top_spacing",
+      "default": false,
+      "label": "Remove top spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_bottom_spacing",
+      "default": false,
+      "label": "Remove bottom spacing"
+    },
+    {
+      "type": "header",
+      "content": "Checkout Button Settings"
+    },
+    {
+      "type": "text",
+      "id": "checkout_button_text",
+      "label": "Checkout Button Text",
+      "default": "CHECKOUT",
+      "info": "Text displayed on the checkout button"
+    },
+    {
+      "type": "color",
+      "id": "checkout_button_color",
+      "label": "Checkout Button Color",
+      "default": "#FB6B00",
+      "info": "Background color of the checkout button"
+    },
+    {
+      "type": "color",
+      "id": "checkout_button_text_color",
+      "label": "Checkout Button Text Color",
+      "default": "#ffffff",
+      "info": "Text color of the checkout button"
+    },
+    {
+      "type": "color",
+      "id": "checkout_button_hover_color",
+      "label": "Checkout Button Hover Color",
+      "default": "#218838",
+      "info": "Background color when hovering over the checkout button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_cart_counter",
+      "label": "Show Cart Counter",
+      "default": true,
+      "info": "Display the number of items in the cart"
+    },
+    {
+      "type": "color",
+      "id": "cart_counter_color",
+      "label": "Cart Counter Color",
+      "default": "rgba(255, 255, 255, 0.2)",
+      "info": "Background color of the cart counter badge"
+    },
+    {
+      "type": "header",
+      "content": "Frame Color Settings"
+    },
+    {
+      "type": "color",
+      "id": "default_frame_color",
+      "label": "Default Frame Color",
+      "default": "#E2E2E2",
+      "info": "Default color for gallery frames when no specific frame is selected"
+    },
+    {
+      "type": "color",
+      "id": "selected_frame_color",
+      "label": "Selected Frame Color",
+      "default": "#fb6b00",
+      "info": "Color for selected frames in the gallery"
+    },
+    {
+      "type": "color",
+      "id": "frame_border_color",
+      "label": "Frame Border Color",
+      "default": "#e0e0e0",
+      "info": "Border color for gallery frames"
+    },
+    {
+      "type": "range",
+      "id": "frame_border_width",
+      "label": "Frame Border Width",
+      "min": 1,
+      "max": 10,
+      "step": 1,
+      "default": 2,
+      "unit": "px",
+      "info": "Width of the frame border in pixels"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "layout",
+      "name": "Gallery Layout",
+      "settings": [
+        {
+          "type": "text",
+          "id": "layout_id",
+          "label": "Layout ID",
+          "default": "layout_1"
+        },
+        {
+          "type": "text",
+          "id": "layout_name",
+          "label": "Layout Name",
+          "default": "Classic Grid"
+        },
+        {
+          "type": "textarea",
+          "id": "layout_data",
+          "label": "Layout Data (JSON)",
+          "default": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":440,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]",
+          "info": "JSON array defining frame positions and sizes"
+        }
+      ]
+    },
+    {
+      "type": "frame_option",
+      "name": "Frame Image",
+      "settings": [
+        {
+          "type": "text",
+          "id": "frame_id",
+          "label": "Frame Handle",
+          "info": "Enter the handle of the frame product from Frame Collection (e.g., oak-frame, black-frame). Must match the product handle exactly."
+        },
+        {
+          "type": "image_picker",
+          "id": "frame_image",
+          "label": "Frame Image",
+          "info": "Upload the frame image. The product will be displayed inside this frame image."
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gallery Wall Builder",
+      "blocks": [
+        {
+          "type": "layout",
+          "settings": {
+            "layout_id": "classic_grid",
+            "layout_name": "Classic Grid",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":440,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        {
+          "type": "layout",
+          "settings": {
+            "layout_id": "asymmetric",
+            "layout_name": "Asymmetric",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":300,\"height\":400,\"size\":\"70x100\"},{\"x\":540,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "oak-frame"
+          }
+        },
+        {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "black-frame"
+          }
+        },
+        {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "white-frame"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}

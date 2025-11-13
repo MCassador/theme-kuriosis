@@ -1,0 +1,682 @@
+/* Gallery Wall Combo Editable - Estilo Desenio */
+
+.gallery-wall-combo-editable {
+  padding: 40px 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+  overflow-x: hidden; /* Previne scroll lateral */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.combo-container {
+  display: grid;
+  grid-template-columns: 450px 1fr; /* Lado esquerdo fixo, direito flexível */
+  gap: 60px;
+  align-items: start;
+  position: relative; /* Para manter o layout estável */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Previne scroll lateral */
+}
+
+/* Seção de Imagem (Esquerda) */
+.combo-image-section {
+  position: sticky;
+  top: 20px;
+  max-width: 450px; /* Diminuído de 600px para 450px */
+  width: 100%;
+}
+
+.combo-main-image-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 450px; /* Diminuído de 600px para 450px */
+}
+
+.combo-main-image {
+  position: relative;
+  width: 100%;
+  max-width: 450px; /* Diminuído de 600px para 450px */
+  aspect-ratio: 4/3;
+  overflow: hidden;
+  border-radius: 8px;
+  background: #f5f5f5;
+}
+
+.combo-main-image-img,
+.combo-main-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+  display: block; /* Previne espaços em branco */
+}
+
+.combo-main-image-wrapper.zoomable:hover .combo-main-image-img,
+.combo-main-image-wrapper.zoomable:hover .combo-main-image img {
+  transform: scale(1.05);
+  cursor: zoom-in;
+}
+
+.zoom-icon {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: rgba(255, 255, 255, 0.9);
+  padding: 12px;
+  border-radius: 50%;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+}
+
+.combo-main-image-wrapper:hover .zoom-icon {
+  opacity: 1;
+}
+
+.placeholder-image {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  background: #f5f5f5;
+  color: #999;
+  padding: 40px;
+  text-align: center;
+}
+
+.placeholder-image p {
+  margin-top: 16px;
+  font-size: 14px;
+}
+
+.combo-image-info {
+  margin-top: 30px;
+}
+
+.combo-title {
+  font-size: 32px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  line-height: 1.3;
+  color: #000;
+}
+
+.combo-description {
+  font-size: 16px;
+  line-height: 1.6;
+  color: #666;
+}
+
+/* Seção de Personalização (Direita) */
+.combo-customization-section {
+  background: white;
+  border-radius: 8px;
+  padding: 30px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Previne scroll lateral */
+}
+
+/* Tabs */
+.combo-tabs {
+  display: flex;
+  gap: 0;
+  border-bottom: 2px solid #e0e0e0;
+  margin-bottom: 30px;
+}
+
+.combo-tab {
+  padding: 12px 24px;
+  background: none;
+  border: none;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  color: #999;
+  border-bottom: 2px solid transparent;
+  margin-bottom: -2px;
+  transition: all 0.3s ease;
+}
+
+.combo-tab:hover {
+  color: #333;
+}
+
+.combo-tab.active {
+  color: #000;
+  border-bottom-color: #000;
+}
+
+/* Conteúdo dos Tabs */
+.combo-tab-content {
+  display: none;
+}
+
+.combo-tab-content.active {
+  display: block;
+}
+
+/* Resumo do que está incluído */
+.combo-included {
+  margin-bottom: 30px;
+}
+
+.combo-included h3 {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 12px;
+  color: #000;
+}
+
+.combo-included-count {
+  font-size: 14px;
+  color: #666;
+  line-height: 1.8;
+}
+
+/* Lista de Produtos - Grid com até 4 produtos por linha */
+.combo-products-list {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 24px;
+  margin-bottom: 30px;
+  padding-bottom: 10px;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden; /* Previne scroll lateral */
+}
+
+@media (max-width: 1200px) {
+  .combo-products-list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px; /* Reduz gap em telas menores */
+  }
+}
+
+@media (max-width: 1024px) {
+  .combo-products-list {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px; /* Reduz gap ainda mais */
+  }
+}
+
+@media (max-width: 768px) {
+  .combo-products-list {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .combo-products-list {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* Scrollbar removido - agora usa grid com wrap */
+
+.combo-product-item {
+  display: flex;
+  flex-direction: column;
+  gap: 10px; /* Reduzido espaçamento */
+  padding: 12px; /* Reduzido padding */
+  border: none; /* Removida borda de seleção */
+  border-radius: 8px;
+  transition: all 0.3s ease;
+  background: white;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0; /* Permite que o item encolha no grid */
+  box-sizing: border-box;
+  overflow: hidden; /* Previne conteúdo saindo */
+}
+
+
+.combo-product-image {
+  width: 100%;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  overflow: visible; /* Permite frame ultrapassar se necessário */
+  background: transparent; /* Removido fundo cinza */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative; /* Para posicionar imagem do produto dentro do frame */
+}
+
+.combo-product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 8px;
+  transition: all 0.3s ease;
+}
+
+/* Quando frame é aplicado, remove limitações de tamanho */
+.combo-product-image.has-frame {
+  aspect-ratio: unset !important; /* Remove aspect-ratio fixo para permitir ajuste */
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 100% 100% !important; /* Frame preenche todo o espaço */
+  /* height será ajustado via JS baseado na proporção do frame */
+}
+
+.combo-product-image.has-frame .combo-product-main-image {
+  position: absolute !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  width: 80% !important; /* Diminuído para ficar dentro do frame */
+  height: 85% !important; /* Diminuído para ficar dentro do frame */
+  object-fit: cover !important;
+  z-index: 5 !important;
+  padding: 0 !important;
+  display: block !important;
+}
+
+.combo-product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px; /* Reduzido espaçamento */
+  flex: 1;
+  min-width: 0; /* Permite que o conteúdo encolha */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.combo-product-title {
+  font-size: 14px; /* Reduzido de 16px */
+  font-weight: 600;
+  margin: 0;
+  line-height: 1.3; /* Reduzido de 1.4 */
+  color: #000;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.combo-product-type {
+  font-size: 10px; /* Reduzido de 12px */
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #999;
+  font-weight: 500;
+}
+
+.combo-product-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px; /* Reduzido espaçamento entre selects */
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.combo-option-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0; /* Sem gap adicional no grupo */
+}
+
+.combo-option-label {
+  display: none; /* Oculta os labels SIZE e MATERIAL */
+}
+
+.combo-option-select {
+  padding: 8px 12px; /* Reduzido padding */
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  font-size: 13px; /* Reduzido de 14px */
+  background: white;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  color: #000;
+  min-height: 40px; /* Reduzido de 44px */
+  display: flex;
+  align-items: center;
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.combo-option-select:hover {
+  border-color: #000;
+}
+
+.combo-option-select:focus {
+  outline: none;
+  border-color: #000;
+}
+
+.combo-product-price {
+  display: none; /* Remove preço separado - só fica no botão */
+}
+
+.price-amount {
+  font-size: 18px;
+  font-weight: 600;
+}
+
+/* Botão Add to Cart Individual - Estilo do tema original */
+.combo-product-add-to-cart {
+  width: 100%;
+  margin-top: 12px; /* Reduzido de 16px para 12px - mais compacto */
+  padding: 12px 16px; /* Reduzido de 14px 18px para 12px 16px */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  border: none;
+  border-radius: var(--button-border-radius, 3px);
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  position: relative;
+  overflow: hidden;
+  background: var(--solid-button-background, var(--color-accent));
+  color: var(--solid-button-label, #fff);
+  min-height: 48px;
+}
+
+.combo-product-add-to-cart .single-add-to-cart-button--text {
+  flex: 1;
+  text-align: left;
+}
+
+.combo-product-button-price {
+  font-weight: 600;
+  margin-left: auto;
+}
+
+.combo-product-add-to-cart .loading-overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  display: none;
+}
+
+.combo-product-add-to-cart.loading .single-add-to-cart-button--text,
+.combo-product-add-to-cart.loading .combo-product-button-price {
+  opacity: 0;
+}
+
+.combo-product-add-to-cart.loading .loading-overlay {
+  display: block;
+}
+
+.combo-product-add-to-cart:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+/* Resumo e Botão */
+.combo-summary {
+  border-top: 1px solid #e0e0e0;
+  padding-top: 24px;
+}
+
+.combo-subtotal {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.subtotal-label {
+  font-weight: 500;
+  color: #000;
+}
+
+.subtotal-amount {
+  font-weight: 600;
+  font-size: 24px;
+  color: #000;
+}
+
+.subtotal-compare {
+  text-decoration: line-through;
+  color: #999;
+  font-size: 18px;
+}
+
+.combo-add-to-cart-btn,
+.combo-buy-all-btn {
+  width: 100%;
+  padding: 16px 24px;
+  background: var(--solid-button-background, var(--color-accent));
+  color: var(--solid-button-label, #fff);
+  border: none;
+  border-radius: var(--button-border-radius, 3px);
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  min-height: 48px;
+}
+
+.combo-add-to-cart-btn:hover:not(:disabled),
+.combo-buy-all-btn:hover {
+  background: var(--solid-button-background-hover, var(--color-accent));
+  opacity: 0.9;
+}
+
+.combo-add-to-cart-btn:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+/* Tab Buy All */
+.buy-all-content {
+  padding: 20px 0;
+}
+
+.buy-all-title {
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 20px;
+  color: #000;
+}
+
+.buy-all-items-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 24px;
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 8px;
+  scrollbar-width: thin;
+}
+
+.buy-all-items-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.buy-all-items-list::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 10px;
+}
+
+.buy-all-items-list::-webkit-scrollbar-thumb {
+  background: #888;
+  border-radius: 10px;
+}
+
+.buy-all-items-list::-webkit-scrollbar-thumb:hover {
+  background: #555;
+}
+
+.buy-all-item {
+  display: flex;
+  gap: 16px;
+  padding: 16px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  background: white;
+  transition: border-color 0.3s ease;
+}
+
+.buy-all-item:hover {
+  border-color: #000;
+}
+
+.buy-all-item-image {
+  width: 90px;
+  height: 90px;
+  flex-shrink: 0;
+  border-radius: 4px;
+  overflow: hidden;
+  background: transparent; /* Removido fundo cinza */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.buy-all-item-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  padding: 6px;
+}
+
+.buy-all-item-details {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.buy-all-item-type {
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #999;
+  font-weight: 500;
+}
+
+.buy-all-item-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #000;
+  line-height: 1.4;
+  margin-bottom: 4px;
+}
+
+.buy-all-item-size,
+.buy-all-item-material {
+  font-size: 12px;
+  color: #666;
+  text-transform: uppercase;
+}
+
+.buy-all-item-price {
+  margin-top: auto;
+  font-size: 16px;
+  font-weight: 600;
+  color: #000;
+}
+
+.buy-all-subtotal {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 0;
+  border-top: 1px solid #e0e0e0;
+  margin-bottom: 20px;
+  font-size: 18px;
+}
+
+.buy-all-subtotal .subtotal-label {
+  font-weight: 500;
+  color: #000;
+}
+
+.buy-all-subtotal .subtotal-amount {
+  font-weight: 600;
+  font-size: 24px;
+  color: #000;
+}
+
+.combo-empty {
+  text-align: center;
+  padding: 60px 20px;
+  color: #999;
+}
+
+.combo-empty p {
+  font-size: 14px;
+}
+
+/* Responsividade */
+@media (max-width: 1024px) {
+  .combo-container {
+    grid-template-columns: 1fr;
+    gap: 40px;
+  }
+
+  .combo-image-section {
+    position: static;
+  }
+
+  .combo-main-image {
+    aspect-ratio: 4/3;
+  }
+}
+
+@media (max-width: 768px) {
+  .combo-product-item {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0; /* Remove largura fixa que causava overflow */
+  }
+  
+  .combo-products-list {
+    gap: 12px;
+  }
+  
+  .gallery-wall-combo-editable {
+    padding: 20px 16px;
+  }
+
+  .combo-customization-section {
+    padding: 20px;
+  }
+
+  .combo-title {
+    font-size: 24px;
+  }
+
+  /* Grid já configurado acima para mobile */
+
+  .combo-product-image {
+    aspect-ratio: 1;
+  }
+}
+

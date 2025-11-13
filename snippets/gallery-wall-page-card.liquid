@@ -1,0 +1,25 @@
+{%- liquid
+  # Pega a imagem principal do combo
+  assign has_manual_image = false
+  assign page_image_url = ''
+  
+  # Prioridade 1: Imagem do block (configurada manualmente - sobrescreve tudo)
+  if block.settings.main_image != blank
+    assign page_image_url = block.settings.main_image | img_url: '1200x1200'
+    assign has_manual_image = true
+  endif
+-%}
+
+<a href="{{ page.url }}" class="gallery-wall-card" title="{{ page.title | escape }}" data-page-url="{{ page.url }}">
+  {%- if has_manual_image -%}
+    <img 
+      src="{{ page_image_url }}" 
+      alt="{{ page.title | escape }}"
+      loading="lazy"
+      width="1200"
+      height="1200">
+  {%- else -%}
+    {{ 'product-1' | placeholder_svg_tag: 'gallery-wall-placeholder' }}
+  {%- endif -%}
+</a>
+

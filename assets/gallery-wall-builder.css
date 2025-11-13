@@ -1,0 +1,5930 @@
+/* Gallery Wall Builder Styles */
+
+/* Mobile Device Detection Overlays */
+.rotateDeviceOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: #000000;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  font-family: Arial, sans-serif;
+}
+
+.rotateDeviceOverlay .iconContainer {
+  text-align: center;
+  color: white;
+}
+
+.rotateDeviceOverlay .iconContainer i {
+  font-size: 48px;
+  color: #666;
+  margin-bottom: 20px;
+  display: block;
+  animation: rotate 2s linear infinite, pulse 1.5s ease-in-out infinite;
+}
+
+/* Fallback arrow if FontAwesome doesn't load */
+.rotateDeviceOverlay .iconContainer i:before {
+  content: "↻";
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Alternative arrow using CSS if FontAwesome fails */
+.rotateDeviceOverlay .iconContainer i.fa-repeat:before {
+  content: "↻" !important;
+  font-family: Arial, sans-serif !important;
+  font-size: 48px !important;
+  color: #666 !important;
+  display: block !important;
+  animation: rotate 2s linear infinite, pulse 1.5s ease-in-out infinite !important;
+}
+
+.rotateDeviceOverlay p {
+  font-size: 18px;
+  font-weight: 500;
+  margin: 0;
+}
+
+@keyframes rotate {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+@keyframes pulse {
+  0%, 100% { 
+    transform: scale(1);
+    opacity: 0.8;
+  }
+  50% { 
+    transform: scale(1.1);
+    opacity: 1;
+  }
+}
+
+.mobileFullscreenOverlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.7);
+  display: none;
+  align-items: center;
+  justify-content: center;
+  z-index: 10000;
+  font-family: Arial, sans-serif;
+}
+
+.mobileFullscreenOverlay .fullscreenContainer {
+  text-align: center;
+  color: white;
+  background: rgba(255, 255, 255, 0.95);
+  padding: 30px;
+  border-radius: 12px;
+  color: #333;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.mobileFullscreenOverlay .fullscreenContainer:hover {
+  transform: scale(1.05);
+  background: rgba(255, 255, 255, 1);
+}
+
+.mobileFullscreenOverlay .fullscreenIcon {
+  width: 60px;
+  height: 60px;
+  background: #333;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 15px;
+}
+
+.mobileFullscreenOverlay .fullscreenIcon i {
+  font-size: 20px;
+  color: white;
+}
+
+.mobileFullscreenOverlay p {
+  font-size: 16px;
+  font-weight: 500;
+  margin: 0;
+}
+
+/* Mobile fullscreen styles */
+body.mobile-fullscreen {
+  height: 100vh !important;
+  overflow: hidden !important;
+  position: fixed !important;
+  width: 100% !important;
+}
+
+body.mobile-fullscreen .gallery-wall-builder {
+  height: 100vh !important;
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+}
+
+/* Mobile Portrait Detection - Like Desenio */
+@media only screen and (max-aspect-ratio: 3 / 4) and (min-aspect-ratio: 1 / 16) and (max-width: 650px) and (min-height: 300px) {
+  .rotateDeviceOverlay {
+    display: flex !important;
+  }
+}
+
+/* Mobile Landscape Detection */
+@media only screen and (min-aspect-ratio: 4 / 3) and (max-width: 768px) and (min-height: 300px) {
+  .mobileFullscreenOverlay {
+    display: flex !important;
+  }
+  
+  /* Force fullscreen in landscape */
+  body {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  .gallery-builder-interface {
+    height: 100vh !important;
+    overflow: hidden !important;
+  }
+  
+  .gallery-builder-canvas {
+    height: 100vh !important;
+    overflow: visible !important;
+  }
+  
+  /* Hide address bar */
+  html, body {
+    height: 100% !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+  
+  /* Mobile Landscape - Ultra compact sidebar like Desenio */
+  .gallery-builder-sidebar {
+    max-height: 25vh !important; /* Even smaller in landscape */
+    padding: 0.5rem !important;
+  }
+  
+  .builder-step h3 {
+    font-size: 1rem !important;
+    margin-bottom: 0.25rem !important;
+  }
+  
+  .layout-options {
+    gap: 0.5rem !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+  }
+  
+  .layout-option {
+    padding: 0.25rem !important;
+    flex-shrink: 0 !important;
+    min-width: 100px !important;
+  }
+  
+  .layout-preview {
+    width: 60px !important;
+    height: 45px !important;
+  }
+  
+  /* Fix layout frames orientation on tablet */
+  .layout-grid .frame {
+    min-width: 10px !important;
+    min-height: 13px !important;
+    aspect-ratio: 3/4 !important;
+  }
+  
+  .builder-navigation {
+    padding: 0.5rem !important;
+    gap: 0.25rem !important;
+  }
+  
+  .builder-navigation .btn-nav {
+    padding: 8px 12px !important;
+    font-size: 11px !important;
+  }
+  
+  /* Mobile Landscape - Allow scroll in sidebar */
+  .gallery-builder-sidebar {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .layout-options {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .product-grid {
+    overflow-x: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* Hide overlays on desktop */
+@media (min-width: 768px) {
+  .rotateDeviceOverlay,
+  .mobileFullscreenOverlay {
+    display: none !important;
+  }
+}
+
+/* Hide body scroll when gallery builder is active - Desktop only */
+@media (min-width: 769px) {
+body.gallery-builder-active {
+  overflow: hidden;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  }
+}
+
+/* Allow scroll when cart drawer is open */
+body.gallery-builder-active.open-cart {
+  overflow: auto !important;
+}
+
+/* ONLY ensure cart drawer appears above gallery builder */
+#Cart-Drawer,
+.cart-drawer,
+.CartDrawer,
+[data-drawer="cart"] {
+  z-index: 10050 !important;
+  position: fixed !important;
+}
+
+/* Framing Service Selection */
+.framing-service-section {
+  margin: 2rem 0;
+  padding: 1.5rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e9ecef;
+}
+
+.framing-service-section h4 {
+  margin: 0 0 1rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.framing-service-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+}
+
+.framing-service-option {
+  display: flex;
+  align-items: center;
+  padding: 1rem;
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.framing-service-option:hover {
+  border-color: #007bff;
+  box-shadow: 0 2px 8px rgba(0, 123, 255, 0.1);
+}
+
+.framing-service-option.selected {
+  border-color: #28a745;
+  background: #f8fff9;
+}
+
+.service-preview {
+  width: 60px;
+  height: 60px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-right: 1rem;
+  flex-shrink: 0;
+}
+
+.service-info {
+  flex: 1;
+}
+
+.service-title {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 0.25rem;
+}
+
+.service-price {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #28a745;
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .framing-service-options {
+    grid-template-columns: 1fr;
+  }
+  
+  .framing-service-option {
+    padding: 0.75rem;
+  }
+  
+  .service-preview {
+    width: 50px;
+    height: 50px;
+  }
+}
+
+/* Material Selection Styles */
+.material-selection {
+  margin-bottom: 20px;
+  padding: 16px;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.material-selection-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 12px 0;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.material-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 8px;
+}
+
+.material-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 12px 8px;
+  background: white;
+  border: 2px solid #e0e0e0;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-align: center;
+}
+
+.material-option:hover {
+  border-color: #fb6b00;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.material-option.selected {
+  border-color: #fb6b00;
+  background: #fff8f0;
+  box-shadow: 0 2px 8px rgba(251, 107, 0, 0.2);
+}
+
+.material-preview {
+  width: 40px;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: #f8f9fa;
+  border-radius: 4px;
+  margin-bottom: 8px;
+}
+
+.material-icon {
+  font-size: 20px;
+}
+
+.material-name {
+  font-size: 12px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 4px;
+  line-height: 1.2;
+}
+
+.material-price {
+  font-size: 11px;
+  color: #666;
+  font-weight: 500;
+}
+
+.material-option.selected .material-price {
+  color: #fb6b00;
+  font-weight: 600;
+}
+
+/* Product filtering by frame size */
+.product-item.size-match {
+  border: 2px solid #4CAF50 !important;
+  box-shadow: 0 0 10px rgba(76, 175, 80, 0.3) !important;
+  transform: scale(1.02) !important;
+}
+
+/* ✅ FIXED: Only apply opacity when there is an active filter (when .size-match class exists) */
+.product-grid:has(.size-match) .product-item:not(.size-match) {
+  opacity: 0.3;
+  filter: grayscale(50%);
+}
+
+/* Fallback for browsers that don't support :has() */
+.filtering-active .product-item:not(.size-match) {
+  opacity: 0.3;
+  filter: grayscale(50%);
+}
+
+.filter-button.active {
+  background: #4CAF50 !important;
+  color: white !important;
+}
+
+/* Hide theme footer and other elements */
+.gallery-wall-builder-section .section-spacing,
+.gallery-wall-builder-section .row,
+.gallery-wall-builder-section .small-12 {
+  margin: 0;
+  padding: 0;
+}
+
+/* Hide all theme elements when gallery builder is active */
+body.gallery-builder-active footer,
+body.gallery-builder-active .footer,
+body.gallery-builder-active .site-footer,
+body.gallery-builder-active .main-footer,
+body.gallery-builder-active .page-footer {
+  display: none !important;
+}
+
+/* Hide theme header when gallery builder is active */
+body.gallery-builder-active .site-header,
+body.gallery-builder-active .main-header,
+body.gallery-builder-active .page-header {
+  display: none !important;
+}
+
+/* Ensure gallery builder takes full screen */
+body.gallery-builder-active .gallery-wall-builder {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  z-index: 9999 !important;
+}
+
+/* Main Container - Desenio Style */
+.gallery-builder-interface {
+  display: flex;
+  width: 100vw;
+  height: 100vh;
+  margin: 0;
+  padding: 0;
+  background: #f8f9fa;
+  overflow: hidden;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 100;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+.gallery-wall-builder {
+  background-color: #ffffff;
+  height: 100vh;
+  padding: 0;
+  margin: 0;
+  width: 100%;
+  position: fixed;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 100;
+}
+
+/* Modal Container - Desenio Style */
+.modalContainer {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modalContainer .title {
+  font-family: Raleway, Helvetica Neue, Helvetica, Arial, sans-serif;
+  text-align: center;
+  padding: 0 0 5px;
+  font-size: 20px;
+  text-transform: uppercase;
+  font-weight: 500;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+  max-width: 80%;
+  margin: auto;
+}
+
+.modalContainer .modalBG {
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  position: fixed;
+  z-index: 9999;
+  top: 0;
+  left: 0;
+}
+
+.modalContainer .modal {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 600px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+  position: relative;
+  z-index: 10001;
+  margin: 0 auto;
+}
+
+.modalContainer .close {
+  position: absolute;
+  right: 0;
+  top: 0;
+  padding: 9px 15px;
+  cursor: pointer;
+  font-size: 24px;
+  color: #666;
+}
+
+.modalContainer .close:hover {
+  color: #000;
+}
+
+/* Share Modal Specific Styles */
+.shareModal .title {
+  margin-top: 15px;
+}
+
+.shareModal .link {
+  text-align: center;
+  margin-top: 50px;
+  padding: 0 20px;
+}
+
+.shareModal .link .linkheading {
+  font-family: Raleway, Helvetica Neue, Helvetica, Arial, sans-serif;
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: 15px;
+  display: block;
+  margin-bottom: 15px;
+}
+
+.shareModal .link input {
+  display: inline-block;
+  margin-top: 15px !important;
+  margin: auto;
+  width: 100%;
+  max-width: 500px;
+  padding: 8px 12px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  font-size: 12px;
+  word-break: break-all;
+  overflow-wrap: break-word;
+}
+
+.shareModal .link .button {
+  color: #fff;
+  background: #000;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-top: 10px;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.shareModal .link .button:hover {
+  background: #333;
+}
+
+.shareModal .shareImage {
+  margin-top: 20px;
+  text-align: center;
+  min-height: 200px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.shareModal .shareImage img {
+  max-width: 100%;
+  max-height: 300px;
+  height: auto;
+  border-radius: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+/* Responsive Design */
+@media screen and (max-width: 1024px) {
+  .modalContainer .modal {
+    width: 90%;
+    max-width: 600px;
+  }
+}
+
+@media screen and (max-width: 768px) {
+  .modalContainer .modal {
+    width: 95%;
+    max-width: 95%;
+    padding: 20px;
+  }
+  
+  .shareModal .link input {
+    font-size: 11px;
+    padding: 10px;
+  }
+  
+  .shareModal .link .button {
+    font-size: 12px;
+    padding: 10px 16px;
+  }
+  
+  .shareModal .shareImage {
+    min-height: 150px;
+  }
+  
+  .shareModal .shareImage img {
+    max-height: 150px;
+  }
+}
+
+/* Mobile Landscape - Duas Colunas */
+@media screen and (max-width: 896px) and (orientation: landscape) {
+  .modalContainer .modal {
+    width: 95vw;
+    height: 95vh;
+    max-width: 95vw;
+    max-height: 95vh;
+    padding: 20px;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .shareModal {
+    display: flex;
+    flex-direction: row;
+    width: 100%;
+    height: 100%;
+    gap: 30px;
+  }
+  
+  .shareModal .title {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    font-size: 18px;
+    margin: 0;
+    z-index: 10;
+  }
+  
+  .shareModal .close {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+  }
+  
+  .shareModal .link {
+    flex: 1;
+    margin: 0;
+    padding: 0 20px;
+    text-align: left;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 100%;
+  }
+  
+  .shareModal .link .linkheading {
+    font-size: 14px;
+    margin-bottom: 15px;
+    text-align: left;
+  }
+  
+  .shareModal .link input {
+    font-size: 11px;
+    padding: 12px;
+    width: 100%;
+    text-align: left;
+    margin-bottom: 15px;
+  }
+  
+  .shareModal .link .button {
+    width: 100%;
+    font-size: 14px;
+    padding: 12px 20px;
+    margin: 0;
+  }
+  
+  .shareModal .shareImage {
+    flex: 1;
+    margin: 0;
+    padding: 20px;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8f8f8;
+    border-radius: 8px;
+    border: 1px solid #e0e0e0;
+  }
+  
+  .shareModal .shareImage img {
+    max-height: 100%;
+    max-width: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+  }
+}
+
+
+/* Modal Overlay */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10000;
+}
+
+.modal-content {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  max-width: 400px;
+  width: 90%;
+  text-align: center;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+}
+
+.modal-content h3 {
+  margin: 0 0 1rem 0;
+  color: #333;
+  font-size: 1.2rem;
+}
+
+.modal-content p {
+  margin: 0 0 1.5rem 0;
+  color: #666;
+  line-height: 1.4;
+}
+
+.modal-buttons {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+}
+
+.btn-cancel, .btn-confirm {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s ease;
+}
+
+.btn-cancel {
+  background: #f5f5f5;
+  color: #333;
+  border: 1px solid #ddd;
+}
+
+.btn-cancel:hover {
+  background: #e5e5e5;
+}
+
+.btn-confirm {
+  background: #000;
+  color: white;
+}
+
+.btn-confirm:hover {
+  background: #333;
+}
+
+/* Desenio-style Header */
+.gallery-builder-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1rem 2rem;
+  background: white;
+  border-bottom: 1px solid #e0e0e0;
+  position: relative;
+  z-index: 10;
+  overflow: visible;
+  pointer-events: auto;
+}
+
+.gallery-builder-title {
+  font-size: 1.5rem;
+  margin: 0;
+  color: #000;
+  font-weight: 700;
+  font-family: 'Arial', sans-serif;
+}
+
+.gallery-builder-close {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: #666;
+  padding: 0.5rem;
+}
+
+.gallery-builder-close:hover {
+  color: #000;
+}
+
+.gallery-builder-description {
+  font-size: 1.1rem;
+  color: #666;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* Header like Desenio */
+.gallery-builder-header {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 20px;
+  z-index: 1001;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  min-width: 0; /* permitir encolher */
+  overflow: visible; /* permitir dropdown sobrepor o canvas */
+}
+
+.gallery-builder-header .logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+  display: flex;
+  align-items: center;
+  min-width: 0; /* habilita ellipsis */
+}
+
+.gallery-builder-header .logolink {
+  text-decoration: none;
+  color: inherit;
+  display: flex;
+  align-items: center;
+}
+
+.gallery-builder-header .logoimg {
+  max-height: 40px;
+  width: auto;
+  object-fit: contain;
+}
+
+.gallery-builder-header .text-logo {
+  font-size: 24px;
+  font-weight: bold;
+  color: #333;
+}
+
+.gallery-builder-header .header-actions {
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  flex-shrink: 0;
+}
+
+.gallery-builder-header .btn-header {
+  padding: 8px 16px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+  pointer-events: auto;
+  user-select: none;
+}
+
+.gallery-builder-header .btn-header:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+/* Checkout button with original theme cart icon */
+.gallery-builder-header .checkout-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  border-color: var(--checkout-button-color, #d89206);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.gallery-builder-header .checkout-btn:hover {
+  border-color: var(--checkout-button-hover-color, #1e7e34);
+  text-decoration: none;
+  transform: translateY(-1px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.gallery-builder-header .thb-secondary-item-icon {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Split cart + checkout like Desenio */
+.gallery-builder-header .cart-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.gallery-builder-header .cart-btn {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  background: #fff;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.gallery-builder-header .cart-btn:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+.gallery-builder-header .cart-total {
+  font-weight: 600;
+  color: #333;
+  font-size: 14px;
+}
+
+/* Ensure theme cart drawer overlays the builder UI */
+#Cart-Drawer,
+.cart-drawer,
+.CartDrawer,
+[data-drawer="cart"] {
+  z-index: 10050 !important; /* above header (1001) and overlays */
+  position: fixed !important;
+}
+
+/* Ensure cart drawer appears above gallery builder */
+#Cart-Drawer,
+.cart-drawer,
+.CartDrawer,
+[data-drawer="cart"] {
+  z-index: 10050 !important;
+  position: fixed !important;
+}
+
+/* =====================
+   Responsivo - Navbar
+   ===================== */
+@media (max-width: 768px) {
+  .gallery-builder-header { padding: 0 8px; height: 48px; }
+  .gallery-builder-header .logo { max-width: 50%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .gallery-builder-header .logoimg { max-height: 26px; }
+  .gallery-builder-header .text-logo { font-size: 18px; }
+  .gallery-builder-header .header-actions { gap: 4px; }
+  .gallery-builder-header .btn-header { padding: 3px 6px; font-size: 10px; }
+  .saved-galleries-dropdown .dropdown-toggle { padding: 3px 6px; font-size: 10px; }
+  .gallery-builder-header .checkout-btn { padding: 4px 8px; font-size: 10px; }
+}
+
+@media (max-width: 480px) {
+  .gallery-builder-header { padding: 0 6px; height: 44px; }
+  .gallery-builder-header .logo { max-width: 55%; }
+  .gallery-builder-header .logoimg { max-height: 22px; }
+  .gallery-builder-header .header-actions { gap: 3px; }
+  .gallery-builder-header .btn-header { padding: 3px 5px; font-size: 9px; }
+  .saved-galleries-dropdown .dropdown-toggle { padding: 3px 5px; font-size: 9px; }
+  .gallery-builder-header .checkout-btn { padding: 3px 6px; font-size: 9px; }
+  /* Em telas muito pequenas, esconder texto dos botões para preservar o logo */
+  .gallery-builder-header .btn-header span { display: none; }
+  .gallery-builder-header .btn-header i { margin: 0; }
+  /* Esconder valor do carrinho para ganhar espaço; manter ícone e quantidade */
+  .gallery-builder-header .cart-total { display: none; }
+}
+
+@media (max-width: 360px) {
+  .gallery-builder-header { padding: 0 4px; height: 40px; }
+  .gallery-builder-header .logo { max-width: 60%; }
+  .gallery-builder-header .logoimg { max-height: 20px; }
+  .gallery-builder-header .btn-header { padding: 2px 4px; font-size: 8px; }
+  .gallery-builder-header .checkout-btn { padding: 2px 4px; font-size: 8px; }
+}
+
+@media (max-width: 320px) {
+  .gallery-builder-header { padding: 0 2px; height: 36px; }
+  .gallery-builder-header .logo { max-width: 65%; }
+  .gallery-builder-header .logoimg { max-height: 18px; }
+  .gallery-builder-header .btn-header { padding: 2px 3px; font-size: 8px; }
+  .gallery-builder-header .checkout-btn { padding: 2px 3px; font-size: 8px; }
+}
+
+.gallery-builder-header .thb-item-count {
+  font-size: 12px;
+  font-weight: bold;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 50%;
+  min-width: 18px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0 4px;
+}
+
+/* No Products Message - Desenio Style */
+.no-products-message {
+  text-align: center;
+  padding: 2rem;
+  background: #f8f9fa;
+  border: 2px dashed #dee2e6;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.no-products-message h4 {
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.no-products-message p {
+  color: #6c757d;
+  margin-bottom: 0.5rem;
+}
+
+.no-products-message strong {
+  color: #495057;
+}
+
+/* Desenio Start Panel Style */
+.startPanel {
+  text-align: center;
+  padding: 3rem 2rem;
+  background: rgba(0, 0, 0, 0.4);
+  border-radius: 4px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  max-width: 700px;
+  width: 80%;
+  margin: 2rem auto;
+}
+
+.startPanel .topHeading {
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: #b0b0b0;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  font-family: 'Arial', sans-serif;
+}
+
+.startPanel .heading {
+  font-size: 2.2rem;
+  font-weight: 400;
+  margin: 0 0 1.5rem 0;
+  color: white;
+  font-family: 'Georgia', serif;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.startPanel .text {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #d0d0d0;
+  margin: 0 0 2.5rem 0;
+  line-height: 1.5;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Arial', sans-serif;
+}
+
+.startPanel .startButton {
+  background: white;
+  color: black;
+  border: 2px solid black;
+  padding: 1rem 2.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Arial', sans-serif;
+  min-width: 140px;
+  display: inline-block;
+}
+
+.startPanel .startButton:hover {
+  background: black;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Gallery Builder Interface - styles moved to main .gallery-builder-interface rule above */
+
+/* Sidebar Styles - Like Desenio */
+.gallery-builder-sidebar {
+  background: #ffffff;
+  padding: 0;
+  border-right: 1px solid #e0e0e0;
+  overflow-y: auto;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  width: 320px;
+  flex-shrink: 0;
+  position: relative;
+  z-index: 10;
+}
+
+.builder-step {
+  display: none;
+  margin-bottom: 0;
+  padding: 16px;
+  flex: 1;
+  height: 100%;
+  overflow-y: auto;
+}
+
+.builder-step.active {
+  display: block;
+}
+
+.step-title {
+  display: flex;
+  align-items: center;
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+.step-number {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+  background: #333;
+  color: white;
+  border-radius: 50%;
+  font-size: 12px;
+  font-weight: 600;
+  margin-right: 8px;
+}
+
+/* Background Selection */
+.background-selection {
+  margin-bottom: 2rem;
+}
+
+.background-options {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.2rem;
+}
+
+.background-option {
+  cursor: pointer;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 0.75rem;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.background-option:hover {
+  border-color: #fb6b00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.background-option.selected {
+  border-color: #fb6b00;
+  background: #fff8f0;
+}
+
+.background-preview {
+  width: 100%;
+  height: 100px;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 6px;
+  margin-bottom: 0.5rem;
+  background-color: #f8f9fa;
+  border: 1px solid #e9ecef;
+}
+
+.background-name {
+  display: block;
+  text-align: center;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: #333;
+}
+
+/* Layout Options - Desenio Style */
+.layout-options {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+  max-height: 400px;
+  overflow-x: hidden;
+  overflow-y: auto;
+  padding-bottom: 8px;
+}
+
+/* Custom scrollbar for layout options */
+.layout-options::-webkit-scrollbar {
+  width: 6px;
+}
+
+.layout-options::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.layout-options::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.layout-options::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+.layout-option {
+  cursor: pointer;
+  border: 1px solid #ddd;
+  border-radius: 6px;
+  padding: 12px;
+  text-align: center;
+  transition: all 0.2s ease;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  margin-bottom: 4px;
+  min-width: 100%;
+}
+
+.layout-option:hover {
+  border-color: #999;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.layout-option.selected {
+  border-color: #fb6b00;
+  background: #fff8f0;
+  box-shadow: 0 2px 8px rgba(251, 107, 0, 0.3);
+}
+
+.layout-preview {
+  flex-shrink: 0;
+  width: 120px;
+  height: 90px;
+  position: relative;
+  background: #f8f9fa;
+  border-radius: 4px;
+  overflow: visible !important;
+  border: 1px solid #e9ecef;
+}
+
+
+/* Preview frames - Desenio style */
+.preview-frame {
+  position: absolute !important;
+  background: rgb(55, 64, 0) !important;
+  border: 2px solid #E2E2E2 !important;
+  border-radius: 2px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  visibility: visible !important;
+  opacity: 0.7 !important;
+  width: auto !important;
+  height: auto !important;
+  overflow: visible !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 10 !important;
+}
+
+.layout-grid {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  padding: 4px;
+}
+
+.layout-grid .frame {
+  background: #6c757d;
+  border-radius: 2px;
+  min-width: 15px;
+  min-height: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 6px;
+  color: white;
+  font-weight: 500;
+  text-align: center;
+  line-height: 1;
+  padding: 1px;
+  aspect-ratio: 3/4;
+}
+
+
+
+/* Layout preview frames removed from HTML */
+
+/* Force show preview frames - Override any hiding rules */
+.layout-preview .preview-frame {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 0.7 !important;
+  width: auto !important;
+  height: auto !important;
+  position: absolute !important;
+  background: rgb(55, 64, 0) !important;
+  border: 2px solid #E2E2E2 !important;
+  border-radius: 2px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  overflow: visible !important;
+  left: auto !important;
+  top: auto !important;
+  z-index: 10 !important;
+  min-width: 15px !important;
+  min-height: 15px !important;
+  padding: 2px !important;
+}
+
+/* Ultra-aggressive preview frame display */
+div.preview-frame {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 0.7 !important;
+  position: absolute !important;
+  background: rgb(55, 64, 0) !important;
+  border: 2px solid #E2E2E2 !important;
+  border-radius: 2px !important;
+  align-items: center !important;
+  justify-content: center !important;
+  font-size: 8px !important;
+  font-weight: 600 !important;
+  color: white !important;
+  text-align: center !important;
+  line-height: 1 !important;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1) !important;
+  overflow: visible !important;
+  z-index: 10 !important;
+  min-width: 15px !important;
+  min-height: 15px !important;
+  padding: 2px !important;
+}
+
+/* Step 4: Frame Selection Styles */
+.frame-options {
+  padding: 1rem 0;
+}
+
+.frame-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.frame-option {
+  cursor: pointer;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.frame-option:hover {
+  border-color: #fb6b00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+
+.frame-option.selected {
+  border-color: #fb6b00;
+  background: rgba(251, 107, 0, 0.05);
+  box-shadow: 0 0 0 2px rgba(251, 107, 0, 0.2);
+}
+
+.frame-preview {
+  width: 100%;
+  height: 120px;
+  margin-bottom: 0.75rem;
+  border-radius: 4px;
+  overflow: hidden;
+  background: #f8f9fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.frame-preview img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.frame-info {
+  text-align: center;
+}
+
+.frame-title {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0 0 0.5rem 0;
+  line-height: 1.3;
+}
+
+.frame-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #fb6b00;
+}
+
+/* Frame Variants Styles */
+.frame-variants {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  width: 100%;
+  margin-top: 0.5rem;
+}
+
+.frame-variant {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.25rem 0.5rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+  font-size: 0.85rem;
+  border: 1px solid #e0e0e0;
+}
+
+.variant-size {
+  font-weight: 500;
+  color: #333;
+}
+
+.variant-price {
+  color: #fb6b00;
+  font-weight: 600;
+}
+
+/* Step 4 - Desenio Style Frame Selection */
+.selected-product-display {
+  margin-bottom: 2rem;
+  padding: 1rem;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.selected-product-preview {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
+.selected-product-preview img {
+  width: 120px;
+  height: 120px;
+  object-fit: cover;
+  border-radius: 6px;
+  border: 2px solid #e0e0e0;
+}
+
+.selected-product-info h4 {
+  margin: 0 0 0.5rem 0;
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #333;
+}
+
+.selected-product-info p {
+  margin: 0;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+.frame-selection-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.frame-selection-grid .frame-option {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 0.75rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: white;
+}
+
+.frame-selection-grid .frame-option:hover {
+  border-color: #fb6b00;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(251, 107, 0, 0.15);
+}
+
+.frame-selection-grid .frame-option.selected {
+  border-color: #fb6b00;
+  background: #fff8f5;
+  box-shadow: 0 4px 12px rgba(251, 107, 0, 0.2);
+}
+
+.frame-selection-grid .frame-preview {
+  width: 80px;
+  height: 80px;
+  border-radius: 6px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+  border: 1px solid #e0e0e0;
+  position: relative;
+}
+
+.frame-selection-grid .frame-preview img {
+  width: 110% !important;
+  height: 110% !important;
+  object-fit: cover !important;
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border-radius: 0;
+}
+
+.frame-selection-grid .frame-name {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #333;
+  text-align: center;
+  line-height: 1.2;
+}
+
+/* Frame Overlay Styles - Thin and Real Images */
+.frame-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  pointer-events: none;
+  z-index: 10;
+  border-radius: 4px;
+  opacity: 1;
+  box-shadow: 0 0 0 1px rgba(0,0,0,0.1);
+}
+
+.gallery-frame {
+  position: relative;
+  overflow: visible;
+}
+
+.gallery-frame .inner {
+  position: relative;
+  z-index: 20;
+  margin: 0;
+  border-radius: 0px;
+  overflow: hidden;
+  width: 100%;
+  height: 100%;
+}
+
+.gallery-frame .inner img {
+  position: relative;
+  z-index: 20;
+  border-radius: 0px;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Force frame styling - Removed fixed colors, now uses frame image background only */
+/* All fixed colors removed from .gallery-frame.has-frame - frame image will be applied via background-image */
+
+.no-frames-message {
+  text-align: center;
+  padding: 2rem;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 8px;
+  border: 1px dashed #ddd;
+}
+
+.layout-name {
+  display: none;
+}
+
+/* Product Filters - Desenio Style */
+.product-filters {
+  margin-bottom: 16px;
+  padding: 0 4px;
+}
+
+.filter-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.filter-tab {
+  padding: 6px 12px;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 16px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  color: #666;
+}
+
+.filter-tab:hover {
+  border-color: #999;
+  color: #333;
+  background: #f8f9fa;
+}
+
+.filter-tab.active {
+  background: #333;
+  color: white;
+  border-color: #333;
+}
+
+/* Show Filter Button - Ensure visibility */
+.filter-toggle {
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: #333 !important;
+  color: white !important;
+  border-color: #333 !important;
+}
+
+.filter-toggle:hover {
+  background: #555 !important;
+  border-color: #555 !important;
+}
+
+.filter-toggle svg {
+  width: 16px;
+  height: 16px;
+  margin-left: 6px;
+}
+
+/* Product Grid - Desenio Style */
+.product-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 12px;
+  max-height: calc(100vh - 200px);
+  overflow-y: auto;
+  padding: 0;
+  margin: 0;
+}
+
+.product-item {
+  cursor: pointer;
+  border: none;
+  border-radius: 4px;
+  overflow: hidden;
+  transition: all 0.2s ease;
+  background: white;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.product-item:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 2px 8px rgba(0,0,0,0.15);
+}
+
+.product-image {
+  position: relative;
+  aspect-ratio: 4/5;
+  overflow: hidden;
+  background: #f8f9fa;
+  z-index: 1;
+}
+
+.product-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.product-item:hover .product-image img {
+  transform: scale(1.05);
+}
+
+.product-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(55, 64, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 10;
+  pointer-events: none;
+  visibility: hidden;
+}
+
+.product-item:hover .product-overlay {
+  opacity: 1;
+  pointer-events: auto;
+  visibility: visible;
+}
+
+.product-item.selected {
+  border: 2px solid #fb6b00;
+  transform: scale(1.05);
+  box-shadow: 0 4px 12px rgba(251, 107, 0, 0.3);
+}
+
+.btn-add-to-gallery {
+  background: white;
+  color: #374000;
+  border: none;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-add-to-gallery:hover {
+  background: #374000;
+  color: white;
+}
+
+.product-info {
+  padding: 8px 0;
+  text-align: center;
+}
+
+.product-title {
+  font-size: 11px;
+  font-weight: 400;
+  color: #666;
+  margin-bottom: 4px;
+  line-height: 1.2;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.product-price {
+  font-size: 12px;
+  font-weight: 600;
+  color: #333;
+}
+
+/* Frame Options */
+.frame-options {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 1rem;
+}
+
+.frame-option {
+  cursor: pointer;
+  border: 2px solid #e9ecef;
+  border-radius: 8px;
+  padding: 1rem;
+  text-align: center;
+  transition: all 0.3s ease;
+  background: white;
+}
+
+.frame-option:hover {
+  border-color: #374000;
+  transform: translateY(-2px);
+}
+
+.frame-option.selected {
+  border-color: #374000;
+  background: #f0f2e8;
+}
+
+.frame-preview {
+  width: 60px;
+  height: 40px;
+  margin: 0 auto 0.5rem;
+  border-radius: 4px;
+  position: relative;
+  overflow: hidden;
+}
+
+.frame-sample {
+  width: 100%;
+  height: 100%;
+  background: #f8f9fa;
+  border: 2px solid currentColor;
+  border-radius: 2px;
+}
+
+.frame-name {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  color: #374000;
+  margin-bottom: 0.25rem;
+}
+
+.frame-price {
+  font-size: 0.75rem;
+  color: #fb6b00;
+  font-weight: 600;
+}
+
+/* Order Summary */
+.order-summary {
+  background: white;
+  border-radius: 8px;
+  padding: 1.5rem;
+  border: 1px solid #e9ecef;
+}
+
+.summary-items {
+  margin-bottom: 1.5rem;
+}
+
+.summary-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 0;
+  border-bottom: 1px solid #f8f9fa;
+}
+
+.summary-item:last-child {
+  border-bottom: none;
+}
+
+.summary-item-image {
+  width: 40px;
+  height: 40px;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  object-fit: cover;
+}
+
+.summary-item-details {
+  flex: 1;
+}
+
+.summary-item-title {
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #374000;
+  margin-bottom: 0.25rem;
+}
+
+.summary-item-meta {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.summary-item-price {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: #fb6b00;
+}
+
+.summary-total {
+  border-top: 2px solid #e9ecef;
+  padding-top: 1rem;
+}
+
+.total-line {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 0.5rem;
+  font-size: 0.9rem;
+}
+
+.total-line.total-final {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #374000;
+  border-top: 1px solid #e9ecef;
+  padding-top: 0.5rem;
+  margin-top: 0.5rem;
+}
+
+.btn-add-to-cart {
+  width: 100%;
+  background: #374000;
+  color: white;
+  border: none;
+  padding: 1rem;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  margin-top: 1rem;
+}
+
+.btn-add-to-cart:hover:not(:disabled) {
+  background: #2a3200;
+  transform: translateY(-1px);
+}
+
+.btn-add-to-cart:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Navigation */
+.builder-navigation {
+  display: flex;
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.btn-nav {
+  flex: 1;
+  padding: 0.75rem;
+  border: 2px solid #374000;
+  background: white;
+  color: #374000;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-nav:hover:not(:disabled) {
+  background: #374000;
+  color: white;
+}
+
+.btn-nav:disabled {
+  border-color: #ccc;
+  color: #ccc;
+  cursor: not-allowed;
+}
+
+.btn-next {
+  background: #374000;
+  color: white;
+}
+
+.btn-next:hover:not(:disabled) {
+  background: #2a3200;
+}
+
+/* Canvas Area */
+.gallery-builder-canvas {
+  background: white;
+  display: flex;
+  flex-direction: column;
+  flex: 1;
+  min-width: 0;
+}
+
+
+.canvas-container {
+  flex: 1;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: stretch;
+  justify-content: stretch;
+  background: #f8f9fa;
+  height: 100vh;
+  position: relative;
+  overflow: hidden;
+  border-radius: 0;
+  width: 100%;
+}
+
+.room-background {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border-radius: 0;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  flex-shrink: 0;
+  object-fit: cover;
+  transition: all 0.3s ease;
+}
+
+.room-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover; /* Fill entire container */
+  display: block;
+}
+
+.gallery-wall-area {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  width: 100%;
+  background: transparent;
+  border: none;
+  border-radius: 0;
+  min-height: 100vh;
+  cursor: move;
+  transition: all 0.3s ease;
+  pointer-events: auto;
+  transform: translate(0px, 0px);
+}
+
+.gallery-wall-area.has-frames {
+  background: transparent;
+  border: none;
+}
+
+.gallery-wall-area.dragging {
+  transform: scale(1.01);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.15);
+  z-index: 1000;
+  border: none;
+  background: transparent;
+}
+
+.gallery-frame {
+  position: absolute;
+  text-align: center;
+  background: #ffffff;
+  cursor: pointer !important;
+  z-index: 99;
+  border: 2px solid #e0e0e0;
+  border-radius: 0px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+  transition: all 0.2s ease;
+  border: 1px solid hsla(0, 0%, 82%, .45);
+  overflow: visible;
+}
+
+/* Inner content can still be clipped */
+.gallery-frame .inner {
+  overflow: hidden;
+}
+
+/* Frame sizes like Desenio - Reduced for better perspective */
+.gallery-frame[data-size="21x30"] {
+  width: 4.2%;
+  padding-bottom: 6.0%;
+}
+
+.gallery-frame[data-size="29.7x42"],
+.gallery-frame[data-size="29x42"] {
+  width: 8.5%;
+  padding-bottom: 11.5%;
+}
+
+.gallery-frame[data-size="30x40"] {
+  width: 7.5%;
+  padding-bottom: 10.0%;
+}
+
+.gallery-frame[data-size="40x50"] {
+  width: 10.0%;
+  padding-bottom: 12.5%;
+}
+
+.gallery-frame[data-size="50x50"] {
+  width: 15.0%;
+  padding-bottom: 15.0%;
+}
+
+.gallery-frame[data-size="50x70"] {
+  width: 11.0%;
+  padding-bottom: 15.5%;
+}
+
+.gallery-frame[data-size="60x80"] {
+  width: 16.0%;
+  padding-bottom: 21.5%;
+}
+
+.gallery-frame[data-size="70x100"] {
+  width: 14.5%;
+  padding-bottom: 20.5%;
+}
+
+.gallery-frame[data-size="84.1x118.9"],
+.gallery-frame[data-size="84x119"] {
+  width: 18%;
+  padding-bottom: 25.5%;
+}
+
+
+.gallery-frame::before,
+.gallery-frame::after,
+.gallery-frame *::before,
+.gallery-frame *::after {
+  display: none !important;
+  content: none !important;
+  background: none !important;
+}
+
+.gallery-frame .inner {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.gallery-frame .frame-size {
+  font-size: 10px;
+  font-weight: 600;
+  color: #333;
+  text-align: center;
+  position: absolute;
+  padding: 2px;
+  word-break: break-all;
+  bottom: 8px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: rgba(255, 255, 255, 0.9);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.btn-add-to-gallery.remove-action {
+  background: #dc3545 !important;
+  color: white !important;
+}
+
+.btn-add-to-gallery.remove-action:hover {
+  background: #c82333 !important;
+}
+
+
+
+
+.gallery-frame .inner img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.gallery-frame:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+}
+
+.gallery-frame.selected {
+  border-color: #fb6b00;
+  box-shadow: 0 0 10px rgba(251, 107, 0, 0.5);
+  transform: scale(1.05);
+}
+
+.gallery-frame.drag-over {
+  border-color: #fb6b00;
+  background: rgba(251, 107, 0, 0.1);
+  box-shadow: 0 0 15px rgba(251, 107, 0, 0.3);
+}
+
+.gallery-frame.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg) scale(1.1);
+  z-index: 1000;
+  cursor: grabbing;
+}
+
+.gallery-frame:hover {
+  cursor: grab;
+}
+
+.gallery-frame:active {
+  cursor: grabbing;
+}
+
+.gallery-frame .frame-image-container {
+  width: 100%;
+  height: 100%;
+  position: relative;
+  overflow: hidden;
+  border-radius: 2px;
+}
+
+.gallery-frame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: relative;
+  border-radius: 0;
+}
+
+/* Removed old frame styles - now using Desenio structure */
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .gallery-builder-interface {
+    grid-template-columns: 350px 1fr;
+  }
+}
+
+@media (max-width: 768px) {
+  .gallery-builder-interface {
+    grid-template-columns: 1fr;
+    gap: 0;
+  }
+  
+  .gallery-builder-sidebar {
+    max-height: 40vh; /* Reduced from 50vh to 40vh like Desenio */
+    border-right: none;
+    border-bottom: 1px solid #e9ecef;
+    width: 100%;
+    padding: 1rem;
+  }
+  
+  .gallery-builder-title {
+    font-size: 2rem;
+  }
+  
+  .product-grid {
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  }
+  
+  .layout-options {
+    grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-wall-builder {
+    padding: 1rem 0;
+  }
+  
+  .gallery-builder-sidebar {
+    padding: 1rem;
+  }
+  
+  .canvas-container {
+    padding: 1rem;
+  }
+  
+  .gallery-builder-title {
+    font-size: 1.5rem;
+  }
+}
+
+/* Animation Classes */
+.fade-in {
+  animation: fadeIn 0.3s ease-in;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.slide-in {
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Loading States */
+.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+.loading::after {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 20px;
+  height: 20px;
+  border: 2px solid #f3f3f3;
+  border-top: 2px solid #374000;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Drag and Drop States */
+.drag-over {
+  border-color: #374000 !important;
+  background: rgba(55, 64, 0, 0.1) !important;
+}
+
+.dragging {
+  opacity: 0.5;
+  transform: rotate(5deg);
+}
+
+/* Custom Scrollbar */
+.gallery-builder-sidebar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.gallery-builder-sidebar::-webkit-scrollbar-track {
+  background: #f1f1f1;
+  border-radius: 3px;
+}
+
+.gallery-builder-sidebar::-webkit-scrollbar-thumb {
+  background: #c1c1c1;
+  border-radius: 3px;
+}
+
+.gallery-builder-sidebar::-webkit-scrollbar-thumb:hover {
+  background: #a8a8a8;
+}
+
+/* Features Section */
+.gallery-features {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin: 3rem 0;
+  padding: 2rem 0;
+}
+
+.feature-item {
+  text-align: center;
+  padding: 1.5rem;
+  background: #f8f8f8;
+  border-radius: 12px;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.feature-item:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.feature-icon {
+  font-size: 3rem;
+  margin-bottom: 1rem;
+}
+
+.feature-item h4 {
+  color: var(--gallery-primary, #374000);
+  margin-bottom: 0.5rem;
+  font-size: 1.2rem;
+}
+
+.feature-item p {
+  color: #666;
+  font-size: 0.9rem;
+  line-height: 1.4;
+}
+
+/* Inspiration Section */
+.gallery-inspiration {
+  margin-top: 4rem;
+  padding: 3rem 0;
+  background: linear-gradient(135deg, #f8f8f8 0%, #ffffff 100%);
+  border-radius: 20px;
+}
+
+.inspiration-header {
+  text-align: center;
+  margin-bottom: 3rem;
+}
+
+.inspiration-header h3 {
+  color: var(--gallery-primary, #374000);
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  font-family: 'Cormorant', serif;
+}
+
+.inspiration-header p {
+  color: #666;
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+.inspiration-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+  margin-bottom: 3rem;
+}
+
+.inspiration-item {
+  background: white;
+  border-radius: 15px;
+  overflow: hidden;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.inspiration-item:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.inspiration-image {
+  height: 200px;
+  overflow: hidden;
+}
+
+.inspiration-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.inspiration-item:hover .inspiration-image img {
+  transform: scale(1.05);
+}
+
+.inspiration-item h4 {
+  color: var(--gallery-primary, #374000);
+  padding: 1.5rem 1.5rem 0.5rem;
+  font-size: 1.3rem;
+  font-family: 'Cormorant', serif;
+}
+
+.inspiration-item p {
+  color: #666;
+  padding: 0 1.5rem 1.5rem;
+  line-height: 1.5;
+}
+
+/* Styling Tips */
+.styling-tips {
+  background: white;
+  padding: 2.5rem;
+  border-radius: 15px;
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.styling-tips h4 {
+  color: var(--gallery-primary, #374000);
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+  text-align: center;
+  font-family: 'Cormorant', serif;
+}
+
+.tips-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.5rem;
+}
+
+.tip-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 1rem;
+  padding: 1.5rem;
+  background: #f8f8f8;
+  border-radius: 12px;
+  transition: background-color 0.3s ease;
+}
+
+.tip-item:hover {
+  background: #e8e8e8;
+}
+
+.tip-number {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  height: 40px;
+  background: var(--gallery-accent, #fb6b00);
+  color: white;
+  border-radius: 50%;
+  font-weight: bold;
+  font-size: 1.2rem;
+  flex-shrink: 0;
+}
+
+.tip-content h5 {
+  color: var(--gallery-primary, #374000);
+  margin-bottom: 0.5rem;
+  font-size: 1.1rem;
+}
+
+.tip-content p {
+  color: #666;
+  line-height: 1.4;
+  font-size: 0.9rem;
+}
+
+/* Mobile Responsive Updates */
+@media (max-width: 768px) {
+  .gallery-features {
+    grid-template-columns: 1fr;
+    gap: 1.5rem;
+  }
+  
+  .inspiration-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .tips-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .inspiration-header h3 {
+    font-size: 2rem;
+  }
+  
+  /* Mobile Gallery Frame Fixes */
+  .gallery-wall-area {
+    padding: 20px !important;
+    box-sizing: border-box !important;
+    overflow: hidden !important;
+    position: relative !important;
+    min-height: 100vh !important;
+    max-height: 100vh !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    z-index: 1 !important;
+    /* Keep within canvas boundaries */
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+  }
+  
+  /* Force gallery-wall-area to stay visible */
+  .gallery-wall-area.has-frames {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  .gallery-frame {
+    min-width: 20px !important;
+    min-height: 25px !important;
+    max-width: 200px !important;
+    max-height: 250px !important;
+    position: absolute !important;
+    z-index: 10 !important;
+  }
+  
+  /* Ensure frames are not cut off */
+  .gallery-builder-canvas {
+    overflow: visible !important;
+    padding: 20px !important;
+    position: relative !important;
+    min-height: 100vh !important;
+  }
+  
+  .canvas-container {
+    overflow: visible !important;
+    padding: 20px !important;
+    position: relative !important;
+    min-height: 100vh !important;
+  }
+  
+  /* Prevent frames from disappearing during scroll */
+  .gallery-frame {
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+    position: absolute !important;
+    z-index: 10 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Room background adjustments for mobile */
+  .room-background {
+    padding: 20px !important;
+    box-sizing: border-box !important;
+  }
+  
+  /* Force frames to stay visible during scroll */
+  .gallery-wall-area .gallery-frame {
+    position: absolute !important;
+    z-index: 10 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    /* Keep frames within gallery-wall-area boundaries */
+    max-width: calc(100% - 40px) !important;
+    max-height: calc(100% - 40px) !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* Prevent selected frames from disappearing during scroll */
+  .gallery-frame.selected {
+    position: absolute !important;
+    z-index: 20 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* Prevent dragging frames from disappearing during scroll */
+  .gallery-frame.dragging {
+    position: absolute !important;
+    z-index: 1000 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 0.95 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* Prevent frames with images from disappearing during scroll */
+  .gallery-frame.has-image {
+    position: absolute !important;
+    z-index: 15 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* Mobile Sidebar Compact - Like Desenio */
+  .gallery-builder-sidebar {
+    max-height: 35vh !important; /* Even smaller like Desenio */
+    padding: 0.75rem !important;
+    overflow-y: auto !important; /* Allow vertical scroll */
+    -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
+    touch-action: pan-y !important; /* Allow vertical panning */
+    overscroll-behavior: contain !important; /* Prevent overscroll */
+  }
+  
+  .builder-step {
+    padding: 0.5rem !important;
+    overflow-y: auto !important; /* Allow vertical scroll */
+    -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
+    touch-action: pan-y !important; /* Allow vertical panning */
+    overscroll-behavior: contain !important; /* Prevent overscroll */
+    max-height: calc(35vh - 2rem) !important; /* Account for padding */
+  }
+  
+  .builder-step h3 {
+    font-size: 1.1rem !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .layout-options {
+    gap: 0.5rem !important;
+    overflow-x: hidden !important; /* Prevent horizontal scroll */
+    overflow-y: auto !important; /* Allow vertical scroll */
+    -webkit-overflow-scrolling: touch !important; /* Smooth scrolling on iOS */
+    padding-bottom: 10px !important; /* Space for scrollbar */
+    flex-direction: column !important; /* Ensure vertical layout */
+    flex-wrap: nowrap !important; /* Prevent wrapping */
+  }
+  
+  .layout-option {
+    padding: 0.5rem !important;
+    flex-shrink: 0 !important; /* Prevent shrinking */
+    min-width: 120px !important; /* Ensure minimum width */
+  }
+  
+  .layout-preview {
+    width: 80px !important;
+    height: 60px !important;
+  }
+  
+  /* Fix layout frames orientation on mobile */
+  .layout-grid .frame {
+    min-width: 12px !important;
+    min-height: 16px !important;
+    aspect-ratio: 3/4 !important;
+  }
+  
+  .builder-navigation {
+    padding: 0.75rem !important;
+    gap: 0.5rem !important;
+  }
+  
+  .builder-navigation .btn-nav {
+    padding: 12px 16px !important;
+    font-size: 12px !important;
+  }
+  
+  /* Product grid scroll on mobile */
+  .product-grid {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    padding-bottom: 10px !important;
+    max-height: 50vh !important;
+    touch-action: pan-y !important;
+  }
+  
+  .product-item {
+    flex-shrink: 0 !important;
+  }
+  
+  /* Ensure Previous button is visible on mobile */
+  .builder-navigation .btn-prev {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+  
+  /* Make disabled Previous button visible but styled differently */
+  .builder-navigation .btn-prev:disabled {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 0.6 !important;
+    background: #f5f5f5 !important;
+    color: #999 !important;
+    border: 1px solid #ddd !important;
+  }
+  
+  /* Mobile Touch Improvements */
+  .product-item,
+  .btn-add-to-gallery,
+  .frame-option,
+  .layout-option,
+  .background-option,
+  .gallery-frame,
+  .builder-step,
+  .btn-nav {
+    -webkit-tap-highlight-color: rgba(0, 0, 0, 0.1) !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+    touch-action: manipulation !important;
+    cursor: pointer !important;
+  }
+  
+  /* Touch feedback for mobile */
+  .product-item:active,
+  .btn-add-to-gallery:active,
+  .frame-option:active,
+  .layout-option:active,
+  .background-option:active,
+  .builder-step:active,
+  .btn-nav:active {
+    transform: scale(0.95) !important;
+    transition: transform 0.1s ease !important;
+  }
+  
+  /* Ensure all interactive elements are touchable */
+  .layout-option,
+  .background-option {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 8px !important;
+  }
+  
+  /* Ensure buttons are large enough for touch */
+  .btn-add-to-gallery {
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 12px 16px !important;
+  }
+  
+  /* ✅ Hide "Remove from Gallery" button on mobile when product is in gallery */
+  .btn-add-to-gallery.remove-action {
+    display: none !important;
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  
+  /* ✅ Product item delete button (mobile only) - SMALLER */
+  .product-item-delete-btn {
+    position: absolute !important;
+    top: 6px !important;
+    right: 6px !important;
+    width: 28px !important;
+    height: 28px !important;
+    background: rgba(0, 0, 0, 0.75) !important;
+    border: none !important;
+    border-radius: 4px !important;
+    color: white !important;
+    cursor: pointer !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    z-index: 100 !important;
+    padding: 0 !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .product-item-delete-btn svg {
+    width: 14px !important;
+    height: 14px !important;
+    stroke: currentColor !important;
+  }
+  
+  .product-item-delete-btn:active {
+    background: rgba(220, 53, 69, 0.85) !important;
+    transform: scale(0.95) !important;
+  }
+  
+  /* ✅ Ensure product-item has relative positioning for absolute delete button */
+  .product-item {
+    position: relative !important;
+    min-height: 44px !important;
+  }
+  
+  .frame-option {
+    min-height: 44px !important;
+  }
+  
+  /* Mobile - Allow all scrolling */
+  body.gallery-builder-active {
+    overflow: auto !important;
+    height: auto !important;
+    position: static !important;
+    touch-action: pan-y !important;
+  }
+  
+  .gallery-wall-builder {
+    overflow: visible !important;
+    touch-action: pan-y !important;
+  }
+  
+  .gallery-builder-interface {
+    overflow: visible !important;
+    height: auto !important;
+    touch-action: pan-y !important;
+  }
+  
+  /* Force gallery-wall-area to stay visible during scroll */
+  .gallery-wall-area {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 999 !important;
+    align-items: center !important;
+    justify-content: center !important;
+    min-height: 100vh !important;
+    overflow: visible !important;
+    pointer-events: auto !important;
+    transform: translateZ(0) !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+  }
+  
+  .gallery-wall-area.has-frames {
+    display: flex !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: relative !important;
+    z-index: 999 !important;
+    pointer-events: auto !important;
+    transform: translateZ(0) !important;
+  }
+  
+  /* Force canvas visibility */
+  .gallery-builder-canvas {
+    overflow: visible !important;
+    position: relative !important;
+    z-index: 998 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  
+  /* Ultra aggressive frame protection */
+  .gallery-frame {
+    position: absolute !important;
+    z-index: 1000 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+    pointer-events: auto !important;
+    min-width: 20px !important;
+    min-height: 25px !important;
+    max-width: 200px !important;
+    max-height: 250px !important;
+    background: #ffffff !important;
+    border: 1px solid #ddd !important;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1) !important;
+    border-radius: 0px !important;
+  }
+  
+  .gallery-frame.selected {
+    z-index: 1001 !important;
+    border: 2px solid #fb6b00 !important;
+    box-shadow: 0 0 10px rgba(251, 107, 0, 0.5) !important;
+  }
+  
+  .gallery-frame.has-image {
+    z-index: 1000 !important;
+  }
+  
+  .gallery-frame.dragging {
+    z-index: 1002 !important;
+  }
+  
+  /* NUCLEAR OPTION - FRAME CANNOT DISAPPEAR */
+  .gallery-frame.has-image {
+    position: absolute !important;
+    z-index: 1001 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+    background: #ffffff !important;
+    border: 3px solid #28a745 !important;
+    box-shadow: 0 6px 12px rgba(40, 167, 69, 0.3) !important;
+    border-radius: 0px !important;
+    min-width: 20px !important;
+    min-height: 25px !important;
+    max-width: 200px !important;
+    max-height: 250px !important;
+    pointer-events: auto !important;
+    overflow: visible !important;
+  }
+  
+  .gallery-frame.selected.has-image {
+    position: absolute !important;
+    z-index: 1002 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+    background: #ffffff !important;
+    border: 4px solid #007bff !important;
+    box-shadow: 0 8px 16px rgba(0, 123, 255, 0.4) !important;
+    border-radius: 0px !important;
+    min-width: 20px !important;
+    min-height: 25px !important;
+    max-width: 200px !important;
+    max-height: 250px !important;
+    pointer-events: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* NUCLEAR OPTION - FRAME CANNOT DISAPPEAR DURING DRAG */
+  .gallery-frame.drag-over {
+    position: absolute !important;
+    z-index: 1003 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+    background: #ffffff !important;
+    border: 5px solid #ff6b00 !important;
+    box-shadow: 0 10px 20px rgba(255, 107, 0, 0.5) !important;
+    border-radius: 0px !important;
+    min-width: 20px !important;
+    min-height: 25px !important;
+    max-width: 200px !important;
+    max-height: 250px !important;
+    pointer-events: auto !important;
+    overflow: visible !important;
+  }
+  
+  /* FORCE ALL FRAMES TO STAY VISIBLE - NO EXCEPTIONS */
+  .gallery-frame[style*="display: none"],
+  .gallery-frame[style*="visibility: hidden"],
+  .gallery-frame[style*="opacity: 0"] {
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    position: absolute !important;
+    z-index: 1000 !important;
+  }
+  
+  /* NUCLEAR PROTECTION - FRAMES CANNOT LEAVE CANVAS */
+  .gallery-builder-canvas .gallery-frame,
+  .canvas-container .gallery-frame {
+    position: absolute !important;
+    z-index: 1000 !important;
+    display: block !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+    will-change: transform !important;
+    backface-visibility: hidden !important;
+    transform: translateZ(0) !important;
+    pointer-events: auto !important;
+    overflow: visible !important;
+    min-width: 20px !important;
+    min-height: 25px !important;
+    max-width: 200px !important;
+    max-height: 250px !important;
+  }
+  
+  /* FORCE CANVAS TO KEEP FRAMES */
+  .gallery-builder-canvas,
+  .canvas-container {
+    position: relative !important;
+    overflow: visible !important;
+    min-height: 100vh !important;
+  }
+  
+  /* NUCLEAR OPTION: COMPLETELY DISABLE DRAG FOR PRODUCT-ITEM */
+  .product-item {
+    touch-action: manipulation !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 1 !important;
+    -webkit-user-drag: none !important;
+    -khtml-user-drag: none !important;
+    -moz-user-drag: none !important;
+    -o-user-drag: none !important;
+  }
+  
+  /* PREVENT SIDEBAR FROM CAUSING ANY DRAG BUT ALLOW SCROLL */
+  .gallery-builder-sidebar {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    pointer-events: auto !important;
+    overflow-y: auto !important;
+  }
+  
+  .gallery-builder-sidebar * {
+    -webkit-user-drag: none !important;
+    -khtml-user-drag: none !important;
+    -moz-user-drag: none !important;
+    -o-user-drag: none !important;
+  }
+  
+  /* Override touch-action for scrollable containers */
+  .gallery-builder-sidebar .background-options,
+  .gallery-builder-sidebar .layout-options,
+  .gallery-builder-sidebar .order-summary,
+  .gallery-builder-sidebar .frame-selection-grid,
+  .gallery-builder-sidebar .summary-items {
+    touch-action: pan-y !important;
+  }
+  
+  .gallery-builder-sidebar .background-options *,
+  .gallery-builder-sidebar .layout-options *,
+  .gallery-builder-sidebar .order-summary *,
+  .gallery-builder-sidebar .frame-selection-grid *,
+  .gallery-builder-sidebar .summary-items * {
+    touch-action: manipulation !important;
+  }
+  
+  /* ALLOW SCROLL IN PRODUCT GRID */
+  .product-grid {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: auto !important;
+  }
+  
+  .product-item {
+    touch-action: manipulation !important;
+    -webkit-user-drag: none !important;
+    -khtml-user-drag: none !important;
+    -moz-user-drag: none !important;
+    -o-user-drag: none !important;
+  }
+  
+  /* ENSURE GALLERY-FRAME DRAG ONLY WORKS ON FRAME ITSELF */
+  .gallery-frame {
+    touch-action: none !important;
+    position: absolute !important;
+    z-index: 10 !important;
+  }
+  
+  /* PREVENT ANY INTERFERENCE BETWEEN PRODUCT AND FRAME */
+  .product-item:active,
+  .product-item:focus {
+    outline: none !important;
+    box-shadow: none !important;
+  }
+  
+  /* NUCLEAR OPTION: COMPLETELY ISOLATE PRODUCT-ITEM TOUCH EVENTS */
+  .product-item * {
+    pointer-events: none !important;
+  }
+  
+  .product-item {
+    pointer-events: auto !important;
+  }
+  
+  /* PREVENT BUILDER-STEP FROM INTERFERING */
+  .builder-step {
+    touch-action: pan-y !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+  
+  /* ISOLATE GALLERY-FRAME FROM ALL OTHER ELEMENTS */
+  .gallery-frame {
+    isolation: isolate !important;
+    contain: layout !important;
+  }
+  
+  /* PREVENT SUCCESS MESSAGES FROM CAUSING DRAG */
+  [class*="message"],
+  [class*="Message"],
+  [class*="success"],
+  [class*="Success"],
+  [class*="notification"],
+  [class*="Notification"] {
+    touch-action: manipulation !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  /* PREVENT ANY ELEMENT WITH SUCCESS TEXT FROM DRAGGING */
+  *:contains("product_added"),
+  *:contains("Product added"),
+  *:contains("success"),
+  *:contains("Message") {
+    touch-action: manipulation !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    pointer-events: auto !important;
+  }
+  
+  .gallery-builder-sidebar {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .layout-options {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    overflow-x: hidden !important;
+    overflow-y: auto !important;
+    flex-direction: column !important;
+    flex-wrap: nowrap !important;
+  }
+  
+  .layout-option {
+    flex-shrink: 0 !important;
+    min-width: 120px !important;
+  }
+  
+  .product-grid {
+    touch-action: pan-x !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+}
+
+/* Desenio-style Layout - Full Screen */
+
+/* Step Indicator - Like Desenio */
+.step-indicator {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 1rem;
+  padding: 1rem;
+  background: #ffffff;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.step {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  background: #e0e0e0;
+  color: #666;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 12px;
+  transition: all 0.3s ease;
+}
+
+.step.active {
+  background: #000;
+  color: white;
+}
+
+.step.completed {
+  background: #000;
+  color: white;
+}
+
+/* Room Background - styles moved to main .room-background rule above */
+
+/* Room furniture removed - not needed for gallery wall builder */
+
+/* Gallery Wall Area - styles moved to main .gallery-wall-area rule above */
+
+.gallery-wall-area.has-frames {
+  background: transparent;
+  border: none;
+}
+
+.empty-gallery-message {
+  text-align: center;
+  color: white;
+  padding: 3rem 2rem;
+  background: rgba(0, 0, 0, 0.6);
+  border-radius: 12px;
+  margin: 2rem auto;
+  max-width: 500px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  position: relative;
+  z-index: 10;
+}
+
+.empty-gallery-message .step-indicator {
+  font-size: 0.875rem;
+  font-weight: 500;
+  letter-spacing: 1px;
+  color: #b0b0b0;
+  margin-bottom: 1.5rem;
+  text-transform: uppercase;
+  font-family: 'Arial', sans-serif;
+}
+
+.empty-gallery-message .main-title {
+  font-size: 2.2rem;
+  font-weight: 400;
+  margin: 0 0 1.5rem 0;
+  color: white;
+  font-family: 'Georgia', serif;
+  line-height: 1.2;
+  letter-spacing: -0.5px;
+}
+
+.empty-gallery-message .description {
+  font-size: 1rem;
+  font-weight: 400;
+  color: #d0d0d0;
+  margin: 0 0 2.5rem 0;
+  line-height: 1.5;
+  max-width: 450px;
+  margin-left: auto;
+  margin-right: auto;
+  font-family: 'Arial', sans-serif;
+}
+
+.empty-gallery-message .start-here-btn {
+  background: white;
+  color: black;
+  border: 2px solid black;
+  padding: 1rem 2.5rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-family: 'Arial', sans-serif;
+  min-width: 140px;
+}
+
+.empty-gallery-message .start-here-btn:hover {
+  background: black;
+  color: white;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+}
+
+/* Tablet Responsiveness for Start Panel */
+@media (max-width: 1024px) and (min-width: 769px) {
+  .startPanel {
+    padding: 2.5rem 2rem;
+    margin: 1rem;
+    max-width: 85%;
+    width: 85%;
+  }
+  
+  .startPanel .heading {
+    font-size: 1.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .startPanel .text {
+    font-size: 1rem;
+    margin-bottom: 2rem;
+  }
+  
+  .startPanel .startButton {
+    padding: 0.875rem 2rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Mobile Responsiveness for Start Panel */
+@media (max-width: 768px) {
+  .startPanel {
+    padding: 1.5rem 1rem;
+    margin: 0.5rem;
+    max-width: 95%;
+    width: 95%;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+  
+  /* Step 4 Frame Selection Mobile Fixes */
+  .frame-selection-grid {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    max-height: 50vh !important;
+  }
+  
+  .frame-option {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+  
+  /* Step 5 Review Order Mobile Fixes */
+  .order-summary {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    max-height: 50vh !important;
+    padding: 1rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .summary-items {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    max-height: 40vh !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .summary-item {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+  
+  /* Step 1 Background Selection Mobile Fixes */
+  .background-selection {
+    max-height: 50vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .background-options {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+    padding: 1rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+  }
+  
+  .background-option {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+    min-height: 44px !important;
+    min-width: 44px !important;
+    padding: 8px !important;
+  }
+  
+  /* Step 2 Layout Selection Mobile Fixes - Enhanced */
+  .layout-options {
+    max-height: 50vh !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    padding: 1rem !important;
+    position: relative !important;
+    z-index: 1 !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .layout-option {
+    touch-action: manipulation !important;
+    -webkit-tap-highlight-color: transparent !important;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    user-select: none !important;
+  }
+  
+  /* Step 1, 2, 3, 4, 5 Container Protection - ALL STEPS */
+  .builder-step[data-step="1"] {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .builder-step[data-step="2"] {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .builder-step[data-step="3"] {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .builder-step[data-step="4"] {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .builder-step[data-step="5"] {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  /* Frame Selection Grid Mobile Optimization */
+  .frame-selection-grid {
+    display: grid !important;
+    grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)) !important;
+    gap: 1rem !important;
+    padding: 1rem !important;
+  }
+  
+  /* CRITICAL: Force scroll behavior for all scrollable containers */
+  .background-options, .layout-options, .order-summary, .frame-selection-grid, .summary-items {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: auto !important;
+    pointer-events: auto !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  /* ULTRA CRITICAL: Force all builder-steps to be scrollable on mobile */
+  .builder-step {
+    touch-action: pan-y !important;
+    -webkit-overflow-scrolling: touch !important;
+    overflow-y: auto !important;
+    overscroll-behavior: contain !important;
+    max-height: calc(35vh - 2rem) !important;
+  }
+  
+  /* Ensure touch events work on scrollable containers */
+  .background-options *, .layout-options *, .order-summary *, .frame-selection-grid *, .summary-items * {
+    touch-action: manipulation !important;
+    pointer-events: auto !important;
+  }
+  
+  .frame-option {
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    padding: 0.75rem !important;
+    border: 2px solid #e0e0e0 !important;
+    border-radius: 8px !important;
+    background: white !important;
+    transition: all 0.2s ease !important;
+  }
+  
+  .frame-option:hover,
+  .frame-option.selected {
+    border-color: #007bff !important;
+    background: #f8f9fa !important;
+  }
+  
+  .frame-preview {
+    width: 80px !important;
+    height: 80px !important;
+    border-radius: 4px !important;
+    overflow: hidden !important;
+    margin-bottom: 0.5rem !important;
+  }
+  
+  .frame-name {
+    font-size: 0.8rem !important;
+    text-align: center !important;
+    font-weight: 500 !important;
+    color: #333 !important;
+  }
+  
+  .startPanel .topHeading {
+    font-size: 0.75rem;
+    margin-bottom: 0.75rem;
+  }
+  
+  .startPanel .heading {
+    font-size: 1.4rem;
+    margin-bottom: 0.75rem;
+    line-height: 1.3;
+  }
+  
+  .startPanel .text {
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+    line-height: 1.4;
+  }
+  
+  .startPanel .startButton {
+    padding: 0.75rem 1.5rem;
+    font-size: 0.85rem;
+  }
+}
+
+/* Extra small mobile devices */
+@media (max-width: 480px) {
+  .startPanel {
+    padding: 1rem 0.75rem;
+    margin: 0.25rem;
+    max-width: 98%;
+    width: 98%;
+    max-height: 85vh;
+  }
+  
+  .startPanel .topHeading {
+    font-size: 0.7rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .startPanel .heading {
+    font-size: 1.2rem;
+    margin-bottom: 0.5rem;
+  }
+  
+  .startPanel .text {
+    font-size: 0.8rem;
+    margin-bottom: 1rem;
+  }
+  
+  .startPanel .startButton {
+    padding: 0.6rem 1.25rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Saved Galleries Dropdown - USING THEME'S ArrowSubMenu PATTERN */
+.saved-galleries-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.saved-galleries-dropdown .dropdown-toggle {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  position: relative;
+  cursor: pointer;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 8px 16px;
+  font-size: 14px;
+  color: #333;
+  transition: all 0.2s ease;
+}
+
+.saved-galleries-dropdown .dropdown-toggle:hover {
+  background: #f5f5f5;
+  border-color: #999;
+}
+
+.saved-galleries-dropdown .dropdown-toggle i.fa-chevron-down {
+  font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+/* Ultra simple dropdown styling */
+.saved-galleries-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 99999 !important;
+  max-height: 300px;
+  overflow-y: auto;
+  min-width: 250px;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: none !important;
+}
+
+.saved-galleries-menu.active {
+  display: block !important;
+}
+
+.saved-galleries-list {
+  padding: 0.5rem 0;
+}
+
+.saved-gallery-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid #eee;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.saved-gallery-item:hover {
+  background-color: #f8f9fa;
+}
+
+.saved-gallery-item:last-child {
+  border-bottom: none;
+}
+
+.saved-gallery-preview {
+  width: 60px;
+  height: 50px;
+  background: #f8f9fa;
+  border-radius: 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  margin-right: 0.75rem;
+  flex-shrink: 0;
+  position: relative;
+}
+
+.mini-gallery-wall {
+  position: relative;
+  width: 50px;
+  height: 40px;
+  background: #f8f9fa;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.mini-frame {
+  position: absolute;
+  border: 1px solid #333;
+  background: #f8f9fa;
+  border-radius: 1px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 4px;
+  color: #666;
+  text-align: center;
+  padding: 1px;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.1);
+  min-width: 8px;
+  min-height: 10px;
+}
+
+.saved-gallery-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.saved-gallery-name {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saved-gallery-date {
+  font-size: 0.75rem;
+  color: #666;
+}
+
+.saved-gallery-actions {
+  display: flex;
+  gap: 0.5rem;
+  margin-left: 0.75rem;
+}
+
+.btn-load, .btn-delete {
+  padding: 0.25rem 0.5rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-load:hover {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.btn-delete:hover {
+  background: #dc3545;
+  color: white;
+  border-color: #dc3545;
+}
+
+.saved-galleries-list {
+  padding: 0.5rem 0;
+}
+
+.saved-gallery-item {
+  display: flex;
+  align-items: center;
+  padding: 0.75rem 1rem;
+  cursor: pointer;
+  border-bottom: 1px solid #f0f0f0;
+  transition: background-color 0.2s ease;
+}
+
+.saved-gallery-item:hover {
+  background-color: #f8f9fa;
+}
+
+.saved-gallery-item:last-child {
+  border-bottom: none;
+}
+
+.saved-gallery-preview {
+  width: 60px;
+  height: 40px;
+  background: #f0f0f0;
+  border-radius: 4px;
+  margin-right: 0.75rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.saved-gallery-info {
+  flex: 1;
+  min-width: 0;
+}
+
+.saved-gallery-name {
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 0.25rem;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.saved-gallery-date {
+  font-size: 0.8rem;
+  color: #666;
+}
+
+.saved-gallery-actions {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.saved-gallery-actions button {
+  padding: 0.25rem 0.5rem;
+  font-size: 0.75rem;
+  border: 1px solid #ddd;
+  background: white;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.saved-gallery-actions .btn-load {
+  color: #007bff;
+  border-color: #007bff;
+}
+
+.saved-gallery-actions .btn-load:hover {
+  background: #007bff;
+  color: white;
+}
+
+.saved-gallery-actions .btn-delete {
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.saved-gallery-actions .btn-delete:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.empty-saved-galleries {
+  padding: 1rem;
+  text-align: center;
+  color: #666;
+  font-style: italic;
+}
+
+/* Fix for gallery name input */
+#gallery-name {
+  width: 100% !important;
+  padding: 0.75rem !important;
+  border: 2px solid #ddd !important;
+  border-radius: 4px !important;
+  font-size: 1rem !important;
+  background: white !important;
+  color: #333 !important;
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+  touch-action: manipulation !important;
+  outline: none !important;
+  box-sizing: border-box !important;
+  /* iOS fix: ensure input is clickable and focusable */
+  -webkit-appearance: none !important;
+  appearance: none !important;
+  -webkit-tap-highlight-color: transparent !important;
+  /* iOS fix: prevent zoom on focus */
+  font-size: 16px !important;
+  /* iOS fix: ensure proper rendering */
+  transform: translateZ(0) !important;
+  -webkit-transform: translateZ(0) !important;
+}
+
+#gallery-name:focus {
+  border-color: #007bff !important;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.25) !important;
+}
+
+#gallery-name:disabled {
+  background: #f8f9fa !important;
+  color: #6c757d !important;
+  cursor: not-allowed !important;
+}
+
+#gallery-name[readonly] {
+  background: #f8f9fa !important;
+  color: #6c757d !important;
+}
+
+/* Ensure modal allows interaction */
+#save-gallery-modal {
+  pointer-events: auto !important;
+  z-index: 10000 !important;
+}
+
+#save-gallery-modal .modal-content {
+  pointer-events: auto !important;
+}
+
+#save-gallery-modal .form-group {
+  pointer-events: auto !important;
+}
+
+#save-gallery-modal input {
+  pointer-events: auto !important;
+  user-select: text !important;
+  -webkit-user-select: text !important;
+  -moz-user-select: text !important;
+  -ms-user-select: text !important;
+}
+
+/* iOS/Safari specific fixes */
+@supports (-webkit-touch-callout: none) {
+  #save-gallery-modal {
+    -webkit-overflow-scrolling: touch !important;
+    position: fixed !important;
+    top: 0 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+  }
+  
+  #save-gallery-modal .modal-content {
+    position: relative !important;
+    margin: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  #gallery-name {
+    -webkit-user-select: text !important;
+    user-select: text !important;
+    -webkit-tap-highlight-color: rgba(0, 123, 255, 0.3) !important;
+    /* Force iOS to show keyboard */
+    cursor: text !important;
+  }
+  
+  /* Prevent iOS from zooming on input focus */
+  #save-gallery-modal .form-group input:focus {
+    font-size: 16px !important;
+  }
+}
+
+/* Mobile Responsiveness for Dropdown */
+@media (max-width: 768px) {
+  .saved-galleries-menu {
+    min-width: 200px;
+    max-height: 250px;
+  }
+  
+  .saved-gallery-item {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .saved-gallery-preview {
+    width: 30px;
+    height: 30px;
+    margin-right: 0.5rem;
+  }
+  
+  .saved-gallery-name {
+    font-size: 0.9rem;
+  }
+  
+  .saved-gallery-date {
+    font-size: 0.75rem;
+  }
+  
+  /* Mobile responsiveness for Saved Gallery Walls Modal */
+  .saved-galleries-modal .modal-content {
+    max-width: 95%;
+    width: 95%;
+    margin: 10px;
+  }
+  
+  /* Mobile DESENIO STYLE */
+  .savedWallsPicker .item {
+    width: 150px;
+    height: 100px;
+    margin-right: 8px;
+  }
+  
+  .savedWallsPicker .item .name {
+    font-size: 11px;
+    padding: 6px 8px;
+  }
+  
+  .savedWallsPicker .item .remove {
+    width: 20px;
+    height: 20px;
+    top: 6px;
+    right: 6px;
+  }
+  
+  .savedWallsPicker .item .remove i {
+    font-size: 10px;
+  }
+}
+
+/* Save Success Modal Styles */
+.save-success-modal {
+  display: none;
+  position: fixed;
+  z-index: 10000;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  backdrop-filter: blur(5px);
+}
+
+.save-success-modal .modal-content {
+  background: white;
+  margin: 5% auto;
+  padding: 0;
+  border-radius: 12px;
+  width: 90%;
+  max-width: 500px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: modalSlideIn 0.3s ease-out;
+}
+
+.save-success-modal .modal-header {
+  background: #4CAF50;
+  color: white;
+  padding: 1.5rem;
+  border-radius: 12px 12px 0 0;
+  text-align: center;
+  position: relative;
+}
+
+.save-success-modal .modal-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.save-success-modal .close-modal {
+  position: absolute;
+  right: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  color: white;
+  font-size: 1.5rem;
+  cursor: pointer;
+  padding: 0.5rem;
+  border-radius: 50%;
+  transition: background-color 0.2s;
+}
+
+.save-success-modal .close-modal:hover {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.save-success-modal .modal-body {
+  padding: 2rem;
+  text-align: center;
+}
+
+.save-success-modal .success-icon {
+  font-size: 4rem;
+  color: #4CAF50;
+  margin-bottom: 1rem;
+  animation: successPulse 0.6s ease-out;
+}
+
+.save-success-modal .success-message {
+  font-size: 1.1rem;
+  color: #333;
+  margin-bottom: 1rem;
+  font-weight: 500;
+}
+
+.save-success-modal .cart-question {
+  font-size: 1rem;
+  color: #666;
+  margin-bottom: 1.5rem;
+}
+
+.save-success-modal .gallery-summary {
+  background: #f8f9fa;
+  border-radius: 8px;
+  padding: 1rem;
+  margin-bottom: 1.5rem;
+  text-align: left;
+}
+
+.save-success-modal .gallery-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #e9ecef;
+}
+
+.save-success-modal .gallery-item:last-child {
+  border-bottom: none;
+}
+
+.save-success-modal .gallery-item-name {
+  font-weight: 500;
+  color: #333;
+}
+
+.save-success-modal .gallery-item-price {
+  color: #666;
+  font-weight: 600;
+}
+
+.save-success-modal .modal-actions {
+  display: flex;
+  gap: 1rem;
+  justify-content: center;
+  padding: 0 2rem 2rem;
+}
+
+.save-success-modal .btn-continue {
+  background: #6c757d;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-success-modal .btn-continue:hover {
+  background: #5a6268;
+}
+
+.save-success-modal .btn-add-to-cart {
+  background: #007bff;
+  color: white;
+  border: none;
+  padding: 0.75rem 1.5rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.save-success-modal .btn-add-to-cart:hover {
+  background: #0056b3;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-50px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes successPulse {
+  0% {
+    transform: scale(0.8);
+    opacity: 0;
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+    /* Gallery Frames - Desenio Style */
+    .gallery-frame {
+      position: absolute;
+      background: #ffffff;
+      border: 2px solid #e0e0e0;
+      border-radius: 0px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: grab;
+      transition: all 0.2s ease;
+      min-width: 20px;
+      min-height: 25px;
+      overflow: hidden;
+      user-select: none;
+      z-index: 10;
+      box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    }
+
+    .gallery-frame:hover {
+      border-color: #999;
+      transform: scale(1.01);
+      box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+      cursor: grab;
+    }
+
+    .gallery-frame:active {
+      cursor: grabbing;
+    }
+
+    .gallery-frame.selected {
+      border-color: #fb6b00;
+      box-shadow: 0 0 0 2px rgba(251, 107, 0, 0.2);
+      transform: scale(1.02);
+    }
+
+    .gallery-frame.dragging {
+      z-index: 1000;
+      transform: rotate(1deg) scale(1.03);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+      opacity: 0.95;
+      cursor: grabbing;
+      transition: none; /* Remove transition during drag for smooth movement */
+    }
+
+.gallery-frame img {
+  width: 100% !important;
+  height: 100% !important;
+  object-fit: cover !important;
+  background: white;
+  padding: 0;
+  border-radius: 4px;
+  display: block;
+  position: relative;
+  transition: all 0.3s ease;
+}
+
+
+    .frame-placeholder {
+      text-align: center;
+      color: #666;
+      font-size: 0.8rem;
+      padding: 0.5rem;
+      background: #f0f0f0;
+      border-radius: 4px;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .frame-size {
+      position: absolute;
+      bottom: 4px;
+      right: 4px;
+      background: rgba(0,0,0,0.8);
+      color: white;
+      padding: 2px 6px;
+      border-radius: 3px;
+      font-size: 0.6rem;
+      font-weight: bold;
+      text-align: center;
+      white-space: nowrap;
+      z-index: 5;
+    }
+
+/* Product Items - styles moved to main .product-item rule above */
+
+/* Layout Options - styles moved to main .layout-option rule above */
+
+/* Drag Over States */
+.drag-over {
+  border-color: #fb6b00 !important;
+  background: rgba(251, 107, 0, 0.1) !important;
+  transform: scale(1.02);
+}
+
+.gallery-wall-area.drag-over {
+  border: none !important;
+  background: transparent !important;
+}
+
+/* Layout Applied */
+.layout-applied {
+  text-align: center;
+  padding: 1rem;
+  color: #fb6b00;
+  font-weight: bold;
+}
+
+.layout-applied .layout-name {
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+}
+
+/* Full Screen Override */
+.gallery-wall-builder * {
+  box-sizing: border-box;
+}
+
+.gallery-wall-builder .row {
+  max-width: 100vw !important;
+  width: 100vw !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.gallery-wall-builder .small-12 {
+  width: 100% !important;
+  max-width: 100% !important;
+  padding: 0 !important;
+  margin: 0 !important;
+}
+
+/* Navigation Inside Sidebar - Like Desenio */
+.builder-navigation {
+  display: flex;
+  flex-direction: column;
+  gap: 0;
+  padding: 0;
+  margin-top: auto;
+  border-top: 1px solid #e0e0e0;
+}
+
+.builder-navigation .btn-nav {
+  padding: 16px 24px;
+  border: none;
+  background: #000;
+  color: white;
+  font-weight: 600;
+  border-radius: 0;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  width: 100%;
+  text-align: center;
+  font-size: 14px;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+.builder-navigation .btn-nav:hover:not(:disabled) {
+  background: #333;
+}
+
+.builder-navigation .btn-nav:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.builder-navigation .btn-next {
+  background: #000;
+  color: white;
+  order: -1; /* Next button first like Desenio */
+}
+
+.builder-navigation .btn-prev {
+  background: white;
+  color: #000;
+  border: 1px solid #e0e0e0;
+}
+
+.builder-navigation .btn-prev:hover:not(:disabled) {
+  background: #f5f5f5;
+}
+
+/* Print Styles */
+@media print {
+  .gallery-builder-sidebar,
+  .canvas-controls,
+  .builder-navigation-external {
+    display: none;
+  }
+  
+  .gallery-builder-canvas {
+    width: 100%;
+  }
+}
+
+/* Filter Sidebar - Desenio Style */
+.filter-sidebar {
+  position: fixed !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 350px !important;
+  height: 100vh !important;
+  background: white !important;
+  z-index: 99999 !important;
+  transform: translateX(100%) !important;
+  transition: transform 0.3s ease !important;
+  box-shadow: -2px 0 10px rgba(0,0,0,0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+}
+
+.filter-sidebar.active {
+  transform: translateX(0) !important;
+  display: flex !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+.filter-sidebar-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+}
+
+.filter-sidebar-header h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.filter-sidebar-close {
+  background: none;
+  border: none;
+  cursor: pointer;
+  padding: 8px;
+  border-radius: 4px;
+  transition: background-color 0.2s ease;
+}
+
+.filter-sidebar-close:hover {
+  background: #f5f5f5;
+}
+
+.filter-sidebar-tabs {
+  display: flex;
+  padding: 0 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+}
+
+.filter-sidebar-tab {
+  background: none;
+  border: none;
+  padding: 16px 20px;
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  color: #666;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.filter-sidebar-tab.active {
+  color: #333;
+  border-bottom-color: #333;
+}
+
+.filter-sidebar-tab:hover {
+  color: #333;
+  background: #f8f8f8;
+}
+
+.filter-sidebar-content {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  background: #f8f8f8;
+}
+
+.filter-section {
+  margin-bottom: 24px;
+}
+
+.filter-section-header {
+  margin-bottom: 12px;
+}
+
+.filter-section-header h4 {
+  font-size: 14px;
+  font-weight: 600;
+  color: #333;
+  margin: 0;
+}
+
+.filter-options {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.filter-option {
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  font-size: 14px;
+  color: #666;
+  text-align: left;
+  width: 100%;
+}
+
+.filter-option:hover {
+  border-color: #999;
+  background: #f8f8f8;
+}
+
+.filter-option.active {
+  border-color: #333;
+  background: #333;
+  color: white;
+}
+
+/* Save Gallery Modal */
+.save-gallery-modal,
+.saved-galleries-modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: none;
+  justify-content: center;
+  align-items: center;
+  z-index: 10001;
+  -webkit-overflow-scrolling: touch;
+  overflow-y: auto;
+  /* iOS fix: transform for hardware acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  /* iOS fix: prevent scrolling issues */
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+/* Specific styling for Saved Gallery Walls Modal - DESENIO STYLE */
+.saved-galleries-modal .modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 900px; /* Even wider for carousel */
+  width: 95%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+}
+
+/* DESENIO STYLE - Saved Walls Picker */
+.savedWallsPicker {
+  padding: 20px;
+}
+
+.savedWallsPicker .listing {
+  position: relative;
+  display: block;
+  box-sizing: border-box;
+}
+
+.savedWallsPicker .slick-list {
+  position: relative;
+  display: block;
+  overflow: hidden;
+  margin: 0;
+  padding: 0;
+}
+
+.savedWallsPicker .slick-track {
+  position: relative;
+  top: 0;
+  left: 0;
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.savedWallsPicker .slick-track:before,
+.savedWallsPicker .slick-track:after {
+  display: table;
+  content: '';
+}
+
+.savedWallsPicker .slick-track:after {
+  clear: both;
+}
+
+.savedWallsPicker .slick-slide {
+  display: none;
+  float: left;
+  height: 100%;
+  min-height: 1px;
+}
+
+.savedWallsPicker .slick-slide.slick-active {
+  display: block;
+}
+
+/* DESENIO STYLE - Gallery Items */
+.savedWallsPicker .item {
+  position: relative;
+  display: inline-block;
+  width: 174px;
+  height: 119px;
+  margin-right: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.savedWallsPicker .item:hover {
+  transform: scale(1.05);
+  z-index: 10;
+}
+
+.savedWallsPicker .item .inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.savedWallsPicker .item .image {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  border-radius: 8px;
+}
+
+.savedWallsPicker .item .name {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  padding: 8px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  text-align: center;
+  border-radius: 0 0 8px 8px;
+}
+
+.savedWallsPicker .item .remove {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  width: 24px;
+  height: 24px;
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  opacity: 0;
+}
+
+.savedWallsPicker .item:hover .remove {
+  opacity: 1;
+}
+
+.savedWallsPicker .item .remove:hover {
+  background: #ff4444;
+  color: white;
+}
+
+.savedWallsPicker .item .remove i {
+  font-size: 12px;
+  color: #666;
+}
+
+.savedWallsPicker .item .remove:hover i {
+  color: white;
+}
+
+.modal-content {
+  background: white;
+  border-radius: 8px;
+  padding: 0;
+  max-width: 500px;
+  width: 90%;
+  max-height: 80vh;
+  overflow: hidden;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+  /* iOS fix: ensure modal content is interactive */
+  position: relative;
+  z-index: 10002;
+  pointer-events: auto !important;
+  /* iOS fix: hardware acceleration */
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+}
+
+.modal-header {
+  padding: 20px 30px;
+  border-bottom: 1px solid #e0e0e0;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.close-modal {
+  background: none;
+  border: none;
+  font-size: 24px;
+  color: #999;
+  cursor: pointer;
+  padding: 0;
+  width: 30px;
+  height: 30px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50%;
+  transition: all 0.2s ease;
+}
+
+.close-modal:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.modal-body {
+  padding: 30px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: 500;
+  color: #333;
+  font-size: 14px;
+}
+
+.form-group input {
+  width: 100%;
+  padding: 12px 16px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 16px; /* iOS fix: prevent zoom on focus */
+  transition: border-color 0.2s ease;
+  box-sizing: border-box;
+  /* iOS fix: ensure input is interactive */
+  -webkit-appearance: none;
+  appearance: none;
+  -webkit-tap-highlight-color: transparent;
+  pointer-events: auto !important;
+  touch-action: manipulation;
+}
+
+.form-group input:focus {
+  outline: none;
+  border-color: #007bff;
+  box-shadow: 0 0 0 2px rgba(0, 123, 255, 0.1);
+}
+
+.modal-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+}
+
+.btn-save {
+  background: #28a745;
+  color: white;
+  border: none;
+  padding: 12px 24px;
+  border-radius: 4px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.btn-save:hover {
+  background: #218838;
+}
+
+.btn-save:disabled {
+  background: #ccc;
+  cursor: not-allowed;
+}
+
+/* Saved Galleries List */
+.saved-galleries-list {
+  max-height: 400px;
+  overflow-y: auto;
+}
+
+.saved-gallery-item {
+  display: flex;
+  align-items: center;
+  padding: 15px;
+  border: 1px solid #e0e0e0;
+  border-radius: 8px;
+  margin-bottom: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  background: #fafafa;
+}
+
+.saved-gallery-item:hover {
+  background: #f0f0f0;
+  border-color: #007bff;
+}
+
+.saved-gallery-preview {
+  width: 60px;
+  height: 60px;
+  background: #f5f5f5;
+  border-radius: 4px;
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 12px;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.saved-gallery-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  min-height: 60px;
+}
+
+.saved-gallery-name {
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 4px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.saved-gallery-details {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+
+.saved-gallery-background {
+  font-size: 12px;
+  color: #666;
+  font-weight: 400;
+}
+
+.saved-gallery-date {
+  font-size: 12px;
+  color: #999;
+  font-weight: 400;
+}
+
+.saved-gallery-price {
+  font-size: 16px;
+  font-weight: 700;
+  color: #2c5aa0;
+  margin-top: auto;
+}
+
+.saved-gallery-date {
+  font-size: 12px;
+  color: #666;
+}
+
+.saved-gallery-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.btn-load,
+.btn-delete {
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-load {
+  background: #007bff;
+  color: white;
+}
+
+.btn-load:hover {
+  background: #0056b3;
+}
+
+.btn-delete {
+  background: #dc3545;
+  color: white;
+}
+
+.btn-delete:hover {
+  background: #c82333;
+}
+
+/* Empty State */
+.empty-saved-galleries {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-saved-galleries i {
+  font-size: 48px;
+  color: #ddd;
+  margin-bottom: 16px;
+  display: block;
+}
+
+.empty-saved-galleries p {
+  margin: 0;
+  font-size: 14px;
+}
+
+/* DESENIO STYLE - Saved Gallery Walls Dropdown */
+.saved-galleries-dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.saved-galleries-menu {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  min-width: 800px;
+  max-width: 1000px;
+  max-height: 500px;
+  overflow-y: auto;
+  display: none;
+}
+
+.saved-galleries-menu.active {
+  display: block;
+}
+
+.saved-galleries-list {
+  padding: 20px;
+  display: flex;
+  flex-wrap: nowrap;
+  gap: 10px;
+  justify-content: flex-start;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+.saved-gallery-item {
+  width: 174px;
+  margin: 0 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.saved-gallery-item:hover {
+  transform: translateY(-2px);
+}
+
+.saved-gallery-item .inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.saved-gallery-item .image.relative {
+  position: relative;
+  width: 160px;
+  height: 119px;
+  border-radius: 6px;
+  overflow: hidden;
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+  margin: 0 auto;
+  transition: all 0.3s ease;
+}
+
+.saved-gallery-item .image.relative:hover {
+  transform: scale(1.02);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
+
+.saved-gallery-item .name {
+  position: absolute;
+  bottom: 8px;
+  left: 8px;
+  color: white;
+  font-size: 12px;
+  font-weight: bold;
+  text-shadow: 0 1px 3px rgba(0,0,0,0.8);
+  background: rgba(0,0,0,0.3);
+  padding: 2px 6px;
+  border-radius: 3px;
+}
+
+.saved-gallery-item .remove.smooth {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.6);
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 10px;
+  transition: all 0.3s ease;
+}
+
+.saved-gallery-item .remove.smooth:hover {
+  background: #dc3545;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 3px 8px rgba(220,53,69,0.3);
+}
+
+.saved-gallery-item .load-btn {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  background: rgba(0,123,255,0.8);
+  color: white;
+  border: none;
+  border-radius: 3px;
+  padding: 4px 8px;
+  cursor: pointer;
+  font-size: 10px;
+  font-weight: bold;
+  transition: all 0.3s ease;
+}
+
+.saved-gallery-item .load-btn:hover {
+  background: rgba(0,123,255,1);
+  transform: scale(1.05);
+}
+
+.mini-frame {
+  position: absolute;
+  border: 1px solid #333;
+  background: white;
+  border-radius: 2px;
+  box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+}
+
+
+.btn-load, .btn-delete {
+  flex: 1;
+  padding: 6px 12px;
+  border: 1px solid;
+  border-radius: 4px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-load {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.btn-load:hover {
+  background: #0056b3;
+  border-color: #0056b3;
+}
+
+.btn-delete {
+  background: white;
+  color: #dc3545;
+  border-color: #dc3545;
+}
+
+.btn-delete:hover {
+  background: #dc3545;
+  color: white;
+}
+
+.empty-saved-galleries {
+  text-align: center;
+  padding: 40px 20px;
+  color: #666;
+}
+
+.empty-saved-galleries i {
+  font-size: 48px;
+  margin-bottom: 16px;
+  color: #ccc;
+}
+
+/* Mobile responsiveness for Saved Gallery Walls Dropdown */
+@media (max-width: 768px) {
+  .saved-galleries-menu {
+    min-width: 350px;
+    max-width: 95vw;
+  }
+  
+  .saved-galleries-list {
+    padding: 15px;
+    gap: 10px;
+  }
+  
+  .saved-gallery-item {
+    min-width: 160px;
+    max-width: 180px;
+    padding: 10px;
+  }
+  
+  .mini-gallery-wall {
+    width: 300px;
+    height: 200px;
+  }
+  
+/* Mobile Gallery Frame Size Improvements - MANTENDO MESMA PROPORÇÃO DO DESKTOP */
+  
+  .mini-frame {
+    font-size: 6px;
+  }
+}
+
+
+/* ===== TABLET FRAME SIZES - PRIORIDADE MÁXIMA ===== */
+@media (max-width: 1024px) {
+  .gallery-frame[data-size="70x100"] {
+    width: 20% !important;
+    padding-bottom: 28% !important;
+  }
+  
+  .gallery-frame[data-size="84.1x118.9"],
+  .gallery-frame[data-size="84x119"] {
+    width: 24% !important;
+    padding-bottom: 35% !important;
+  }
+  
+  .gallery-frame[data-size="29.7x42"],
+  .gallery-frame[data-size="29x42"] {
+    width: 14% !important;
+    padding-bottom: 17% !important;
+  }
+  
+  /* Ajustar fundo branco e texto dos frames para tablet */
+  .gallery-frame .inner {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  .gallery-frame .frame-size {
+    font-size: 9px !important;
+    padding: 1px 3px !important;
+    background: none !important;
+  }
+}
+
+/* ===== MOBILE FRAME SIZES - PRIORIDADE MÁXIMA ===== */
+@media (max-width: 768px) {
+  .gallery-frame[data-size="50x70"] {
+    width: 18% !important; /* AUMENTADO */
+    padding-bottom: 23% !important; /* AUMENTADO */
+  }
+  
+  .gallery-frame[data-size="70x100"] {
+    width: 32% !important; /* AUMENTADO - DIFERENÇA DRAMÁTICA */
+    padding-bottom: 46% !important; /* AUMENTADO - DIFERENÇA DRAMÁTICA */
+  }
+  
+  .gallery-frame[data-size="84.1x118.9"],
+  .gallery-frame[data-size="84x119"] {
+    width: 40% !important;
+    padding-bottom: 57% !important;
+  }
+  
+  .gallery-frame[data-size="40x50"] {
+    width: 18% !important;
+    padding-bottom: 20% !important;
+  }
+  
+  .gallery-frame[data-size="60x80"] {
+    width: 26% !important;
+    padding-bottom: 35% !important;
+  }
+  
+  .gallery-frame[data-size="50x50"] {
+    width: 22% !important;
+    padding-bottom: 22% !important;
+  }
+  
+  .gallery-frame[data-size="30x40"] {
+    width: 18% !important;
+    padding-bottom: 23% !important;
+  }
+  
+  .gallery-frame[data-size="21x30"] {
+    width: 16% !important;
+    padding-bottom: 21% !important;
+  }
+  
+  .gallery-frame[data-size="29.7x42"],
+  .gallery-frame[data-size="29x42"] {
+    width: 30% !important;
+    padding-bottom: 40% !important;
+  }
+  
+  /* Ajustar fundo branco e texto dos frames para mobile */
+  .gallery-frame .inner {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* When frame has frame image applied, keep product centered and sized correctly */
+  .gallery-frame.has-frame .inner {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 88% !important;
+    height: 92% !important;
+    background: transparent !important;
+  }
+  
+  .gallery-frame .frame-size {
+    font-size: 9px !important;
+    padding: 1px 3px !important;
+    background: none !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .gallery-frame[data-size="50x70"] {
+    width: 14% !important; /* AUMENTADO */
+    padding-bottom: 20% !important; /* AUMENTADO */
+  }
+  
+  .gallery-frame[data-size="70x100"] {
+    width: 36% !important; /* AUMENTADO - DIFERENÇA MEGA DRAMÁTICA */
+    padding-bottom: 52% !important; /* AUMENTADO - DIFERENÇA MEGA DRAMÁTICA */
+  }
+  
+  .gallery-frame[data-size="84.1x118.9"],
+  .gallery-frame[data-size="84x119"] {
+    width: 42% !important;
+    padding-bottom: 60% !important;
+  }
+  
+  .gallery-frame[data-size="40x50"] {
+    width: 17% !important;
+    padding-bottom: 21% !important;
+  }
+  
+  .gallery-frame[data-size="60x80"] {
+    width: 28% !important;
+    padding-bottom: 38% !important;
+  }
+  
+  .gallery-frame[data-size="50x50"] {
+    width: 24% !important;
+    padding-bottom: 24% !important;
+  }
+  
+  .gallery-frame[data-size="30x40"] {
+    width: 20% !important;
+    padding-bottom: 26% !important;
+  }
+  
+  .gallery-frame[data-size="21x30"] {
+    width: 18% !important;
+    padding-bottom: 24% !important;
+  }
+  
+  .gallery-frame[data-size="29.7x42"],
+  .gallery-frame[data-size="29x42"] {
+    width: 32% !important;
+    padding-bottom: 43% !important;
+  }
+  
+  /* Ajustar fundo branco e texto dos frames para mobile 480px */
+  .gallery-frame .inner {
+    position: absolute !important;
+    top: 0 !important;
+    left: 0 !important;
+    width: 100% !important;
+    height: 100% !important;
+    background: rgba(255, 255, 255, 0.9) !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+  
+  /* When frame has frame image applied, keep product centered and sized correctly */
+  .gallery-frame.has-frame .inner {
+    top: 50% !important;
+    left: 50% !important;
+    transform: translate(-50%, -50%) !important;
+    width: 88% !important;
+    height: 92% !important;
+    background: transparent !important;
+  }
+  
+  .gallery-frame .frame-size {
+    font-size: 8px !important;
+    padding: 1px 2px !important;
+    background: none !important;
+  }
+}
+
+/* Frame Size Selection Menu Styles - Lateral Slide Like The Poster Club */
+.frame-size-menu {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 350px !important;
+  height: 100vh !important;
+  background: white !important;
+  z-index: 100001 !important;
+  transform: translateX(-100%) !important;
+  transition: transform 0.3s ease !important;
+  box-shadow: 2px 0 10px rgba(0,0,0,0.1) !important;
+  display: flex !important;
+  flex-direction: column !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  overflow-y: auto !important;
+  overflow-x: hidden !important;
+  -webkit-overflow-scrolling: touch !important;
+  touch-action: pan-y !important;
+  overscroll-behavior: contain !important;
+}
+
+.frame-size-menu.active {
+  transform: translateX(0) !important;
+}
+
+/* Backdrop overlay */
+.frame-size-menu-overlay {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  width: 100vw !important;
+  height: 100vh !important;
+  background: rgba(0, 0, 0, 0.5) !important;
+  z-index: 100000 !important;
+  opacity: 0 !important;
+  visibility: hidden !important;
+  transition: opacity 0.3s ease, visibility 0.3s ease !important;
+  pointer-events: auto !important;
+  touch-action: none !important;
+}
+
+.frame-size-menu-overlay.active {
+  opacity: 1 !important;
+  visibility: visible !important;
+}
+
+.size-menu-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  border-bottom: 1px solid #e0e0e0;
+  background: white;
+}
+
+.size-menu-header h4 {
+  margin: 0;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.close-size-menu {
+  background: none;
+  border: none;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  color: #999;
+  padding: 8px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.close-size-menu:hover {
+  background: #f5f5f5;
+  color: #333;
+}
+
+.menu-section {
+  padding: 0 20px 16px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.menu-section:last-child {
+  border-bottom: none;
+}
+
+.menu-section-title {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #666;
+  margin: 0 0 12px 0;
+}
+
+.size-options {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  flex: 1;
+  overflow-y: auto;
+}
+
+.material-options-inline {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.material-option-inline {
+  padding: 10px 16px;
+  background: #f8f8f8;
+  border: 2px solid transparent;
+  border-radius: 6px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: center;
+  flex: 1;
+  min-width: calc(50% - 4px);
+}
+
+.material-option-inline:hover {
+  background: #f0f0f0;
+  border-color: #fb6b00;
+}
+
+.material-option-inline.selected {
+  background: #fff8f0;
+  border-color: #fb6b00;
+}
+
+.material-option-inline .material-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.size-option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: #f8f8f8;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-align: left;
+}
+
+.size-option:hover {
+  background: #f0f0f0;
+  border-color: #fb6b00;
+}
+
+.size-option.selected {
+  background: #fff8f0;
+  border-color: #fb6b00;
+}
+
+.size-option .size-name {
+  font-size: 14px;
+  font-weight: 500;
+  color: #333;
+}
+
+.size-option .size-price {
+  font-size: 14px;
+  font-weight: 600;
+  color: #fb6b00;
+}
+
+/* Mobile adjustments for frame size menu */
+@media (max-width: 768px) {
+  .frame-size-menu {
+    width: 100vw !important; /* Full width on mobile */
+    max-width: 100vw !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .size-menu-content {
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+    touch-action: pan-y !important;
+    overscroll-behavior: contain !important;
+  }
+  
+  .size-menu-header {
+    padding: 15px !important;
+    flex-shrink: 0 !important;
+  }
+  
+  .menu-section {
+    padding: 0 15px 15px !important;
+    touch-action: pan-y !important;
+    overflow-y: auto !important;
+    -webkit-overflow-scrolling: touch !important;
+  }
+  
+  .size-option {
+    padding: 12px !important;
+    touch-action: manipulation !important;
+  }
+  
+  .material-option-inline {
+    touch-action: manipulation !important;
+  }
+}
+
+/* Frame Control Buttons (Edit & Delete) - The Poster Club Style */
+.gallery-frame .frame-controls {
+  position: absolute !important;
+  right: -48px !important; /* ✅ OUTSIDE the frame, to the right like The Poster Club */
+  bottom: 8px !important;
+  display: flex !important; /* ✅ Force display */
+  flex-direction: column !important; /* ✅ Vertical stack */
+  gap: 0 !important;
+  z-index: 99999 !important; /* ✅ Very high z-index */
+  opacity: 0 !important;
+  transition: opacity 0.2s ease !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+  background: rgba(0, 0, 0, 0.75) !important;
+  border-radius: 4px !important;
+  overflow: visible !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2) !important;
+}
+
+/* ✅ Show OUTSIDE frame on hover like The Poster Club - DESKTOP ONLY */
+@media (min-width: 769px) {
+  .gallery-frame:hover .frame-controls {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    display: flex !important;
+  }
+  
+  /* Keep controls visible when hovering over them */
+  .frame-controls:hover {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}
+
+/* ✅ Ensure gallery-wall-area and parent containers allow overflow */
+.gallery-wall-area {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+.canvas-container,
+.room-background {
+  overflow: visible !important;
+  position: relative !important;
+}
+
+/* ✅ Ensure gallery-frame itself has proper stacking */
+.gallery-frame {
+  overflow: visible !important;
+  position: absolute !important;
+}
+
+
+.frame-edit-btn,
+.frame-delete-btn {
+  background: transparent !important; /* ✅ Transparent background */
+  border: none !important; /* ✅ No border */
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1) !important; /* ✅ Subtle separator */
+  width: 40px !important;
+  height: 40px !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  cursor: pointer !important;
+  transition: all 0.2s ease !important;
+  padding: 0 !important;
+  position: relative !important;
+  z-index: 100000 !important;
+  pointer-events: auto !important;
+}
+
+/* Remove border from last button */
+.frame-delete-btn {
+  border-bottom: none !important;
+}
+
+.frame-edit-btn:hover {
+  background: rgba(255, 255, 255, 0.1) !important; /* ✅ Subtle white overlay on hover */
+}
+
+/* Desktop: ensure buttons stay visible when hovering */
+@media (min-width: 769px) {
+  .frame-edit-btn:hover,
+  .frame-delete-btn:hover {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+}
+
+.frame-edit-btn svg,
+.frame-delete-btn svg {
+  color: white !important; /* ✅ White icons like The Poster Club */
+  width: 18px !important;
+  height: 18px !important;
+  transition: color 0.2s, transform 0.2s !important;
+  pointer-events: none !important;
+}
+
+.frame-edit-btn:hover svg {
+  color: #fb6b00 !important;
+  transform: scale(1.1) !important;
+}
+
+.frame-delete-btn:hover {
+  background: rgba(220, 53, 69, 0.2) !important; /* ✅ Red tint on hover */
+}
+
+.frame-delete-btn:hover svg {
+  color: #ff4444 !important;
+  transform: scale(1.1) !important;
+}
+
+
+/* Frame controls positioning on mobile */
+@media (max-width: 768px) {
+  /* ✅ SHOW BUTTONS ONLY WHEN FRAME IS SELECTED (clicked) ON MOBILE */
+  .gallery-frame .frame-controls {
+    right: 4px !important; /* ✅ INSIDE the frame on mobile */
+    bottom: 4px !important;
+    top: auto !important;
+    left: auto !important;
+    transform: none !important;
+    gap: 0 !important;
+    opacity: 0 !important; /* ✅ Hidden by default */
+    visibility: hidden !important; /* ✅ Hidden by default */
+    pointer-events: none !important; /* ✅ Not clickable by default */
+    display: flex !important; /* ✅ Force display */
+    flex-direction: column !important; /* ✅ Vertical stack */
+    background: rgba(0, 0, 0, 0.85) !important; /* Stronger background on mobile */
+    border-radius: 6px !important;
+    z-index: 999999 !important;
+    transition: opacity 0.2s ease, visibility 0.2s ease !important;
+  }
+  
+  /* ✅ Show buttons when frame is selected (mobile) */
+  .gallery-frame.selected .frame-controls {
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    display: flex !important;
+    z-index: 999999 !important;
+    transform: translateZ(0) !important; /* Force hardware acceleration */
+  }
+  
+  .gallery-frame.selected .frame-edit-btn,
+  .gallery-frame.selected .frame-delete-btn {
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+    position: relative !important;
+    z-index: 9999999 !important;
+    transform: translateZ(0) !important; /* Force hardware acceleration */
+  }
+  
+  .frame-edit-btn,
+  .frame-delete-btn {
+    width: 36px !important;
+    height: 36px !important;
+    display: flex !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    pointer-events: auto !important;
+  }
+  
+  .gallery-frame.selected .frame-edit-btn svg,
+  .gallery-frame.selected .frame-delete-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  .frame-edit-btn svg,
+  .frame-delete-btn svg {
+    width: 16px !important;
+    height: 16px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    display: block !important;
+  }
+  
+  /* ✅ Ensure parent containers allow visibility */
+  .gallery-wall-area,
+  .canvas-container,
+  .room-background,
+  .gallery-frame,
+  .gallery-frame.selected {
+    overflow: visible !important;
+    position: relative !important;
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "sections": {
+    "gallery-wall-combo-editable": {
+      "type": "gallery-wall-combo-editable",
+      "settings": {
+        "title": "",
+        "description": "",
+        "main_image": null,
+        "enable_zoom": true,
+        "price": null,
+        "compare_at_price": null,
+        "default_product_type": "Tela",
+        "frame_collection": "",
+        "product_list": []
+      },
+      "blocks": []
+    }
+  },
+  "order": [
+    "gallery-wall-combo-editable"
+  ]
+}
+

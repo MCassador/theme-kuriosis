@@ -1,0 +1,297 @@
+{
+  "sections": {
+    "hero": {
+      "type": "image-with-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Gallery Wall Builder Demo",
+            "heading_size": "h1",
+            "heading_tag": "h1",
+            "heading_color": "#374000"
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Experience our interactive gallery wall builder. Create stunning wall arrangements with our curated art collection and premium frames.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_text": "Try Gallery Builder",
+            "button_link": "/pages/gallery-builder"
+          }
+        }
+      },
+      "block_order": ["heading", "text", "button"],
+      "settings": {
+        "image": "shopify://shop_images/gallery-demo-hero.jpg",
+        "height": "adapt",
+        "desktop_image_width": "medium",
+        "section_width": "full-width-row-full",
+        "layout": "image_first",
+        "content_position": "text-left",
+        "color_bg": "#f8f8f8",
+        "color_text": "#374000",
+        "disable_top_spacing": false,
+        "disable_bottom_spacing": false
+      }
+    },
+    "features": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "How It Works",
+            "size": "h2",
+            "heading_tag": "h2",
+            "heading_color": "#374000",
+            "text_center": true
+          }
+        },
+        "step1": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>1. Choose Your Layout</h3><p>Select from 5 pre-designed gallery layouts or create your own custom arrangement.</p>"
+          }
+        },
+        "step2": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>2. Select Your Art</h3><p>Browse our curated collection of art prints and drag them into your chosen frames.</p>"
+          }
+        },
+        "step3": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>3. Pick Your Frames</h3><p>Choose from 6 premium frame options including oak, black, white, gold, walnut, and brass.</p>"
+          }
+        },
+        "step4": {
+          "type": "text",
+          "settings": {
+            "text": "<h3>4. Preview & Order</h3><p>See your gallery in a realistic room setting, then add everything to your cart with one click.</p>"
+          }
+        }
+      },
+      "block_order": ["heading", "step1", "step2", "step3", "step4"],
+      "settings": {
+        "section_width": "full-width-row-full",
+        "text_width": "large",
+        "text_position": "center",
+        "text_alignment": "center",
+        "color_bg": "#ffffff",
+        "color_text": "#374000",
+        "disable_top_spacing": false,
+        "disable_bottom_spacing": false
+      }
+    },
+    "gallery_builder": {
+      "type": "gallery-wall-builder",
+      "settings": {
+        "heading": "Try Our Gallery Builder",
+        "description": "Create your perfect gallery wall with our interactive tool. Mix and match different sizes, styles, and frames to create a unique display.",
+        "product_collection": "all-prints",
+        "room_image": "shopify://shop_images/gallery-room-background.jpg",
+        "disable_top_spacing": false,
+        "disable_bottom_spacing": false
+      },
+      "blocks": {
+        "layout_classic": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "classic_grid",
+            "layout_name": "Classic Grid",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":440,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        "layout_asymmetric": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "asymmetric",
+            "layout_name": "Asymmetric",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":300,\"height\":400,\"size\":\"70x100\"},{\"x\":540,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        "layout_vertical": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "vertical_stack",
+            "layout_name": "Vertical Stack",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":0,\"y\":270,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":0,\"y\":540,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        "layout_horizontal": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "horizontal_line",
+            "layout_name": "Horizontal Line",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":220,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":440,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":660,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"}]"
+          }
+        },
+        "layout_gallery": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "gallery_style",
+            "layout_name": "Gallery Style",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":150,\"height\":200,\"size\":\"40x50\"},{\"x\":170,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":390,\"y\":0,\"width\":150,\"height\":200,\"size\":\"40x50\"},{\"x\":0,\"y\":220,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":220,\"y\":220,\"width\":150,\"height\":200,\"size\":\"40x50\"},{\"x\":390,\"y\":220,\"width\":200,\"height\":150,\"size\":\"50x40\"}]"
+          }
+        },
+        "frame_oak": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "oak_frame",
+            "frame_name": "Oak Frame",
+            "frame_color": "#E2E2E2",
+            "frame_price": 1500
+          }
+        },
+        "frame_black": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "black_frame",
+            "frame_name": "Black Frame",
+            "frame_color": "#000000",
+            "frame_price": 1200
+          }
+        },
+        "frame_white": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "white_frame",
+            "frame_name": "White Frame",
+            "frame_color": "#FFFFFF",
+            "frame_price": 1000
+          }
+        },
+        "frame_gold": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "gold_frame",
+            "frame_name": "Gold Frame",
+            "frame_color": "#FFD700",
+            "frame_price": 1800
+          }
+        },
+        "frame_walnut": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "walnut_frame",
+            "frame_name": "Walnut Frame",
+            "frame_color": "#5D4E37",
+            "frame_price": 1600
+          }
+        },
+        "frame_brass": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "brass_frame",
+            "frame_name": "Brass Frame",
+            "frame_color": "#B87333",
+            "frame_price": 2000
+          }
+        }
+      },
+      "block_order": [
+        "layout_classic",
+        "layout_asymmetric",
+        "layout_vertical",
+        "layout_horizontal",
+        "layout_gallery",
+        "frame_oak",
+        "frame_black",
+        "frame_white",
+        "frame_gold",
+        "frame_walnut",
+        "frame_brass"
+      ]
+    },
+    "testimonials": {
+      "type": "testimonials",
+      "blocks": {
+        "quote1": {
+          "type": "quote",
+          "settings": {
+            "stars": "5",
+            "text": "The gallery builder made it so easy to visualize how my art would look on the wall. I could try different arrangements and frames before buying!",
+            "author": "Sarah M."
+          }
+        },
+        "quote2": {
+          "type": "quote",
+          "settings": {
+            "stars": "5",
+            "text": "I love being able to mix different sizes and styles. The drag and drop feature is intuitive and the preview looks exactly like the final result.",
+            "author": "Michael R."
+          }
+        },
+        "quote3": {
+          "type": "quote",
+          "settings": {
+            "stars": "5",
+            "text": "Perfect for someone like me who's not great at interior design. The tool guided me through the process and I'm thrilled with my gallery wall!",
+            "author": "Emma L."
+          }
+        }
+      },
+      "block_order": ["quote1", "quote2", "quote3"],
+      "settings": {
+        "full_width": true,
+        "text_size": "medium",
+        "pagination": "none",
+        "autoplay": true,
+        "autoplay_length": 5,
+        "color_bg": "#f8f8f8",
+        "color_text": "#374000",
+        "disable_top_spacing": false,
+        "disable_bottom_spacing": false
+      }
+    },
+    "cta": {
+      "type": "rich-text",
+      "blocks": {
+        "heading": {
+          "type": "heading",
+          "settings": {
+            "text": "Ready to Create Your Gallery?",
+            "size": "h2",
+            "heading_tag": "h2",
+            "heading_color": "#374000",
+            "text_center": true
+          }
+        },
+        "text": {
+          "type": "text",
+          "settings": {
+            "text": "<p>Start building your perfect gallery wall today. With our curated art collection and premium frames, you'll create something truly unique.</p>"
+          }
+        },
+        "button": {
+          "type": "button",
+          "settings": {
+            "button_text": "Start Building Now",
+            "button_link": "/pages/gallery-builder"
+          }
+        }
+      },
+      "block_order": ["heading", "text", "button"],
+      "settings": {
+        "section_width": "full-width-row-full",
+        "text_width": "medium",
+        "text_position": "center",
+        "text_alignment": "center",
+        "color_bg": "#374000",
+        "color_text": "#ffffff",
+        "button_background_color": "#fb6b00",
+        "button_text_color": "#ffffff",
+        "disable_top_spacing": false,
+        "disable_bottom_spacing": false
+      }
+    }
+  },
+  "order": ["hero", "features", "gallery_builder", "testimonials", "cta"]
+}

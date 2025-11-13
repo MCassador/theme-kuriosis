@@ -1,0 +1,125 @@
+{
+  "sections": {
+    "main": {
+      "type": "gallery-wall-builder",
+      "settings": {
+        "heading": "Create Your Perfect Gallery Wall",
+        "description": "Design your dream gallery wall with our curated collection of art prints and premium frames. Mix and match different sizes, styles, and frames to create a unique display that reflects your personality.",
+        "product_collection": "all-prints",
+        "room_image": "shopify://shop_images/gallery-room-background.jpg",
+        "disable_top_spacing": false,
+        "disable_bottom_spacing": false
+      },
+      "blocks": {
+        "layout_classic": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "classic_grid",
+            "layout_name": "Classic Grid",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":440,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        "layout_asymmetric": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "asymmetric",
+            "layout_name": "Asymmetric",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":220,\"y\":0,\"width\":300,\"height\":400,\"size\":\"70x100\"},{\"x\":540,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        "layout_vertical": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "vertical_stack",
+            "layout_name": "Vertical Stack",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":0,\"y\":270,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":0,\"y\":540,\"width\":200,\"height\":250,\"size\":\"50x70\"}]"
+          }
+        },
+        "layout_horizontal": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "horizontal_line",
+            "layout_name": "Horizontal Line",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":220,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":440,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":660,\"y\":0,\"width\":200,\"height\":150,\"size\":\"50x40\"}]"
+          }
+        },
+        "layout_gallery": {
+          "type": "layout",
+          "settings": {
+            "layout_id": "gallery_style",
+            "layout_name": "Gallery Style",
+            "layout_data": "[{\"x\":0,\"y\":0,\"width\":150,\"height\":200,\"size\":\"40x50\"},{\"x\":170,\"y\":0,\"width\":200,\"height\":250,\"size\":\"50x70\"},{\"x\":390,\"y\":0,\"width\":150,\"height\":200,\"size\":\"40x50\"},{\"x\":0,\"y\":220,\"width\":200,\"height\":150,\"size\":\"50x40\"},{\"x\":220,\"y\":220,\"width\":150,\"height\":200,\"size\":\"40x50\"},{\"x\":390,\"y\":220,\"width\":200,\"height\":150,\"size\":\"50x40\"}]"
+          }
+        },
+        "frame_oak": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "oak_frame",
+            "frame_name": "Oak Frame",
+            "frame_color": "#E2E2E2",
+            "frame_price": 1500
+          }
+        },
+        "frame_black": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "black_frame",
+            "frame_name": "Black Frame",
+            "frame_color": "#000000",
+            "frame_price": 1200
+          }
+        },
+        "frame_white": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "white_frame",
+            "frame_name": "White Frame",
+            "frame_color": "#FFFFFF",
+            "frame_price": 1000
+          }
+        },
+        "frame_gold": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "gold_frame",
+            "frame_name": "Gold Frame",
+            "frame_color": "#FFD700",
+            "frame_price": 1800
+          }
+        },
+        "frame_walnut": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "walnut_frame",
+            "frame_name": "Walnut Frame",
+            "frame_color": "#5D4E37",
+            "frame_price": 1600
+          }
+        },
+        "frame_brass": {
+          "type": "frame_option",
+          "settings": {
+            "frame_id": "brass_frame",
+            "frame_name": "Brass Frame",
+            "frame_color": "#B87333",
+            "frame_price": 2000
+          }
+        }
+      },
+      "block_order": [
+        "layout_classic",
+        "layout_asymmetric",
+        "layout_vertical",
+        "layout_horizontal",
+        "layout_gallery",
+        "frame_oak",
+        "frame_black",
+        "frame_white",
+        "frame_gold",
+        "frame_walnut",
+        "frame_brass"
+      ]
+    }
+  },
+  "order": ["main"]
+}

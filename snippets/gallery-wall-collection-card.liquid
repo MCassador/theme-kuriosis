@@ -1,0 +1,35 @@
+{%- liquid
+  # Pega a imagem principal do combo
+  assign has_manual_image = false
+  assign collection_image_url = ''
+  
+  # Prioridade 1: Imagem do block (configurada manualmente - sobrescreve tudo)
+  if block.settings.main_image != blank
+    assign collection_image_url = block.settings.main_image | img_url: '1200x1200'
+    assign has_manual_image = true
+  # Prioridade 2: Imagem da coleção
+  elsif collection.featured_image != blank
+    assign collection_image_url = collection.featured_image | img_url: '1200x1200'
+    assign has_manual_image = true
+  # Prioridade 3: Primeira imagem do primeiro produto da coleção
+  elsif collection.products.first != blank and collection.products.first.featured_image != blank
+    assign collection_image_url = collection.products.first.featured_image | img_url: '1200x1200'
+    assign has_manual_image = true
+  endif
+-%}
+
+<a href="{{ collection.url }}" class="gallery-wall-card" title="{{ collection.title | escape }}" data-collection-url="{{ collection.url }}" data-collection-handle="{{ collection.handle }}" data-collection-id="{{ collection.id }}">
+  {%- if has_manual_image -%}
+    <img 
+      src="{{ collection_image_url }}" 
+      alt="{{ collection.title | escape }}"
+      loading="lazy"
+      width="1200"
+      height="1200"
+      data-collection-image="true"
+      data-collection-handle="{{ collection.handle }}">
+  {%- else -%}
+    {{ 'collection-1' | placeholder_svg_tag: 'gallery-wall-placeholder' }}
+  {%- endif -%}
+</a>
+

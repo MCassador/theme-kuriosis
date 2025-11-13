@@ -1,0 +1,24 @@
+{%- liquid
+  # Pega a imagem principal do combo (featured image ou primeira imagem)
+  assign product_image = product.featured_image | default: product.images.first
+  assign product_image_url = product_image | img_url: '1200x1200'
+  
+  # Tenta pegar a imagem do metafield se existir
+  if product.metafields.custom.combo_main_image
+    assign product_image_url = product.metafields.custom.combo_main_image | img_url: '1200x1200'
+  endif
+-%}
+
+<a href="{{ product.url }}" class="gallery-wall-card" title="{{ product.title | escape }}">
+  {%- if product_image_url != blank -%}
+    <img 
+      src="{{ product_image_url }}" 
+      alt="{{ product.title | escape }}"
+      loading="lazy"
+      width="1200"
+      height="1200">
+  {%- else -%}
+    {{ 'product-1' | placeholder_svg_tag }}
+  {%- endif -%}
+</a>
+

@@ -1,0 +1,991 @@
+{{ 'gallery-wall-combo-editable.css' | asset_url | stylesheet_tag }}
+{{ 'gallery-wall-combo-editable.js' | asset_url | script_tag }}
+
+{% comment %} Configuração JavaScript {% endcomment %}
+<script>
+  window.galleryWallComboConfig = {
+    cartAddUrl: '{{ routes.cart_add_url }}',
+    cartUrl: '{{ routes.cart_url }}',
+    moneyFormat: {{ shop.money_format | json }},
+    frameCollection: {{ section.settings.frame_collection | default: '' | json }},
+    productCollection: {{ section.settings.product_collection | default: '' | json }},
+    products: [
+      {%- comment -%} Prioridade 1: Se tem coleção selecionada, usa produtos da coleção {%- endcomment -%}
+      {% if section.settings.product_collection != blank and collections[section.settings.product_collection] %}
+        {% for product_item in collections[section.settings.product_collection].products %}
+          {% assign combo_product = product_item %}
+          {% if combo_product %}
+            {
+              id: {{ combo_product.id | json }},
+              handle: {{ combo_product.handle | json }},
+              title: {{ combo_product.title | json }},
+              price: {{ combo_product.price | json }},
+              priceFormatted: {{ combo_product.price | money | json }},
+              image: {{ combo_product.featured_image | img_url: '600x600' | json }},
+              url: {{ combo_product.url | json }},
+              productType: {{ section.settings.default_product_type | default: 'Tela' | json }},
+              variants: [
+                {% for variant in combo_product.variants %}
+                  {
+                    id: {{ variant.id | json }},
+                    price: {{ variant.price | json }},
+                    priceFormatted: {{ variant.price | money | json }},
+                    available: {{ variant.available | json }},
+                    option1: {{ variant.option1 | json }},
+                    option2: {{ variant.option2 | json }},
+                    option3: {{ variant.option3 | json }}
+                  }{% unless forloop.last %},{% endunless %}
+                {% endfor %}
+              ],
+              options: [
+                {% for option in combo_product.options_with_values %}
+                  {
+                    name: {{ option.name | json }},
+                    position: {{ option.position | json }},
+                    values: {{ option.values | json }}
+                  }{% unless forloop.last %},{% endunless %}
+                {% endfor %}
+              ]
+            }{% unless forloop.last %},{% endunless %}
+          {% endif %}
+        {% endfor %}
+      {%- comment -%} Prioridade 2: Se não tem coleção, usa product_list {%- endcomment -%}
+      {% elsif section.settings.product_list != blank %}
+        {% for product_item in section.settings.product_list %}
+          {% assign combo_product = product_item %}
+          {% if combo_product %}
+            {
+              id: {{ combo_product.id | json }},
+              handle: {{ combo_product.handle | json }},
+              title: {{ combo_product.title | json }},
+              price: {{ combo_product.price | json }},
+              priceFormatted: {{ combo_product.price | money | json }},
+              image: {{ combo_product.featured_image | img_url: '600x600' | json }},
+              url: {{ combo_product.url | json }},
+              productType: {{ section.settings.default_product_type | default: 'Tela' | json }},
+              variants: [
+                {% for variant in combo_product.variants %}
+                  {
+                    id: {{ variant.id | json }},
+                    price: {{ variant.price | json }},
+                    priceFormatted: {{ variant.price | money | json }},
+                    available: {{ variant.available | json }},
+                    option1: {{ variant.option1 | json }},
+                    option2: {{ variant.option2 | json }},
+                    option3: {{ variant.option3 | json }}
+                  }{% unless forloop.last %},{% endunless %}
+                {% endfor %}
+              ],
+              options: [
+                {% for option in combo_product.options_with_values %}
+                  {
+                    name: {{ option.name | json }},
+                    position: {{ option.position | json }},
+                    values: {{ option.values | json }}
+                  }{% unless forloop.last %},{% endunless %}
+                {% endfor %}
+              ]
+            }{% unless forloop.last %},{% endunless %}
+          {% endif %}
+        {% endfor %}
+      {% else %}
+        {% for block in section.blocks %}
+          {% if block.type == 'combo_product' and block.settings.product != blank %}
+            {% assign combo_product = all_products[block.settings.product] %}
+            {% if combo_product %}
+              {
+                id: {{ combo_product.id | json }},
+                handle: {{ combo_product.handle | json }},
+                title: {{ combo_product.title | json }},
+                price: {{ combo_product.price | json }},
+                priceFormatted: {{ combo_product.price | money | json }},
+                image: {{ combo_product.featured_image | img_url: '600x600' | json }},
+                url: {{ combo_product.url | json }},
+                productType: {{ block.settings.product_type | json }},
+                variants: [
+                  {% for variant in combo_product.variants %}
+                    {
+                      id: {{ variant.id | json }},
+                      price: {{ variant.price | json }},
+                      priceFormatted: {{ variant.price | money | json }},
+                      available: {{ variant.available | json }},
+                      option1: {{ variant.option1 | json }},
+                      option2: {{ variant.option2 | json }},
+                      option3: {{ variant.option3 | json }}
+                    }{% unless forloop.last %},{% endunless %}
+                  {% endfor %}
+                ],
+                options: [
+                  {% for option in combo_product.options_with_values %}
+                    {
+                      name: {{ option.name | json }},
+                      position: {{ option.position | json }},
+                      values: {{ option.values | json }}
+                    }{% unless forloop.last %},{% endunless %}
+                  {% endfor %}
+                ]
+              }{% unless forloop.last %},{% endunless %}
+            {% endif %}
+          {% endif %}
+        {% endfor %}
+      {% endif %}
+    ]
+  };
+</script>
+
+<div class="gallery-wall-combo-editable section-spacing" {{ section.shopify_attributes }}>
+  <div class="combo-container">
+    
+    {% comment %} Imagem Principal (Lado Esquerdo) {% endcomment %}
+    {%- liquid
+      # Salva a imagem principal em um atributo data para facilitar extração
+      assign main_image_url = ''
+      if section.settings.main_image != blank
+        assign main_image_url = section.settings.main_image | img_url: '1200x1200'
+      endif
+    -%}
+    <div class="combo-image-section" data-combo-main-image="{{ main_image_url }}">
+      <div class="combo-main-image-wrapper{% if section.settings.enable_zoom %} zoomable{% endif %}">
+        {% if section.settings.main_image %}
+          <div class="combo-main-image" id="combo-main-image-container">
+            <img src="{{ main_image_url }}" 
+                 alt="{{ section.settings.title | escape }}" 
+                 id="combo-main-image"
+                 class="combo-main-image-img"
+                 data-main-image-url="{{ main_image_url }}"
+                 loading="eager">
+          </div>
+          {% if section.settings.enable_zoom %}
+            <div class="zoom-icon">
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <circle cx="11" cy="11" r="8"></circle>
+                <path d="m21 21-4.35-4.35"></path>
+              </svg>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="combo-main-image">
+            <div class="placeholder-image">
+              {{ 'product-1' | placeholder_svg_tag }}
+              <p>Adicione uma imagem principal nas configurações</p>
+            </div>
+          </div>
+        {% endif %}
+      </div>
+      
+      {% comment %} Título e Descrição {% endcomment %}
+      {% if section.settings.title != blank or section.settings.description != blank %}
+        <div class="combo-image-info">
+          {% if section.settings.title != blank %}
+            <h1 class="combo-title">{{ section.settings.title }}</h1>
+          {% endif %}
+          {% if section.settings.description != blank %}
+            <div class="combo-description">{{ section.settings.description }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+    </div>
+
+    {% comment %} Painel de Personalização (Lado Direito) {% endcomment %}
+    <div class="combo-customization-section">
+      
+      {% comment %} Tabs {% endcomment %}
+      <div class="combo-tabs">
+        <button class="combo-tab active" data-tab="personalize">CUSTOMIZE</button>
+        <button class="combo-tab" data-tab="buy-all">BUY ALL</button>
+      </div>
+
+      {% comment %} Conteúdo do Tab PERSONALIZAR {% endcomment %}
+      <div class="combo-tab-content active" id="tab-personalize">
+        
+        {% comment %} Resumo do que está incluído {% endcomment %}
+        <div class="combo-included">
+          <h3>What's included?</h3>
+          <div class="combo-included-count" id="combo-included-count">
+            {% comment %} Will be filled via JavaScript {% endcomment %}
+          </div>
+        </div>
+
+        {% comment %} Lista de Produtos do Combo {% endcomment %}
+        <div class="combo-products-list" id="combo-products-list">
+          {%- comment -%} Prioridade 1: Se tem coleção selecionada, usa produtos da coleção {%- endcomment -%}
+          {% if section.settings.product_collection != blank and collections[section.settings.product_collection] %}
+            {% for product_item in collections[section.settings.product_collection].products %}
+              {% assign combo_product = product_item %}
+              {% if combo_product %}
+                {% assign product_type = section.settings.default_product_type | default: 'Tela' %}
+                {%- liquid
+                  # Get size and material option indices
+                  assign size_option_index = 0
+                  assign material_option_index = 0
+                  assign has_size_option = false
+                  assign has_material_option = false
+                  
+                  for option in combo_product.options_with_values
+                    if option.name == 'Size'
+                      assign size_option_index = forloop.index0
+                      assign has_size_option = true
+                    endif
+                    if option.name == 'Material'
+                      assign material_option_index = forloop.index0
+                      assign has_material_option = true
+                    endif
+                  endfor
+                  
+                  # Build all-variants map: "size|material:price|variantId"
+                  assign all_variants_map = ''
+                  assign processed_combinations = ''
+                  
+                  for variant in combo_product.variants
+                    if variant.available
+                      assign size_value = variant.options[size_option_index] | default: 'Unknown'
+                      assign material_value = variant.options[material_option_index] | default: 'Unknown'
+                      assign combination_key = size_value | append: '###' | append: material_value
+                      
+                      unless processed_combinations contains combination_key
+                        assign formatted_price = variant.price | divided_by: 100.0 | round: 2
+                        assign variant_entry = size_value | append: '|' | append: material_value | append: ':' | append: formatted_price | append: '|' | append: variant.id
+                        
+                        if all_variants_map != ''
+                          assign all_variants_map = all_variants_map | append: ';'
+                        endif
+                        assign all_variants_map = all_variants_map | append: variant_entry
+                        
+                        if processed_combinations != ''
+                          assign processed_combinations = processed_combinations | append: '||'
+                        endif
+                        assign processed_combinations = processed_combinations | append: combination_key
+                      endunless
+                    endif
+                  endfor
+                -%}
+                <div class="combo-product-item" 
+                  data-product-id="{{ combo_product.id }}"
+                  data-product-type="{{ product_type }}"
+                     data-all-variants="{{ all_variants_map }}"
+                     data-has-size="{{ has_size_option }}"
+                     data-has-material="{{ has_material_option }}">
+                  
+                  {% comment %} Imagem do Produto {% endcomment %}
+                  {%- liquid
+                    # Pega a última imagem do produto (igual gallery-wall-builder)
+                    assign product_image_url = ''
+                    if combo_product.images.size > 2
+                      assign last_index = combo_product.images.size | minus: 1
+                      assign product_image_url = combo_product.images[last_index] | img_url: '600x600'
+                    else
+                      assign product_image_url = combo_product.featured_image | img_url: '600x600'
+                    endif
+                  -%}
+                  <div class="combo-product-image" 
+                       data-product-id="{{ combo_product.id }}"
+                       data-product-image="{{ product_image_url }}">
+                    {% if product_image_url != blank %}
+                      <img src="{{ product_image_url }}" 
+                           alt="{{ combo_product.title }}"
+                           loading="lazy"
+                           class="combo-product-main-image">
+                    {% else %}
+                      <div class="placeholder-image">{{ 'product-1' | placeholder_svg_tag }}</div>
+                    {% endif %}
+                  </div>
+
+                  {% comment %} Informações e Opções {% endcomment %}
+                  <div class="combo-product-info">
+                    <h4 class="combo-product-title">{{ combo_product.title }}</h4>
+                    <span class="combo-product-type">{{ product_type }}</span>
+                    
+                    {% comment %} Opções de Personalização {% endcomment %}
+                    <div class="combo-product-options">
+                      
+                      {% comment %} Opção: Tamanho (Size) com preço {% endcomment %}
+                      {% for option in combo_product.options_with_values %}
+                        {% if option.name == 'Size' %}
+                          {%- liquid
+                            # Pega o primeiro material disponível para calcular preço de cada tamanho
+                            assign default_material = ''
+                            for material_option in combo_product.options_with_values
+                              if material_option.name == 'Material'
+                                assign default_material = material_option.values[0]
+                                break
+                              endif
+                            endfor
+                          -%}
+                          <div class="combo-option-group">
+                            <label class="combo-option-label">{{ option.name }}</label>
+                            <select class="combo-option-select combo-option-select-size" 
+                                    data-option-position="{{ option.position }}"
+                                    data-product-id="{{ combo_product.id }}">
+                              {% for value in option.values %}
+                                {%- liquid
+                                  # Encontra a variante correspondente para este tamanho e material padrão
+                                  assign variant_price = ''
+                                  for variant in combo_product.variants
+                                    if variant.available
+                                      assign variant_size = variant.options[size_option_index] | default: ''
+                                      assign variant_material = variant.options[material_option_index] | default: ''
+                                      if variant_size == value and variant_material == default_material
+                                        assign variant_price = variant.price | money
+                                        break
+                                      endif
+                                    endif
+                                  endfor
+                                  # Se não encontrou com material padrão, pega qualquer variante disponível deste tamanho
+                                  if variant_price == ''
+                                    for variant in combo_product.variants
+                                      if variant.available
+                                        assign variant_size = variant.options[size_option_index] | default: ''
+                                        if variant_size == value
+                                          assign variant_price = variant.price | money
+                                          break
+                                        endif
+                                      endif
+                                    endfor
+                                  endif
+                                -%}
+                                <option value="{{ value | escape }}" 
+                                        data-size-price="{{ variant_price }}">
+                                  {% if variant_price != '' %}
+                                    {{ value }} - {{ variant_price }}
+                                  {% else %}
+                                    {{ value }}
+                                  {% endif %}
+                                </option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+
+                      {% comment %} Opção: Material {% endcomment %}
+                      {% for option in combo_product.options_with_values %}
+                        {% if option.name == 'Material' %}
+                          <div class="combo-option-group">
+                            <label class="combo-option-label">{{ option.name }}</label>
+                            <select class="combo-option-select" 
+                                    data-option-position="{{ option.position }}"
+                                    data-product-id="{{ combo_product.id }}">
+                              {% for value in option.values %}
+                                <option value="{{ value | escape }}">{{ value }}</option>
+                              {% endfor %}
+                            </select>
+                          </div>
+                        {% endif %}
+                      {% endfor %}
+
+                      {% comment %} Opção: Moldura (Frame/Framing) - Sempre mostra {% endcomment %}
+                      {%- liquid
+                        # Verifica se o produto tem opção de framing
+                        assign has_framing_option = false
+                        assign framing_option_values = ''
+                        
+                        for option in combo_product.options_with_values
+                          if option.name == 'Framing' or option.name == 'Frame'
+                            assign has_framing_option = true
+                            assign framing_option_values = option.values
+                            break
+                          endif
+                        endfor
+                        
+                        # Se não tem opção no produto, busca da coleção de frames
+                        unless has_framing_option
+                          if section.settings.frame_collection != blank and collections[section.settings.frame_collection]
+                            assign frame_products = collections[section.settings.frame_collection].products
+                            if frame_products.size > 0
+                              assign has_framing_option = true
+                            endif
+                          endif
+                        endunless
+                      -%}
+                      
+                      {% if has_framing_option %}
+                        <div class="combo-option-group combo-option-group-framing">
+                          <label class="combo-option-label">Framing</label>
+                          <select class="combo-option-select combo-option-select-framing" 
+                                  data-product-id="{{ combo_product.id }}"
+                                  data-option-type="framing">
+                            {% comment %} Opção padrão: sem frame {% endcomment %}
+                            <option value="" selected>No Frame</option>
+                            {% comment %} Se produto tem opção de framing, usa os valores do produto {% endcomment %}
+                            {% if framing_option_values != blank %}
+                              {% for value in framing_option_values %}
+                                <option value="{{ value | escape }}">{{ value }}</option>
+                              {% endfor %}
+                            {% else %}
+                              {% comment %} Se não tem, busca da coleção de frames {% endcomment %}
+                              {% if section.settings.frame_collection != blank and collections[section.settings.frame_collection] %}
+                                {% assign frame_products = collections[section.settings.frame_collection].products %}
+                                {% for frame_product in frame_products limit: 20 %}
+                                  <option value="{{ frame_product.title | escape }}" 
+                                          data-frame-handle="{{ frame_product.handle }}"
+                                          data-frame-id="{{ frame_product.id }}">
+                                    {{ frame_product.title }}
+                                  </option>
+                                {% endfor %}
+                              {% endif %}
+                            {% endif %}
+                          </select>
+                        </div>
+                      {% endif %}
+
+                    </div>
+
+                    {% comment %} Preço do Produto {% endcomment %}
+                    <div class="combo-product-price">
+                      <span class="price-amount" data-product-id="{{ combo_product.id }}">
+                        {{ combo_product.price | money }}
+                      </span>
+                    </div>
+
+                    {% comment %} Botão Add to Cart Individual {% endcomment %}
+                    <button type="button" 
+                            class="combo-product-add-to-cart single-add-to-cart-button button" 
+                            data-product-id="{{ combo_product.id }}"
+                            data-variant-id="{{ combo_product.selected_or_first_available_variant.id }}">
+                      <span class="single-add-to-cart-button--text proza-libre">
+                        {{ 'products.product.add_to_cart' | t }}
+                      </span>
+                      <span class="proza-libre" style="margin: 0 5px;"></span>
+                      <span class="combo-product-button-price" data-product-id="{{ combo_product.id }}">
+                        {{ combo_product.price | money }}
+                      </span>
+                      <span class="loading-overlay">
+                        {% render 'svg-icons' with 'thb-loading' %}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+              {% endif %}
+            {% endfor %}
+          {% else %}
+            {% for block in section.blocks %}
+              {% if block.type == 'combo_product' and block.settings.product != blank %}
+                {% assign combo_product = all_products[block.settings.product] %}
+                {% if combo_product %}
+                  {% assign product_type = block.settings.product_type %}
+                  {%- liquid
+                    # Get size and material option indices
+                    assign size_option_index = 0
+                    assign material_option_index = 0
+                    assign has_size_option = false
+                    assign has_material_option = false
+                    
+                    for option in combo_product.options_with_values
+                      if option.name == 'Size'
+                        assign size_option_index = forloop.index0
+                        assign has_size_option = true
+                      endif
+                      if option.name == 'Material'
+                        assign material_option_index = forloop.index0
+                        assign has_material_option = true
+                      endif
+                    endfor
+                    
+                    # Build all-variants map: "size|material:price|variantId"
+                    assign all_variants_map = ''
+                    assign processed_combinations = ''
+                    
+                    for variant in combo_product.variants
+                      if variant.available
+                        assign size_value = variant.options[size_option_index] | default: 'Unknown'
+                        assign material_value = variant.options[material_option_index] | default: 'Unknown'
+                        assign combination_key = size_value | append: '###' | append: material_value
+                        
+                        unless processed_combinations contains combination_key
+                          assign formatted_price = variant.price | divided_by: 100.0 | round: 2
+                          assign variant_entry = size_value | append: '|' | append: material_value | append: ':' | append: formatted_price | append: '|' | append: variant.id
+                          
+                          if all_variants_map != ''
+                            assign all_variants_map = all_variants_map | append: ';'
+                          endif
+                          assign all_variants_map = all_variants_map | append: variant_entry
+                          
+                          if processed_combinations != ''
+                            assign processed_combinations = processed_combinations | append: '||'
+                          endif
+                          assign processed_combinations = processed_combinations | append: combination_key
+                        endunless
+                      endif
+                    endfor
+                  -%}
+                  <div class="combo-product-item" 
+                       data-product-id="{{ combo_product.id }}"
+                       data-product-type="{{ product_type }}"
+                       data-all-variants="{{ all_variants_map }}"
+                       data-has-size="{{ has_size_option }}"
+                       data-has-material="{{ has_material_option }}"
+                       {{ block.shopify_attributes }}>
+                    
+                    {% comment %} Imagem do Produto {% endcomment %}
+                    {%- liquid
+                      # Pega a última imagem do produto (igual gallery-wall-builder)
+                      assign product_image_url = ''
+                      if combo_product.images.size > 2
+                        assign last_index = combo_product.images.size | minus: 1
+                        assign product_image_url = combo_product.images[last_index] | img_url: '600x600'
+                      else
+                        assign product_image_url = combo_product.featured_image | img_url: '600x600'
+                      endif
+                    -%}
+                    <div class="combo-product-image" 
+                         data-product-id="{{ combo_product.id }}"
+                         data-product-image="{{ product_image_url }}">
+                      {% if product_image_url != blank %}
+                        <img src="{{ product_image_url }}" 
+                             alt="{{ combo_product.title }}"
+                             loading="lazy"
+                             class="combo-product-main-image">
+                      {% else %}
+                        <div class="placeholder-image">{{ 'product-1' | placeholder_svg_tag }}</div>
+                      {% endif %}
+                    </div>
+
+                    {% comment %} Informações e Opções {% endcomment %}
+                    <div class="combo-product-info">
+                      <h4 class="combo-product-title">{{ combo_product.title }}</h4>
+                      <span class="combo-product-type">{{ product_type }}</span>
+                      
+                      {% comment %} Opções de Personalização {% endcomment %}
+                      <div class="combo-product-options">
+                        
+                        {% comment %} Opção: Tamanho (Size) {% endcomment %}
+                        {% for option in combo_product.options_with_values %}
+                          {% if option.name == 'Size' %}
+                            <div class="combo-option-group">
+                              <label class="combo-option-label">{{ option.name }}</label>
+                              <select class="combo-option-select" 
+                                      data-option-position="{{ option.position }}"
+                                      data-product-id="{{ combo_product.id }}">
+                                {% for value in option.values %}
+                                  <option value="{{ value | escape }}">{{ value }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+
+                        {% comment %} Opção: Material {% endcomment %}
+                        {% for option in combo_product.options_with_values %}
+                          {% if option.name == 'Material' %}
+                            <div class="combo-option-group">
+                              <label class="combo-option-label">{{ option.name }}</label>
+                              <select class="combo-option-select" 
+                                      data-option-position="{{ option.position }}"
+                                      data-product-id="{{ combo_product.id }}">
+                                {% for value in option.values %}
+                                  <option value="{{ value | escape }}">{{ value }}</option>
+                                {% endfor %}
+                              </select>
+                            </div>
+                          {% endif %}
+                        {% endfor %}
+
+                        {% comment %} Opção: Moldura (Frame/Framing) - Sempre mostra {% endcomment %}
+                        {%- liquid
+                          # Verifica se o produto tem opção de framing
+                          assign has_framing_option = false
+                          assign framing_option_values = ''
+                          
+                          for option in combo_product.options_with_values
+                            if option.name == 'Framing' or option.name == 'Frame'
+                              assign has_framing_option = true
+                              assign framing_option_values = option.values
+                              break
+                            endif
+                          endfor
+                          
+                          # Se não tem opção no produto, busca da coleção de frames
+                          unless has_framing_option
+                            if section.settings.frame_collection != blank and collections[section.settings.frame_collection]
+                              assign frame_products = collections[section.settings.frame_collection].products
+                              if frame_products.size > 0
+                                assign has_framing_option = true
+                              endif
+                            endif
+                          endunless
+                        -%}
+                        
+                        {% if has_framing_option %}
+                          <div class="combo-option-group combo-option-group-framing">
+                            <label class="combo-option-label">Framing</label>
+                            <select class="combo-option-select combo-option-select-framing" 
+                                    data-product-id="{{ combo_product.id }}"
+                                    data-option-type="framing">
+                              {% comment %} Opção padrão: sem frame {% endcomment %}
+                              <option value="" selected>No Frame</option>
+                              {% comment %} Se produto tem opção de framing, usa os valores do produto {% endcomment %}
+                              {% if framing_option_values != blank %}
+                                {% for value in framing_option_values %}
+                                  <option value="{{ value | escape }}">{{ value }}</option>
+                                {% endfor %}
+                              {% else %}
+                                {% comment %} Se não tem, busca da coleção de frames {% endcomment %}
+                                {% if section.settings.frame_collection != blank and collections[section.settings.frame_collection] %}
+                                  {% assign frame_products = collections[section.settings.frame_collection].products %}
+                                  {% for frame_product in frame_products limit: 20 %}
+                                    <option value="{{ frame_product.title | escape }}" 
+                                            data-frame-handle="{{ frame_product.handle }}"
+                                            data-frame-id="{{ frame_product.id }}">
+                                      {{ frame_product.title }}
+                                    </option>
+                                  {% endfor %}
+                                {% endif %}
+                              {% endif %}
+                            </select>
+                          </div>
+                        {% endif %}
+
+                      </div>
+
+                      {% comment %} Preço do Produto {% endcomment %}
+                      <div class="combo-product-price">
+                        <span class="price-amount" data-product-id="{{ combo_product.id }}">
+                          {{ combo_product.price | money }}
+                        </span>
+                      </div>
+
+                      {% comment %} Botão Add to Cart Individual {% endcomment %}
+                      <button type="button" 
+                              class="combo-product-add-to-cart single-add-to-cart-button button" 
+                              data-product-id="{{ combo_product.id }}"
+                              data-variant-id="{{ combo_product.selected_or_first_available_variant.id }}">
+                        <span class="single-add-to-cart-button--text proza-libre">
+                          {{ 'products.product.add_to_cart' | t }}
+                        </span>
+                        <span class="proza-libre" style="margin: 0 5px;"></span>
+                        <span class="combo-product-button-price" data-product-id="{{ combo_product.id }}">
+                          {{ combo_product.price | money }}
+                        </span>
+                        <span class="loading-overlay">
+                          {% render 'svg-icons' with 'thb-loading' %}
+                        </span>
+                      </button>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          {% endif %}
+
+          {% comment %} Mensagem se não houver produtos {% endcomment %}
+          {% if section.settings.product_collection == blank and section.settings.product_list == blank and section.blocks.size == 0 %}
+            <div class="combo-empty">
+              <p>Adicione produtos usando uma das opções: 1) Selecione uma coleção, 2) Selecione múltiplos produtos, ou 3) Use o botão "Add block" para adicionar produtos individuais.</p>
+            </div>
+          {% endif %}
+        </div>
+
+        {% comment %} Subtotal e Botão {% endcomment %}
+        <div class="combo-summary">
+          <div class="combo-subtotal">
+            <span class="subtotal-label">Subtotal:</span>
+            <span class="subtotal-amount" id="combo-subtotal">€0.00</span>
+            {% if section.settings.compare_at_price > section.settings.price %}
+              <span class="subtotal-compare">{{ section.settings.compare_at_price | money }}</span>
+            {% endif %}
+          </div>
+          
+          <button class="combo-add-to-cart-btn button" id="combo-add-to-cart" disabled>
+            <span class="btn-text">ADD SELECTION TO CART</span>
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M6 2L3 6v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V6l-3-4z"></path>
+              <line x1="3" y1="6" x2="21" y2="6"></line>
+              <path d="M16 10a4 4 0 0 1-8 0"></path>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      {% comment %} Conteúdo do Tab BUY ALL {% endcomment %}
+      <div class="combo-tab-content" id="tab-buy-all">
+        <div class="buy-all-content">
+          <h3 class="buy-all-title">What's included?</h3>
+          
+          {% comment %} Lista de produtos igual ao carrinho {% endcomment %}
+          <div class="buy-all-items-list">
+            {%- comment -%} Prioridade 1: Se tem coleção selecionada, usa produtos da coleção {%- endcomment -%}
+            {% if section.settings.product_collection != blank and collections[section.settings.product_collection] %}
+              {% for product_item in collections[section.settings.product_collection].products %}
+                {% assign combo_product = product_item %}
+                {% if combo_product %}
+                  {% assign product_type = section.settings.default_product_type | default: 'Tela' %}
+                  {%- liquid
+                    assign default_variant = combo_product.selected_or_first_available_variant
+                    assign default_size = ''
+                    assign default_material = ''
+                    for option in combo_product.options_with_values
+                      if option.name == 'Size'
+                        assign default_size = option.values.first
+                      endif
+                      if option.name == 'Material'
+                        assign default_material = option.values.first
+                      endif
+                    endfor
+                  -%}
+                  <div class="buy-all-item" data-product-id="{{ combo_product.id }}">
+                    <div class="buy-all-item-image">
+                      {% if combo_product.featured_image %}
+                        <img src="{{ combo_product.featured_image | img_url: '150x150' }}" alt="{{ combo_product.title }}" loading="lazy">
+                      {% else %}
+                        <div class="placeholder-image">{{ 'product-1' | placeholder_svg_tag }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="buy-all-item-details">
+                      <div class="buy-all-item-type">{{ product_type | upcase }}</div>
+                      <div class="buy-all-item-title">{{ combo_product.title }}</div>
+                      {% if default_size != blank %}<div class="buy-all-item-size">Size: {{ default_size }}</div>{% endif %}
+                      {% if default_material != blank %}<div class="buy-all-item-material">Material: {{ default_material }}</div>{% endif %}
+                      <div class="buy-all-item-price">
+                        <span class="price-amount" data-product-id="{{ combo_product.id }}">{{ default_variant.price | money }}</span>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {%- comment -%} Prioridade 2: Se não tem coleção, usa product_list {%- endcomment -%}
+            {% elsif section.settings.product_list != blank %}
+              {% for product_item in section.settings.product_list %}
+                {% assign combo_product = product_item %}
+                {% if combo_product %}
+                  {% assign product_type = section.settings.default_product_type | default: 'Tela' %}
+                  {%- liquid
+                    # Get first available variant for default display
+                    assign default_variant = combo_product.selected_or_first_available_variant
+                    assign default_size = ''
+                    assign default_material = ''
+                    
+                    for option in combo_product.options_with_values
+                      if option.name == 'Size'
+                        assign default_size = option.values.first
+                      endif
+                      if option.name == 'Material'
+                        assign default_material = option.values.first
+                      endif
+                    endfor
+                  -%}
+                  <div class="buy-all-item" data-product-id="{{ combo_product.id }}">
+                    <div class="buy-all-item-image">
+                      {% if combo_product.featured_image %}
+                        <img src="{{ combo_product.featured_image | img_url: '150x150' }}" 
+                             alt="{{ combo_product.title }}"
+                             loading="lazy">
+                      {% else %}
+                        <div class="placeholder-image">{{ 'product-1' | placeholder_svg_tag }}</div>
+                      {% endif %}
+                    </div>
+                    <div class="buy-all-item-details">
+                      <div class="buy-all-item-type">{{ product_type | upcase }}</div>
+                      <div class="buy-all-item-title">{{ combo_product.title }}</div>
+                      {% if default_size != blank %}
+                        <div class="buy-all-item-size">Size: {{ default_size }}</div>
+                      {% endif %}
+                      {% if default_material != blank %}
+                        <div class="buy-all-item-material">Material: {{ default_material }}</div>
+                      {% endif %}
+                      <div class="buy-all-item-price">
+                        <span class="price-amount" data-product-id="{{ combo_product.id }}">
+                          {{ default_variant.price | money }}
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                {% endif %}
+              {% endfor %}
+            {% else %}
+              {% for block in section.blocks %}
+                {% if block.type == 'combo_product' and block.settings.product != blank %}
+                  {% assign combo_product = all_products[block.settings.product] %}
+                  {% if combo_product %}
+                    {% assign product_type = block.settings.product_type %}
+                    {%- liquid
+                      # Get first available variant for default display
+                      assign default_variant = combo_product.selected_or_first_available_variant
+                      assign default_size = ''
+                      assign default_material = ''
+                      
+                      for option in combo_product.options_with_values
+                        if option.name == 'Size'
+                          assign default_size = option.values.first
+                        endif
+                        if option.name == 'Material'
+                          assign default_material = option.values.first
+                        endif
+                      endfor
+                    -%}
+                    <div class="buy-all-item" data-product-id="{{ combo_product.id }}">
+                      <div class="buy-all-item-image">
+                        {% if combo_product.featured_image %}
+                          <img src="{{ combo_product.featured_image | img_url: '150x150' }}" 
+                               alt="{{ combo_product.title }}"
+                               loading="lazy">
+                        {% else %}
+                          <div class="placeholder-image">{{ 'product-1' | placeholder_svg_tag }}</div>
+                        {% endif %}
+                      </div>
+                      <div class="buy-all-item-details">
+                        <div class="buy-all-item-type">{{ product_type | upcase }}</div>
+                        <div class="buy-all-item-title">{{ combo_product.title }}</div>
+                        {% if default_size != blank %}
+                          <div class="buy-all-item-size">Size: {{ default_size }}</div>
+                        {% endif %}
+                        {% if default_material != blank %}
+                          <div class="buy-all-item-material">Material: {{ default_material }}</div>
+                        {% endif %}
+                        <div class="buy-all-item-price">
+                          <span class="price-amount" data-product-id="{{ combo_product.id }}">
+                            {{ default_variant.price | money }}
+                          </span>
+                        </div>
+                      </div>
+                    </div>
+                  {% endif %}
+                {% endif %}
+              {% endfor %}
+            {% endif %}
+          </div>
+          
+          {% comment %} Subtotal {% endcomment %}
+          <div class="buy-all-subtotal">
+            <span class="subtotal-label">SUBTOTAL:</span>
+            <span class="subtotal-amount" id="buy-all-subtotal">€0.00</span>
+          </div>
+          
+          {% comment %} Botão Add to Cart {% endcomment %}
+          <button class="combo-buy-all-btn button" id="combo-buy-all">
+            ADD ALL TO CART
+          </button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Gallery Wall Combo",
+  "tag": "section",
+  "class": "gallery-wall-combo-section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Título do Combo",
+      "info": "Digite o título do combo (ex: Natal Gallery Wall)"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Descrição",
+      "info": "Digite a descrição do combo"
+    },
+    {
+      "type": "image_picker",
+      "id": "main_image",
+      "label": "Imagem Principal (Lifestyle)",
+      "info": "Imagem grande mostrando o combo montado"
+    },
+    {
+      "type": "checkbox",
+      "id": "enable_zoom",
+      "label": "Ativar zoom na imagem",
+      "default": true
+    },
+    {
+      "type": "number",
+      "id": "price",
+      "label": "Preço Base (opcional)",
+      "info": "Deixe vazio para calcular automaticamente"
+    },
+    {
+      "type": "number",
+      "id": "compare_at_price",
+      "label": "Preço Comparado (opcional)",
+      "info": "Para mostrar desconto"
+    },
+    {
+      "type": "header",
+      "content": "Seleção Rápida de Produtos"
+    },
+    {
+      "type": "collection",
+      "id": "product_collection",
+      "label": "Select Collection",
+      "info": "Selecione uma coleção de produtos (igual ao Gallery Builder). Se usar esta opção, todos os produtos da coleção serão usados."
+    },
+    {
+      "type": "product_list",
+      "id": "product_list",
+      "label": "Selecionar Múltiplos Produtos",
+      "info": "OU selecione produtos individuais. Se usar coleção, esta opção será ignorada."
+    },
+    {
+      "type": "text",
+      "id": "default_product_type",
+      "label": "Tipo Padrão dos Produtos",
+      "default": "Tela",
+      "info": "Tipo aplicado a todos os produtos da lista/coleção (Ex: Tela, Pôster, Moldura)"
+    },
+    {
+      "type": "collection",
+      "id": "frame_collection",
+      "label": "Frame Collection",
+      "info": "Selecione a coleção de frames para buscar imagens dos frames. Deixe vazio se os frames estiverem na mesma página."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "combo_product",
+      "name": "Produto do Combo",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Produto",
+          "info": "Selecione o produto que faz parte do combo"
+        },
+        {
+          "type": "text",
+          "id": "product_type",
+          "label": "Tipo de Produto",
+          "default": "Tela",
+          "info": "Ex: Tela, Pôster, Moldura",
+          "placeholder": "Tela"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Gallery Wall Combo",
+      "blocks": [
+        {
+          "type": "combo_product",
+          "settings": {
+            "product_type": "Tela"
+          }
+        },
+        {
+          "type": "combo_product",
+          "settings": {
+            "product_type": "Tela"
+          }
+        },
+        {
+          "type": "combo_product",
+          "settings": {
+            "product_type": "Pôster"
+          }
+        },
+        {
+          "type": "combo_product",
+          "settings": {
+            "product_type": "Moldura"
+          }
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
+

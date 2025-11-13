@@ -1,0 +1,24 @@
+{
+  "name": "Gallery Builder App",
+  "description": "App para gerenciar galerias salvas dos clientes",
+  "version": "1.0.0",
+  "permissions": [
+    "read_customers",
+    "write_customers"
+  ],
+  "endpoints": {
+    "save": "/apps/gallery-builder/save",
+    "load": "/apps/gallery-builder/load",
+    "delete": "/apps/gallery-builder/delete"
+  },
+  "metafields": {
+    "customer": {
+      "gallery_data": {
+        "namespace": "gallery_builder",
+        "key": "saved_galleries",
+        "type": "json",
+        "description": "Galerias salvas pelo cliente"
+      }
+    }
+  }
+}
