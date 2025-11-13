@@ -1,0 +1,38 @@
+{% comment %}
+  Test snippet to verify the fixed working days calculation
+  Usage: {% render 'date-translation-test' %}
+{% endcomment %}
+
+<div style="background: #f0f0f0; padding: 15px; margin: 15px 0; border: 2px solid #333; font-family: monospace; font-size: 12px;">
+  <strong>✅ FIXED WORKING DAYS CALCULATION TEST:</strong><br><br>
+  
+  <strong>📅 WORKING DAYS CALCULATIONS:</strong><br>
+  <strong>5 Working Days:</strong> {% render 'working-days-calculation', days: 5 %}<br>
+  <strong>10 Working Days:</strong> {% render 'working-days-calculation', days: 10 %}<br>
+  <strong>15 Working Days:</strong> {% render 'working-days-calculation', days: 15 %}<br><br>
+  
+  <strong>📆 CURRENT DATE:</strong><br>
+  <strong>Today:</strong> {% render 'working-days-calculation', days: 0 %}<br><br>
+  
+  <strong>🌍 LANGUAGE TESTS:</strong><br>
+  <strong>German:</strong> {% render 'working-days-calculation', days: 5, language: 'de' %}<br>
+  <strong>French:</strong> {% render 'working-days-calculation', days: 5, language: 'fr' %}<br>
+  <strong>Spanish:</strong> {% render 'working-days-calculation', days: 5, language: 'es' %}<br>
+  <strong>Italian:</strong> {% render 'working-days-calculation', days: 5, language: 'it' %}<br>
+  <strong>Dutch:</strong> {% render 'working-days-calculation', days: 5, language: 'nl' %}<br>
+  <strong>Turkish:</strong> {% render 'working-days-calculation', days: 5, language: 'tr' %}<br>
+  <strong>English:</strong> {% render 'working-days-calculation', days: 5, language: 'en' %}<br><br>
+  
+  <strong>🎯 EXPECTED RESULTS:</strong><br>
+  ✅ German: "15 Januar"<br>
+  ✅ French: "15 janvier"<br>
+  ✅ Spanish: "15 de enero"<br>
+  ✅ Italian: "15 gennaio"<br>
+  ✅ Dutch: "15 januari"<br>
+  ✅ Turkish: "15 Ocak"<br>
+  ✅ English: "January 15th"<br><br>
+  
+  <strong>📝 USAGE:</strong><br>
+  <code>{% raw %}{% render 'working-days-calculation', days: 5 %}{% endraw %}</code><br>
+  <code>{% raw %}{% render 'working-days-calculation', days: 5, language: 'de' %}{% endraw %}</code>
+</div> 

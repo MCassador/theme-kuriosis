@@ -1,0 +1,695 @@
+<div id="ProductInfo-{{ section.id }}" class="product-information--inner{% if section.settings.enable_sticky_info %} production-information--sticky{% endif %}">
+  <link rel="stylesheet" href="{{ 'product-info.css' | asset_url }}" media="print" onload="this.media='all'">
+  {%- assign product_form_id = 'product-form-' | append: section.id -%}
+  {%- assign outline_button = false -%}
+  {% for block in section.blocks %}
+    {%- case block.type -%}
+    {%- when 'benefits_checkboxes' -%}
+      <div class="benefits-checkboxes proza-libre">
+
+        <div class="benefits-checkboxes__checkboxes">
+          <div class="benefits-checkboxes__checkbox">
+            {% render 'svg-icons' with 'check-primary' %}
+            <p>{{ block.settings.checkbox_1_label }}</p>
+          </div>
+          <div class="benefits-checkboxes__checkbox">
+            {% render 'svg-icons' with 'check-primary' %}
+            <p>{{ block.settings.checkbox_2_label }}</p>
+          </div>
+          <div class="benefits-checkboxes__checkbox">
+            {% render 'svg-icons' with 'check-primary' %}
+            <p>{{ block.settings.checkbox_3_label }}</p>
+          </div>
+          <div class="benefits-checkboxes__checkbox">
+            {% render 'svg-icons' with 'check-primary' %}
+            <p>{{ block.settings.checkbox_4_label }}</p>
+          </div>
+        </div>
+      </div>
+    {%- when '@app' -%}
+
+      {% render block %}
+    {%- when 'text' -%}
+      <p class="product--text {{ block.settings.text_style }}" {{ block.shopify_attributes }}>
+        {{- block.settings.text -}}
+      </p>
+
+    {%- when 'icons' -%}
+
+      <div class="icon-set" style="display: flex;align-items: flex-start;justify-content: space-between;">
+        <div class="icon">
+          <div class="icon__wrap ">
+            {%- liquid
+              assign image = block.settings.icon_1
+              assign sizes = image.src.width | append: 'x' | append: image.src.height
+              render 'responsive-image', image: image, sizes: sizes
+              -%}  
+          </div>
+          <p>{{ block.settings.icon_1_text }}</p>
+        </div>
+        <div class="icon">
+          <div class="icon__wrap ">
+            {%- liquid
+              assign image = block.settings.icon_2
+              assign sizes = image.src.width | append: 'x' | append: image.src.height
+              render 'responsive-image', image: image, sizes: sizes
+              -%}  
+          </div>
+
+          <p>{{ block.settings.icon_2_text }}</p>
+        </div>
+        <div class="icon">
+          <div class="icon__wrap ">
+            {%- liquid
+              assign image = block.settings.icon_3
+              assign sizes = image.src.width | append: 'x' | append: image.src.height
+              render 'responsive-image', image: image, sizes: sizes
+              -%}  
+          </div>
+          <p>{{ block.settings.icon_3_text }}</p>
+        </div>
+        <div class="icon">
+          <div class="icon__wrap ">
+            {%- liquid
+              assign image = block.settings.icon_4
+              assign sizes = image.src.width | append: 'x' | append: image.src.height
+              render 'responsive-image', image: image, sizes: sizes
+              -%}  
+          </div>
+          <p>{{ block.settings.icon_4_text }}</p>
+        </div>
+      </div>
+    {%- when 'trustpilot' -%}
+
+      <div class="trustpilot proza-libre product">
+
+        <div class="trustpilot__stars">
+          {%- render 'svg-icons' with 'star' -%}
+          {%- render 'svg-icons' with 'star' -%}
+          {%- render 'svg-icons' with 'star' -%}
+          {%- render 'svg-icons' with 'star' -%}
+          {%- render 'svg-icons' with 'star' -%}
+          <span>{{ block.settings.bewertungen_tp }}</span>
+              
+        </div>
+        <span class="trustpilot__text">{{ 'general.5starrating' | t }}</span>
+
+        <div class="trustpilot__tp-logo">
+          <a href="#trustpilot-reviews" onclick="document.querySelector('[data-reviews-section-trustpilot]').scrollIntoView({behavior: 'smooth'}); return false;" aria-label="Link zu Trustpilot" title="Trustpilot Kuriosis">
+            <svg xmlns="http://www.w3.org/2000/svg" width="11.978" height="11.335" viewBox="0 0 11.978 11.335">
+              <path id="Pfad_6543" data-name="Pfad 6543" d="M5.989,8.644l3.689,2.691L8.591,7.985ZM5.986,0,4.577,4.313H0L3.707,6.987,2.3,11.3,6,8.626,8.29,6.986l3.688-2.673H7.4Z" fill="#50b17f"/>
+              </svg>
+             Trustpilot
+          </a>
+
+        </div>
+
+      </div>
+      
+    {%- when 'present_designer' -%}
+
+      {% if block.settings.use_metafields_to_present %}
+
+        {% if product.metafields.custom.designer_name != blank and product.metafields.custom.designer_link != blank and product.metafields.custom.designer_description != blank %}
+    
+          <div class="present-designer">
+            <!-- Display Image if uploaded -->
+            {% if product.metafields.custom.designer_image != blank %}
+              <div class="designer-image">
+                {% if product.metafields.custom.designer_link != blank %}
+                  <a href="{{ product.metafields.custom.designer_link }}" target="_blank">
+                {% endif %}
+                  <img src="{{ product.metafields.custom.designer_image | image_url: width: 80, height: 80 }}" width="80px" height="80px" 
+                    {% if product.metafields.custom.designer_name != blank %}
+                      alt="{{ product.metafields.custom.designer_name }}"
+                    {% endif %}
+                  >
+                {% if product.metafields.custom.designer_link != blank %}
+                  </a>
+                {% endif %}
+              </div>
+            {% endif %}
+          
+            <!-- Text Areas -->
+            <div class="designer-text">
+              {% if product.metafields.custom.textarea_description  != blank %}
+                <p class="designer-text__1">{{ product.metafields.custom.textarea_description }}</p>
+              {% endif %}
+              
+              {% if product.metafields.custom.designer_name != blank %}
+                {% if product.metafields.custom.designer_link != blank %}
+                  <a href="{{ product.metafields.custom.designer_link }}" class="text_area_2_link proza-libre" target="_blank">
+                {% else %}
+                  <p class="designer-text__2">
+                {% endif %}
+                {{ product.metafields.custom.designer_name }}
+                {% if product.metafields.custom.designer_link != blank %}
+                  </a>
+                {% else %}
+                  </p>
+                {% endif %}
+              {% endif %}
+          
+              {% if product.metafields.custom.designer_description != blank %}
+                <p class="designer-text__3 proza-libre">{{ product.metafields.custom.designer_description }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+
+      {% else %}
+        {% if block.settings.text_area_2 != blank and block.settings.text_area_3 %}
+  
+          <div class="present-designer">
+            <!-- Display Image if uploaded -->
+            {% if block.settings.designer_image != blank %}
+    
+              <div class="designer-image">
+                {% if block.settings.designer_collection %}
+                  <a href="{{ block.settings.designer_collection.url }}" target="_blank">
+                {% elsif block.settings.manual_link %}
+                  <a href="{{ block.settings.manual_link }}" target="_blank">
+                {% endif %}
+                  <img src="{{ block.settings.designer_image | image_url: width: 80, height: 80  }}" width="80px" height="80px" 
+                    {% if block.settings.text_area_1 != blank %}
+                      alt="{{ block.settings.text_area_1 }}"
+                    {% endif %}
+                  >
+                {% if block.settings.designer_collection %}
+                  </a>
+                {% elsif block.settings.manual_link %}
+                  </a>
+                {% endif %}
+              </div>
+            {% endif %}
+          
+            <!-- Text Areas -->
+            <div class="designer-text">
+              {% if block.settings.text_area_1 != blank %}
+                <p class="designer-text__1">{{ block.settings.text_area_1 }}</p>
+              {% endif %}
+              {% if block.settings.text_area_2 != blank %}
+                {% if block.settings.designer_collection %}
+                  <a href="{{ block.settings.designer_collection.url }}" class="text_area_2_link proza-libre" target="_blank">
+                {% elsif block.settings.manual_link %}
+                  <a href="{{ block.settings.manual_link }}" class="text_area_2_link proza-libre" target="_blank">
+                {% else %}
+                  <p class="designer-text__2">
+                {% endif %}
+                {{ block.settings.text_area_2 }}
+                  {% if block.settings.designer_collection %}
+                    </a>
+                  {% elsif block.settings.manual_link %}
+                    </a>
+                  {% else %}
+                  </p>
+                  {% endif %}
+              {% endif %}
+              {% if block.settings.text_area_3 != blank %}
+                <p class="designer-text__3 proza-libre">{{ block.settings.text_area_3 }}</p>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endif %}
+
+
+    {%- when 'custom_liquid' -%}
+      {{ block.settings.custom_liquid }}
+    {%- when 'title' -%}
+      <div class="product-title-container" {{ block.shopify_attributes }}>
+        <h1 class="product-title uppercase--{{ block.settings.uppercase }}">{{ product.title }}</h1>
+
+        {% if product.metafields.custom.designer_link and product.metafields.custom.designer_name != blank %}
+          <div class="designer-on-title proza-libre">
+            {{ 'products.product.by' | t }} 
+            <a class="designer-on-title" title="Link to {{ product.metafields.custom.designer_name }}" href="{{ product.metafields.custom.designer_link }}" target="_blank">
+              {{ product.metafields.custom.designer_name }}
+            </a>
+          </div>
+        {% endif %}
+        <div class="trustpilot proza-libre product">
+
+          <div class="trustpilot__stars">
+            {%- render 'svg-icons' with 'star' -%}
+            {%- render 'svg-icons' with 'star' -%}
+            {%- render 'svg-icons' with 'star' -%}
+            {%- render 'svg-icons' with 'star' -%}
+            {%- render 'svg-icons' with 'star' -%}
+            <span>{{ block.settings.bewertungen_tp }}</span>
+                
+          </div>
+          <span class="trustpilot__text">{{ 'general.5starrating' | t }}</span>
+  
+          <div class="trustpilot__tp-logo">
+            <a href="#trustpilot-reviews" onclick="document.querySelector('[data-reviews-section-trustpilot]').scrollIntoView({behavior: 'smooth'}); return false;" aria-label="Link zu Trustpilot" title="Trustpilot Kuriosis">
+              <svg xmlns="http://www.w3.org/2000/svg" width="11.978" height="11.335" viewBox="0 0 11.978 11.335">
+                <path id="Pfad_6543" data-name="Pfad 6543" d="M5.989,8.644l3.689,2.691L8.591,7.985ZM5.986,0,4.577,4.313H0L3.707,6.987,2.3,11.3,6,8.626,8.29,6.986l3.688-2.673H7.4Z" fill="#50b17f"/>
+                </svg>
+               Trustpilot
+            </a>
+  
+          </div>
+  
+        </div>
+        
+        <div class="product-price-container">
+          <div class="no-js-hidden" id="price-{{ section.id }}" aria-live="polite">
+            {% render 'product-price', product: product, use_variant: true, show_badges: true, show_custom_badges: block.settings.show_custom_badges %}
+          </div>
+          {% comment %} {%- if section.settings.show_taxes_included != blank -%}
+            {%- if cart.taxes_included or shop.shipping_policy.body != blank -%}
+              <div class="product__tax caption proza-libre">
+                {%- if cart.taxes_included -%}
+                  {{ 'products.product.include_taxes' | t }}
+                {%- endif -%}
+                {%- if shop.shipping_policy.body != blank -%}
+                  {{ 'products.product.shipping_policy_html' | t: link: shop.shipping_policy.url }}
+                {%- endif -%}
+              </div>
+            {%- endif -%}
+          {%- endif -%} {% endcomment %}
+        </div>
+        {%- if block.settings.show_products_rating and product.metafields.reviews.rating.value != blank -%}
+          <a class="star-rating-container" href="#shopify-product-reviews">
+            <div class="star-rating" style="--star-rating: {{ product.metafields.reviews.rating.value.rating }};"></div>
+            <span>{{ 'products.product.reviews' | t: count: product.metafields.reviews.rating_count }}</span>
+          </a>
+        {%- endif -%}
+      </div>
+    {%- when 'description' -%}
+      {%- liquid
+        assign seo_text_max_height = block.settings.seo_text_max_height
+        assign seo_text_read_more = block.settings.seo_text_read_more
+        assign seo_text_read_less = block.settings.seo_text_read_less
+      -%}
+      <div {{ block.shopify_attributes }}>
+      {%- render 'text-max-height', no_bg: true, content: product.description, custom_liquid: seo_text_custom_liquid, read_more: seo_text_read_more, read_less: seo_text_read_less, max_height: seo_text_max_height, extra_class: 'product-short-description' -%}
+      </div>
+    {%- when 'inventory_level' -%}
+      {% render 'product-inventory-notice', product: product, section: section, block: block %}
+    {%- when 'variant_picker' -%}
+      {%- unless product.has_only_default_variant -%}
+        {%- liquid
+          assign is_disabled = block.settings.variant_is_disabled
+          assign picker_type = 'dropdown'
+          assign color_picker = true
+          assign color_picker_size = block.settings.color_picker_size | default: 'regular'
+          assign color_picker_use_variants = block.settings.color_picker_use_variants
+          assign framing_guide_variant_lower = block.settings.framing_guide_variant | downcase
+        -%}
+      
+        <variant-selects
+          id="variant-selects-{{ section.id }}"
+          class="no-js-hidden proza-libre"
+          data-update-url="{{ update_url }}"
+          data-section="{{ section.id }}"
+          data-url="{{ product.url }}"
+          data-is-disabled="{{ is_disabled }}"
+        >
+          <div class="variations" {{ block.shopify_attributes }}>
+            {%- for option in product.options_with_values -%}
+              {%- liquid
+                assign option_name = option.name | downcase | escape
+                assign option_type = block.settings.picker_type
+                assign picker_type = option_type
+                assign swatch_count = option.values | map: 'swatch' | compact | size
+      
+                if block.settings.color_picker
+                  if option_name contains 'color' or option_name contains 'colour' or option_name contains 'couleur' or option_name contains 'farbe'
+                    assign option_type = 'color'
+                  endif
+      
+                  # Additional swatch variant options set inside theme settings
+                  assign color_swatches_variant_option = settings.color_swatches_variant_option | downcase | split: ', '
+                  if color_swatches_variant_option contains option_name
+                    assign option_type = 'color'
+                  endif
+                endif
+      
+                unless block.settings.color_picker
+                  assign color_picker = false
+                endunless
+      
+                if swatch_count > 0
+                  assign option_type = 'color'
+                endif
+      
+                # Detect if the option should use framing images
+                if option_name == framing_guide_variant_lower
+                  assign option_type = 'framing'
+                endif
+
+                # Detect if the option should use material boxes
+                if option_name == material_guide_variant
+                  assign option_type = 'material'
+                endif
+              -%}
+      
+              {%- liquid
+                assign option_slug = option.name | downcase
+                assign sizing_link = ''
+                assign material_link = ''
+                assign framing_link = ''
+      
+                assign sizing_guide_variant = block.settings.sizing_guide_variant | default: 'Size' | downcase
+                assign material_guide_variant = block.settings.material_guide_variant | default: 'Material' | downcase
+              -%}
+      
+              {%- if option_slug == sizing_guide_variant -%}
+                {%- if block.settings.sizing_guide_text != '' -%}
+                  {%- capture sizing_link -%}
+                    <modal-opener class="product-popup-modal__opener no-js-hidden" data-modal="#PopupModal-{{ block.id }}">
+                      <button id="ProductPopup-{{ block.id }}" class="product-popup-modal__button" type="button" aria-haspopup="dialog">
+                        {% comment %} {% render 'svg-icons-inline', icon: block.settings.sizing_guide_icon %}<span>{{ block.settings.sizing_guide_text }}</span> {% endcomment %}
+
+                        <span>{{ block.settings.sizing_guide_text }}
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:5px;" height="9px" width="9px" viewBox="0 0 6.4 6.3"><g id="Ebene_1-2"><g id="text" style="isolation:isolate;"><g style="isolation:isolate;"><path d="M6.4.1l-.4,4.3h0l-.3-3.2L.4,6.3s-.1,0-.2-.2c-.1-.1-.2-.2-.2-.2L5.1.7,1.9.4h0l4.3-.4h.1v.1h.1Z" style=""></path></g></g></g></svg>
+                      </span>
+                      </button>
+                    </modal-opener>
+                  {%- endcapture -%}
+                  {%- capture sizing_popup -%}
+                  <modal-dialog id="PopupModal-{{ block.id }}" class="product-popup-modal">
+                    <div role="dialog" aria-label="{{ block.settings.sizing_guide_text }}" aria-modal="true" class="product-popup-modal__content" tabindex="-1">
+                      <div class="product-popup-modal__content-header">
+                        <h5>{{ block.settings.sizing_guide_page.title }}</h5>
+                        <button id="ModalClose-{{ block.id }}" type="button" class="product-popup-modal__toggle" aria-label="{{ 'accessibility.close' | t }}">{% render 'svg-icons' with 'close' %}</button>
+                      </div>
+                      <scroll-shadow>
+                        <div class="product-popup-modal__content-info">
+                          {{ block.settings.sizing_guide_page.content }}
+                        </div>
+                      </scroll-shadow>
+                    </div>
+                  </modal-dialog>
+                  <script src="{{ 'modal-dialog.js' | asset_url }}" defer="defer"></script>
+                  {%- endcapture -%}
+                  {{ sizing_popup }}
+                {%- endif -%}
+              {%- endif -%}
+      
+              {%- if option_slug == material_guide_variant -%}
+                {%- if block.settings.material_guide_text != '' -%}
+                  {%- capture material_link -%}
+                    <modal-opener class="product-popup-modal__opener no-js-hidden" data-modal="#PopupModal-Material-{{ block.id }}">
+                      <button id="MaterialPopup-{{ block.id }}" class="product-popup-modal__button" type="button" aria-haspopup="dialog">
+                        {% comment %} {% render 'svg-icons-inline', icon: block.settings.material_guide_icon %} {% endcomment %}
+                        <span>{{ block.settings.material_guide_text }}
+
+                        <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:5px;" height="9px" width="9px" viewBox="0 0 6.4 6.3"><g id="Ebene_1-2"><g id="text" style="isolation:isolate;"><g style="isolation:isolate;"><path d="M6.4.1l-.4,4.3h0l-.3-3.2L.4,6.3s-.1,0-.2-.2c-.1-.1-.2-.2-.2-.2L5.1.7,1.9.4h0l4.3-.4h.1v.1h.1Z" style=""></path></g></g></g></svg>
+                        </span>
+                      </button>
+                    </modal-opener>
+                  {%- endcapture -%}
+                  {%- capture material_popup -%}
+                  <modal-dialog id="PopupModal-Material-{{ block.id }}" class="product-popup-modal">
+                    <div role="dialog" aria-label="{{ block.settings.material_guide_text }}" aria-modal="true" class="product-popup-modal__content" tabindex="-1">
+                      <div class="product-popup-modal__content-header">
+                        <h5>{{ block.settings.material_guide_page.title }}</h5>
+                        <button id="ModalClose-Material-{{ block.id }}" type="button" class="product-popup-modal__toggle" aria-label="{{ 'accessibility.close' | t }}">{% render 'svg-icons' with 'close' %}</button>
+                      </div>
+                      <scroll-shadow>
+                        <div class="product-popup-modal__content-info">
+                          {{ block.settings.material_guide_page.content }}
+                        </div>
+                      </scroll-shadow>
+                    </div>
+                  </modal-dialog>
+                  <script src="{{ 'modal-dialog.js' | asset_url }}" defer="defer"></script>
+                  {%- endcapture -%}
+                  {{ material_popup }}
+                {%- endif -%}
+              {%- endif -%}
+      
+              {%- if option_slug == framing_guide_variant_lower -%}
+                {%- if block.settings.framing_guide_text != '' -%}
+                  {%- capture framing_link -%}
+                    <modal-opener class="product-popup-modal__opener no-js-hidden" data-modal="#PopupModal-Framing-{{ block.id }}">
+                      <button id="FramingPopup-{{ block.id }}" class="product-popup-modal__button" type="button" aria-haspopup="dialog">
+                        {% comment %} {% render 'svg-icons-inline', icon: block.settings.framing_guide_icon %} {% endcomment %}
+                        <span>{{ block.settings.framing_guide_text }}
+                          <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:5px;" height="9px" width="9px" viewBox="0 0 6.4 6.3"><g id="Ebene_1-2"><g id="text" style="isolation:isolate;"><g style="isolation:isolate;"><path d="M6.4.1l-.4,4.3h0l-.3-3.2L.4,6.3s-.1,0-.2-.2c-.1-.1-.2-.2-.2-.2L5.1.7,1.9.4h0l4.3-.4h.1v.1h.1Z" style=""></path></g></g></g></svg>
+                        </span>
+                      </button>
+                    </modal-opener>
+                  {%- endcapture -%}
+                  {%- capture framing_popup -%}
+                  <modal-dialog id="PopupModal-Framing-{{ block.id }}" class="product-popup-modal">
+                    <div role="dialog" aria-label="{{ block.settings.framing_guide_text }}" aria-modal="true" class="product-popup-modal__content" tabindex="-1">
+                      <div class="product-popup-modal__content-header">
+                        <h5>{{ block.settings.framing_guide_page.title }}</h5>
+                        <button id="ModalClose-Framing-{{ block.id }}" type="button" class="product-popup-modal__toggle" aria-label="{{ 'accessibility.close' | t }}">{% render 'svg-icons' with 'close' %}</button>
+                      </div>
+                      <scroll-shadow>
+                        <div class="product-popup-modal__content-info">
+                          {{ block.settings.framing_guide_page.content }}
+                        </div>
+                      </scroll-shadow>
+                    </div>
+                  </modal-dialog>
+                  <script src="{{ 'modal-dialog.js' | asset_url }}" defer="defer"></script>
+                  {%- endcapture -%}
+                  {{ framing_popup }}
+                {%- endif -%}
+              {%- endif -%}
+      
+              {% render 'product-option', option_type: option_type, color_picker_size: color_picker_size, color_picker_use_variants: color_picker_use_variants, product: product, option: option, forloop: forloop, product_form_id: product_form_id, sizing_link: sizing_link, material_link: material_link, framing_link: framing_link %}
+
+            {%- endfor -%}
+          </div>
+          <script type="application/json">
+            {{ product.variants | json }}
+          </script>
+        </variant-selects>
+
+        {% comment %} Handle Frames like Variants if no Frame Variant available {% endcomment %}
+        {% case option_type %}
+        {% when 'framing' %}
+        {% else %}
+          {% render 'related-product-variant-frame-picker' %}
+        {% endcase %}
+
+      {%- endunless -%}
+      <noscript class="product-form__noscript-wrapper-{{ section.id }}">
+        <div class="product-form__input{% if product.has_only_default_variant %} hidden{% endif %}">
+          <label for="Variants-{{ section.id }}">{{ 'products.product.product_variants' | t }}</label>
+          <div class="select">
+            <select name="id" id="Variants-{{ section.id }}" class="select__select" form="{{ product_form_id }}">
+              {%- for variant in product.variants -%}
+                <option
+                  {% if variant == product.selected_or_first_available_variant %}selected="selected"{% endif %}
+                  {% if variant.available == false %}disabled{% endif %}
+                  value="{{ variant.id }}">
+                  {{ variant.title }}
+                  {%- if variant.available == false %} - {{ 'products.product.sold_out' | t }}{% endif %}
+                  - {{ variant.price | money | strip_html -}}
+                </option>
+              {%- endfor -%}
+            </select>
+          </div>
+        </div>
+      </noscript>
+    {%- when 'side_panel' -%}
+      <side-panel-links class="side-panel-links">
+        {%- if block.settings.side_panel_1_label != '' -%}
+        <button class="side-panel-links--link no-js-hidden" data-id="1">{% render 'svg-icons-inline', icon: block.settings.side_panel_1_icon %}<span class="text-button">{{ block.settings.side_panel_1_label }}</span></button>
+        {%- endif -%}
+        {%- if block.settings.side_panel_2_label != '' -%}
+        <button class="side-panel-links--link no-js-hidden" data-id="2">{% render 'svg-icons-inline', icon: block.settings.side_panel_2_icon %}<span class="text-button">{{ block.settings.side_panel_2_label }}</span></button>
+        {%- endif -%}
+        {%- if block.settings.side_panel_3_label != '' -%}
+        <button class="side-panel-links--link no-js-hidden" data-id="3">{% render 'svg-icons-inline', icon: block.settings.side_panel_3_icon %}<span class="text-button">{{ block.settings.side_panel_3_label }}</span></button>
+        {%- endif -%}
+      </side-panel-links>
+    {%- when 'buy_buttons' -%}
+        {%- assign outline_button = block.settings.outline_button -%}
+        {% render 'product-add-to-cart', product: product, form: form, product_form_id: product_form_id, block: block, pickup: pickup %}
+    {%- when 'share' -%}
+        {% render 'social-share', share_label: false, share_title: product.title, share_permalink: product.url, share_image: product.featured_image %}
+    {%- when 'specifications_tab' -%}
+    {%- if block.settings.heading != blank -%}
+    <collapsible-row class="product--accordion accordion proza-libre" {{ block.shopify_attributes }}>
+      <details id="Details-{{ block.id }}-{{ section.id }}" {% if block.settings.open %}open{% endif %}>
+        <summary>
+          {{ block.settings.heading | default: block.settings.page.title }}<span></span>
+        </summary>
+        <div class="collapsible__content accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
+          {%- render 'product-specification-table', block: block -%}
+        </div>
+      </details>
+    </collapsible-row>
+    {%- endif -%}
+    {%- when 'collapsible_tab' -%}
+      {%- if block.settings.heading != blank -%}
+      <collapsible-row class="product__accordion accordion  proza-libre" {{ block.shopify_attributes }}>
+        <details id="Details-{{ block.id }}-{{ section.id }}" {% if block.settings.open %}open{% endif %}>
+          <summary>
+            {{ block.settings.heading | default: block.settings.page.title }}
+            <span></span>
+          </summary>
+          <div class="collapsible__content accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
+            {{ block.settings.content }}
+            {{ block.settings.page.content }}
+            {{ block.settings.custom_liquid }}
+          </div>
+        </details>
+      </collapsible-row>
+      {%- endif -%}
+
+    {%- when 'collapsible_tab_dynamic' -%} 
+      {%- if block.settings.heading != blank and block.settings.content != blank -%}
+      <collapsible-row class="product__accordion accordion proza-libre" {{ block.shopify_attributes }}>
+        <details id="Details-{{ block.id }}-{{ section.id }}" {% if block.settings.open %}open{% endif %}>
+          <summary>
+            {{ block.settings.heading | default: block.settings.page.title }}
+            <span></span>
+          </summary>
+          {%- if block.settings.content or block.settings.page.content or block.settings.custom_liquid != blank -%}
+          <div class="collapsible__content accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
+            {{ block.settings.content }}
+            {{ block.settings.page.content }}
+            {{ block.settings.custom_liquid }}
+          </div>
+          {%- endif -%}
+        </details>
+      </collapsible-row>
+      {%- endif -%}
+    {%- when 'complementary' -%}
+      <product-recommendations class="complementary-products no-js-hidden" data-url="{{ routes.product_recommendations_url }}?section_id={{ section.id }}&product_id={{ product.id }}&limit={{ block.settings.product_list_limit }}&intent=complementary">
+        {%- if recommendations.performed and recommendations.products_count > 0 -%}
+
+          <div class="complementary-products--inner">
+            {%- if block.settings.block_heading != blank -%}
+              <div class="complementary-products--heading">{{ block.settings.block_heading }}</div>
+            {%- endif -%}
+            {%- for recommended_product in recommendations.products limit: block.settings.product_list_limit offset: continue -%}
+              {%- render 'product-card-small', product_small: recommended_product, quick_add: true -%}
+            {%- endfor -%}
+          </div>
+          <script src="{{ 'product-recommendations.js' | asset_url }}" defer="defer"></script>
+        {%- endif -%}
+      </product-recommendations>
+    {%- when 'image' -%}
+      <div class="product-information--image {{ block.settings.position }}" {{ block.shopify_attributes }}>
+        {% if block.settings.image %}
+        {%- liquid
+          assign image = block.settings.image
+          assign sizes = image.src.width | append: 'x' | append: image.src.height
+          render 'responsive-image', image: image, sizes: sizes
+          -%}
+        {%- else -%}
+          <div class="thb-placeholder">
+            {{ 'image' | placeholder_svg_tag: 'placeholder_svg_tag' }}
+          </div>
+        {%- endif -%}
+      </div>
+    {% when 'custom_option' %}
+      {%- if block.settings.label != blank -%}
+        {%- liquid
+          assign line_item_input_id = product_form_id | append: '-custom-' | append: forloop.index
+          assign line_item_input_name = block.settings.label | escape | prepend: 'properties[' | append: ']'
+          assign required = block.settings.text_required
+          assign text_placeholder = block.settings.text_placeholder
+        -%}
+        <fieldset class="product-form__input product-information--line-item" {{ block.shopify_attributes}}>
+          <div class="form__label" for="{{ line_item_input_id }}">{{ block.settings.label | escape }}</div>
+          {% case block.settings.type %}
+            {% when 'text' %}
+                <input class="product-information--line-item--text" type="text" id="{{ line_item_input_id }}" form="{{ product_form_id }}" name="{{ line_item_input_name }}" placeholder="{{ text_placeholder }}" form="{{ product_form_id }}" {% if required %}required{% endif %}>
+
+            {% when 'textarea' %}
+                <textarea class="product-information--line-item--textarea" id="{{ line_item_input_id }}" form="{{ product_form_id }}" name="{{ line_item_input_name }}" rows="3" placeholder="{{ text_placeholder }}" form="{{ product_form_id }}" {% if required %}required{% endif %}></textarea>
+
+            {% when 'checkbox' %}
+                <input type="hidden" form="{{ product_form_id }}" name="{{ line_item_input_name }}" value="{{ block.settings.checkbox_unchecked_value | escape }}">
+                <input type="checkbox" class="custom-checkbox" form="{{ product_form_id }}" name="{{ line_item_input_name }}" value="{{ block.settings.checkbox_checked_value | escape }}" id="{{ line_item_input_id }}" {% if required %}required{% endif %}>
+
+            {% when 'multiple' %}
+              {%- assign custom_options = block.settings.multiple_options | newline_to_br | strip_newlines | split: '<br />' -%}
+
+              {% if block.settings.multiple_style == 'dropdown' %}
+                <div class="select">
+                  <select name="{{ line_item_input_name }}" id="{{ line_item_input_id }}" form="{{ product_form_id }}">
+                    {% for option in custom_options %}
+                      <option value="{{ option | escape }}" {% if forloop.first %} selected{% endif %}>{{ option | escape }}</option>
+                    {% endfor %}
+                  </select>
+                  <div class="select-arrow">{%- render 'svg-icons' with 'thb-select' -%}</div>
+                </div>
+              {% else %}
+                {% for option in custom_options %}
+                  <label class="label">
+                    <input type="radio" form="{{ product_form_id }}" name="{{ line_item_input_name }}" value="{{ option | escape }}"{% if forloop.first %} checked{% endif %}>
+                    <span class="label__text-beside-input">{{ option | escape }}</span>
+                  </label>
+                {% endfor %}
+              {% endif %}
+          {% endcase %}
+        </fieldset>
+      {%- endif -%}
+    {%- when 'sku' -%}
+      <div class="product-sku product--text {{ block.settings.sku_style }}" id="sku-{{ section.id }}" {{ block.shopify_attributes }}>{{ product.selected_or_first_available_variant.sku }}</div>
+    {%- when 'product_link' -%}
+			<a href="{{ product.url }}" title="{{ 'products.product.view_product_details' | t | escape }}" class="text-button view-product-details" {{ block.shopify_attributes }}>{{ 'products.product.view_product_details' | t }}</a>
+    {%- when 'siblings' -%}
+      {%- render 'product-siblings' product: product, product_form_id: product_form_id, block: block -%}
+    {%- when 'shipping_estimator' -%}
+      <collapsible-row class="product__accordion accordion" {{ block.shopify_attributes }}>
+        <details id="Details-{{ block.id }}-{{ section.id }}" {% if block.settings.open %}open{% endif %}>
+          <summary>
+            {{- 'sections.cart.shipping_estimator.estimate_shipping' | t -}}
+            <span>{%- render 'svg-icons' with 'thb-collapsible-arrow' -%}</span>
+          </summary>
+          <div class="collapsible__content accordion__content rte" id="ProductAccordion-{{ block.id }}-{{ section.id }}">
+            {%- render 'shipping-estimator', section: section, shipping_estimator: block -%}
+          </div>
+        </details>
+      </collapsible-row>
+    {%- when 'fit_guide' -%}
+      <div class="product-fit-guide" style="--active-color: {{ block.settings.color_active_segment }};" {{ block.shopify_attributes }}>
+        {%- liquid
+          assign block_heading = block.settings.block_heading
+          assign label_active = block.settings.label_active | abs | at_most: 5 | at_least: 1
+          assign label_left = block.settings.label_left
+          assign label_middle = block.settings.label_middle
+          assign label_right = block.settings.label_right
+        -%}
+        {%- if block_heading != blank -%}<div class="product-fit-guide--heading">{{ block_heading }}</div>{%- endif -%}
+        <div class="product-fit-guide--lines">
+          {%- for i in (1..5) -%}
+          <div class="product-fit-guide--line{% if label_active == i %} product-fit-guide--line--active{%- endif -%}"></div>
+          {%- endfor -%}
+        </div>
+        <div class="product-fit-guide--labels">
+          <div class="product-fit-guide--label-left">{{ label_left }}</div>
+          {%- if label_middle != blank -%}<div class="product-fit-guide--label-middle">{{ label_middle }}</div>{%- endif -%}
+          <div class="product-fit-guide--label-right">{{ label_right }}</div>
+        </div>
+        <link rel="stylesheet" href="{{ 'product-fit.css' | asset_url }}" media="print" onload="this.media='all'">
+      </div>
+    {%- when 'payment_icons' -%}
+      <div class="payment-icons">
+      {%- unless shop.enabled_payment_types == empty -%}
+        {%- for type in shop.enabled_payment_types -%}
+          <figure>{{ type | payment_type_svg_tag: class: 'payment-icons__icon' }}</figure>
+        {%- endfor -%}
+      {%- endunless -%}
+      </div>
+  {%- endcase -%}
+  {% endfor %}
+</div>
+
+{% case option_type %}
+{% when 'framing' %}
+  {%- if section.settings.enable_sticky_add_to_cart -%}
+    {% render 'product-add-to-cart-sticky', product: product, media: first_image, color_picker: color_picker, picker_type: picker_type, form: form, is_disabled: is_disabled, outline_button: outline_button %}
+  {%- endif -%}
+{% else %}
+  {%- if section.settings.enable_sticky_add_to_cart -%}
+    {% render 'product-add-to-cart-sticky-frames', product: product, media: first_image, color_picker: color_picker, picker_type: picker_type, form: form, is_disabled: is_disabled, outline_button: outline_button %}
+  {%- endif -%}
+{% endcase %}
+
+
+{{ sizing_popup }}

@@ -1,0 +1,240 @@
+{{ 'rich-slideshow.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign section_heading = section.settings.heading
+  assign section_description = section.settings.description
+  assign disable_top_spacing = section.settings.disable_top_spacing
+  assign disable_bottom_spacing = section.settings.disable_bottom_spacing
+-%}
+
+<div class="rich-slideshow-section section-spacing{% if disable_top_spacing %} section-spacing--disable-top{% endif %}{% if disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}" style="background-color: {{ section.settings.background_color }};">
+  <div class="row">
+    <div class="small-12 columns">
+      {% if section_heading != blank %}
+        <div class="rich-slideshow__header text-center">
+          <h2>{{ section_heading }}</h2>
+        </div>
+      {% endif %}
+      <div class="rich-slideshow__content">
+        <div class="rich-slideshow">
+          {% for slide in section.blocks %}
+            <div class="rich-slideshow__slide">
+              {% if slide.settings.headline != blank %}
+                <div class="rich-slideshow__text-heading open-modal"
+                     data-headline="{{ slide.settings.headline }}"
+                     data-text="{{ slide.settings.text }}"
+                     data-image-url="{{ slide.settings.image | img_url: 'large' }}"
+                     data-modal-id="PopupModal">
+                  <h4>{{ slide.settings.headline }}</h4>
+                  {%- render 'svg-icons' with 'info' -%}
+                </div>
+              {% endif %}
+              <div class="rich-slideshow__slide-content">
+                {% if slide.settings.image != blank %}
+                  <img src="{{ slide.settings.image | img_url: 'large' }}"
+                       height="63px"
+                       width="63px"
+                       alt="{{ slide.settings.headline }}"
+                       class="open-modal"
+                       data-headline="{{ slide.settings.headline }}"
+                       data-text="{{ slide.settings.text }}"
+                       data-image-url="{{ slide.settings.image | img_url: 'large' }}"
+                       data-modal-id="PopupModal">
+                {% endif %}
+                <div class="rich-slideshow__text">
+                  {% if slide.settings.excerpt != blank %}
+                    <p class="excerpt">{{ slide.settings.excerpt }}</p>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        </div>
+        <button class="custom-slider-button" tabindex="0">
+          {%- render 'svg-icons' with 'carousel-next' -%}
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Universal Modal (outside of slideshow) -->
+  <div id="PopupModal" class="slider-product-popup-modal" hidden>
+    <div role="dialog" aria-modal="true" class="slider-product-popup-modal__content" tabindex="-1">
+      <div class="slider-product-popup-modal__content-header">
+        <h5 id="modalHeadline"></h5>
+        <button type="button" class="slider-product-popup-modal__toggle close-modal" data-modal-id="PopupModal" aria-label="Close">
+          {% render 'svg-icons' with 'close' %}
+        </button>
+      </div>
+      <div class="slider-product-popup-modal__content-info">
+        <!-- Image placeholder -->
+        <img id="modalImage" src="" alt="" height="100%" width="100%" style="display: none;">
+        <p id="modalText"></p>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      // Initialize Flickity slider
+      var slideshowElem = document.querySelector('.rich-slideshow');
+      var flkty;
+
+      if (slideshowElem) {
+        flkty = new Flickity(slideshowElem, {
+          cellAlign: 'left',
+          contain: true,
+          wrapAround: true,
+          prevNextButtons: false, // Disable default prev/next buttons
+          adaptiveHeight: false,
+          pageDots: false
+        });
+      }
+
+      // Add click event to custom button for next slide
+      document.querySelector('.custom-slider-button').addEventListener('click', function () {
+        if (flkty) {
+          flkty.next(); // Slide to the next cell
+        }
+      });
+
+      // Open modal function
+      function openModal(modalId, headline, text, imageUrl) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          document.getElementById('modalHeadline').innerText = headline;
+          document.getElementById('modalText').innerText = text;
+
+          const modalImage = document.getElementById('modalImage');
+          if (imageUrl && modalImage) {
+            modalImage.src = imageUrl;
+            modalImage.style.display = 'block';
+            modalImage.alt = headline || '';
+          } else if (modalImage) {
+            modalImage.style.display = 'none';
+          }
+
+          modal.classList.add('is-active');
+          modal.removeAttribute('hidden');
+          document.body.style.overflow = 'hidden'; // Disable background scrolling
+        } else {
+          console.error("Modal with ID '" + modalId + "' not found.");
+        }
+      }
+
+      // Close modal function
+      function closeModal(modalId) {
+        const modal = document.getElementById(modalId);
+        if (modal) {
+          modal.classList.remove('is-active');
+          modal.setAttribute('hidden', true);
+          document.body.style.overflow = ''; // Re-enable background scrolling
+
+          // Clear the modal image
+          const modalImage = document.getElementById('modalImage');
+          if (modalImage) {
+            modalImage.src = '';
+            modalImage.style.display = 'none';
+          }
+        } else {
+          console.error("Modal with ID '" + modalId + "' not found.");
+        }
+      }
+
+      // Add click event listeners to open-modal buttons
+      document.querySelectorAll('.open-modal').forEach(function (item) {
+        item.addEventListener('click', function () {
+          const modalId = this.getAttribute('data-modal-id');
+          const headline = this.getAttribute('data-headline');
+          const text = this.getAttribute('data-text');
+          const imageUrl = this.getAttribute('data-image-url');
+          openModal(modalId, headline, text, imageUrl);
+        });
+      });
+
+      // Add click event listener to close-modal button
+      document.querySelectorAll('.close-modal').forEach(function (item) {
+        item.addEventListener('click', function () {
+          const modalId = this.getAttribute('data-modal-id');
+          closeModal(modalId);
+        });
+      });
+
+      // Close modal when clicking outside modal content
+      document.getElementById('PopupModal').addEventListener('click', function (event) {
+        if (event.target === this) {
+          closeModal(this.id);
+        }
+      });
+    });
+  </script>
+</div>
+
+{% schema %}
+{
+  "name": "Rich Slideshow",
+  "class": "section-rich-slideshow",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "Art Prints in Premiumqualität"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_top_spacing",
+      "label": "Remove top spacing",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_bottom_spacing",
+      "label": "Remove bottom spacing",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#FFFFFF"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "slide",
+      "name": "Slide",
+      "settings": [
+        {
+          "type": "text",
+          "id": "headline",
+          "label": "Headline",
+          "default": "Slide Headline"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "label": "Text",
+          "default": "This is the main text for the slide."
+        },
+        {
+          "type": "textarea",
+          "id": "excerpt",
+          "label": "Excerpt",
+          "default": "This is a short excerpt for the slide."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rich Slideshow",
+      "category": "Media"
+    }
+  ]
+}
+{% endschema %}

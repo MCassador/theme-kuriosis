@@ -1,0 +1,546 @@
+{%- assign product_form_id = 'product-form-' | append: section.id -%}
+<product-add-to-cart-sticky class="product-add-to-cart-sticky no-js-hidden" data-section="{{ section.id }}">
+  <button class="product-add-to-cart-sticky--inner">
+    <div class="product-add-to-cart-sticky--image" id="product-image-{{ section.id }}--sticky">
+      {%- if media -%}
+        {%- render 'responsive-image', image: media, sizes: '96x96', priority: 'low' -%}
+      {%- endif -%}
+    </div>
+    <div class="product-add-to-cart-sticky--info">
+      <div class="product-add-to-cart-sticky--title">{{ product.title }}</div>
+      <div id="price-{{ section.id }}--sticky">
+        {% render 'product-price', product: product, use_variant: true, show_badges: false %}
+      </div>
+    </div>
+    <span class="plus"></span>
+  </button>
+  <div class="product-add-to-cart-sticky--content">
+    {%- unless product.has_only_default_variant -%}
+      <variant-selects id="variant-selects-{{ section.id }}--sticky" class="no-js-hidden variant-selects--sticky" data-section="{{ section.id }}" data-url="{{ product.url }}" data-sticky="1" data-is-disabled="{{ is_disabled }}">
+        <div class="variations">
+          {%- for option in product.options_with_values -%}
+            {%- liquid
+              assign option_name = option.name | downcase | escape
+              assign option_type = picker_type
+              if color_picker
+                if option_name contains 'color' or option_name contains 'colour' or option_name contains 'couleur' or option_name contains 'farbe'
+                  assign option_type = 'color'
+                endif
+                assign color_swatches_variant_option = settings.custom_product_badge_group_1_tag_names | downcase | split: ', '
+                if color_swatches_variant_option contains option_name
+                  assign option_type = 'color'
+                endif
+              endif
+            -%}
+            {% render 'product-option', option_type: option_type, product: product, option: option, forloop: forloop, product_form_id: product_form_id, sticky: true %}
+          {%- endfor -%}
+        </div>
+        <script type="application/json">
+          {{ product.variants | json }}
+        </script>
+      </variant-selects>
+    {%- endunless -%}
+    {%- if product != blank -%}
+      {%- liquid
+        assign product_template = product.template_suffix | escape 
+        if product.metafields.theme.preorder and product.available
+          assign product_template = 'pre-order'
+        endif
+      -%}
+      <product-form class="product-form" data-sticky="1" data-section="{{ section.id }}" template="{{ product_template | escape }}">
+        <div class="product-form__error-message-wrapper form-notification error" role="alert" hidden>
+          {% render 'svg-icons' with 'thb-error' %}
+          <span class="product-form__error-message"></span>
+        </div>
+        <div class="product-add-to-cart-container">
+          <div class="form-notification error" style="display:none;"></div>
+          <div class="add_to_cart_holder">
+            <button type="submit" name="add" id="AddToCartSticky" class="single-add-to-cart-button button{% if outline_button %} outline{% endif %} {% unless product.selected_or_first_available_variant.available %}sold-out{% endunless %}" {% if product.selected_or_first_available_variant.available == false %}disabled{% endif %} form="{{ product_form_id }}">
+              <span class="single-add-to-cart-button--text">
+                {%- liquid
+                  if product.selected_or_first_available_variant.available == false
+                    assign button_content = 'products.product.sold_out' | t
+                  else
+                    if product.template_suffix contains 'pre-order'
+                      assign button_content = 'products.product.pre_order' | t
+                    else
+                      assign button_content = 'products.product.add_to_cart' | t
+                    endif
+                  endif
+                -%}
+                {{- button_content -}}
+              </span>
+              <span class="loading-overlay">
+                {% render 'svg-icons' with 'thb-loading' %}
+              </span>
+            </button>
+          </div>
+        </div>
+      </product-form>
+    {%- else -%}
+      <div class="product-form">
+        <div class="product-form__buttons form">
+          <button type="submit" name="add" class="single_add_to_cart_button button sold-out" disabled>
+            <span class="single-add-to-cart-button--text">{{ 'products.product.sold_out' | t }}</span>
+          </button>
+        </div>
+      </div>
+    {%- endif -%}
+    
+    <!-- Sticky Frame Picker Section -->
+    {% comment %}
+      Only show the frame picker if the product does NOT have an option named "framing"
+    {% endcomment %}
+    <div class="sticky-frame-picker variations" style="margin-top: 1rem;">
+        <fieldset class="product-form__input product-form__input--framing" data-handle="frames-collection">
+          <div class="form__label proza-libre" id="StickyFrameOptionsHeading">
+            Rahmung <span class="selected-frame-option">: Ohne Rahmen</span>
+          </div>
+          <!-- No Frame option -->
+          <input type="radio" id="sticky-frame-collection-no-frame"
+                 name="sticky-frame-collection"
+                 value="no-frame"
+                 class="frame-option-input"
+                 data-has-size="false"
+                 data-frame-title="Ohne Rahmen"
+                 data-base-price="0"
+                 checked>
+          <label for="sticky-frame-collection-no-frame" style="--option-image: url('{{ 'no-frame.png' | file_url }}');">
+            {%- if settings.no_frame_image != blank -%}
+              <img src="{{ settings.no_frame_image | img_url: '72x' }}" 
+                   alt="Ohne Rahmen"
+                   loading="lazy"
+                   width="72"
+                   height="72">
+            {%- else -%}
+              <div style="display:flex; align-items:center; justify-content:center; width:100%; height:100%; text-align:center; font-size:12px; color:#666; border:1px dashed #ccc; padding:10px;">
+                <span>Ohne Rahmen</span>
+              </div>
+            {%- endif -%}
+            <span class="price">{{ cart.currency.symbol }}0,00</span>
+          </label>
+          {%- assign frame_products = collections['frames'].products -%}
+          {% for product in frame_products %}
+            {% unless product.id == product_id %}
+              {% assign has_size_option = false %}
+              {% assign size_option_index = -1 %}
+              {% assign is_available = product.available %}
+              {% assign any_variant_available = false %}
+              {% for option in product.options_with_values %}
+                {% assign option_name_lowercase = option.name | downcase %}
+                {% if option_name_lowercase == 'size' or option_name_lowercase == 'größe' %}
+                  {% assign has_size_option = true %}
+                  {% assign size_option_index = forloop.index0 %}
+                  {% break %}
+                {% endif %}
+              {% endfor %}
+              {% if has_size_option %}
+                {% assign price_data = '{}' %}
+                {% assign variant_id_data = '{}' %}
+                {% assign inventory_data = '{}' %}
+                {% assign size_options = '' %}
+                {% assign available_sizes = '' %}
+                {% for variant in product.variants %}
+                  {% if variant.available %}
+                    {% assign any_variant_available = true %}
+                    {% assign size_value = variant.options[size_option_index] %}
+                    {% if available_sizes != '' %}
+                      {% assign available_sizes = available_sizes | append: ',' %}
+                    {% endif %}
+                    {% assign available_sizes = available_sizes | append: size_value %}
+                    {% assign formatted_price = variant.price | divided_by: 100.0 | round: 2 %}
+                    {% assign price_key = size_value | replace: '"', '\"' %}
+                    {% if price_data == '{}' %}
+                      {% assign price_data = price_data | append: '"' | append: price_key | append: '":' | append: formatted_price %}
+                    {% else %}
+                      {% assign price_data = price_data | remove: '}' | append: ',"' | append: price_key | append: '":' | append: formatted_price %}
+                    {% endif %}
+                    {% assign price_data = price_data | append: '}' %}
+                    {% assign variant_id_key = size_value | replace: '"', '\"' %}
+                    {% if variant_id_data == '{}' %}
+                      {% assign variant_id_data = variant_id_data | append: '"' | append: variant_id_key | append: '":' | append: variant.id %}
+                    {% else %}
+                      {% assign variant_id_data = variant_id_data | remove: '}' | append: ',"' | append: variant_id_key | append: '":' | append: variant.id %}
+                    {% endif %}
+                    {% assign variant_id_data = variant_id_data | append: '}' %}
+                    {% assign inventory_key = size_value | replace: '"', '\"' %}
+                    {% if inventory_data == '{}' %}
+                      {% assign inventory_data = inventory_data | append: '"' | append: inventory_key | append: '":' | append: variant.inventory_quantity %}
+                    {% else %}
+                      {% assign inventory_data = inventory_data | remove: '}' | append: ',"' | append: inventory_key | append: '":' | append: variant.inventory_quantity %}
+                    {% endif %}
+                    {% assign inventory_data = inventory_data | append: '}' %}
+                  {% endif %}
+                  {% assign size_value = variant.options[size_option_index] %}
+                  {% unless size_options contains size_value %}
+                    {% if size_options != '' %}
+                      {% assign size_options = size_options | append: ',' %}
+                    {% endif %}
+                    {% assign size_options = size_options | append: size_value %}
+                  {% endunless %}
+                {% endfor %}
+              {% endif %}
+              <input type="radio" id="sticky-frame-collection-{{ product.handle }}"
+                     name="sticky-frame-collection"
+                     value="{{ product.handle }}"
+                     data-product-id="{{ product.id }}"
+                     data-has-size="{{ has_size_option }}"
+                     data-frame-title="{{ product.title }}"
+                     data-base-price="{{ product.price | divided_by: 100.0 | round: 2 }}"
+                     data-default-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                     {% if has_size_option %}
+                       data-size-options="{{ size_options }}"
+                       data-available-sizes="{{ available_sizes }}"
+                       data-variant-prices='{{ price_data }}'
+                       data-variant-ids-by-size='{{ variant_id_data }}'
+                       data-inventory-by-size='{{ inventory_data }}'
+                     {% endif %}
+                     class="frame-option-input{% if has_size_option and available_sizes == '' or is_available == false or any_variant_available == false %} is-disabled{% endif %}"
+                     {% if has_size_option and available_sizes == '' or is_available == false or any_variant_available == false %}disabled{% endif %}>
+              <label for="sticky-frame-collection-{{ product.handle }}"
+                     style="--option-image: url('{% if product.metafields.custom.frame_image != blank %}{{ product.metafields.custom.frame_image | img_url: 'medium' }}{% else %}{{ product.featured_image | img_url: 'medium' }}{% endif %}');"
+                     class="{% if has_size_option and available_sizes == '' or is_available == false or any_variant_available == false %}size-not-available out-of-stock-frame{% endif %}">
+                <img src="{% if product.metafields.custom.frame_image != blank %}{{ product.metafields.custom.frame_image | img_url: '72x' }}{% else %}{{ product.featured_image | img_url: '72x' }}{% endif %}" 
+                     alt="{{ product.title }}"
+                     loading="lazy"
+                     width="72"
+                     height="72">
+                <span class="price">+{{ cart.currency.symbol }}{{ product.price | divided_by: 100.0 | round: 2 }}</span>
+                {% if has_size_option %}
+                  <span class="size-mismatch-indicator" style="display: none;" title="Größe nicht verfügbar"></span>
+                {% endif %}
+                {% if has_size_option and available_sizes == '' or is_available == false or any_variant_available == false %}
+                  <span class="stock-status">Ausverkauft</span>
+                {% endif %}
+              </label>
+            {% endunless %}
+          {% endfor %}
+          <div style="color:#666; font-size:12px; display:none;">Available frame products: {{ frame_products.size }}</div>
+        </fieldset>
+      </div>
+    
+    <!-- Sticky Price Updating Script -->
+    <script>
+      (function(){
+        var mainPriceCents = {{ product.selected_or_first_available_variant.price }};
+        var mainCompareAtCents = {{ product.selected_or_first_available_variant.compare_at_price | default: 0 }};
+        console.log("Sticky main price (cents):", mainPriceCents, "Sticky compare at (cents):", mainCompareAtCents);
+        
+        function getSelectedFramePriceCents() {
+          var selectedFrame = document.querySelector('input[name="sticky-frame-collection"]:checked');
+          if (!selectedFrame || selectedFrame.value === 'no-frame') {
+            console.log("No sticky frame selected");
+            return 0;
+          }
+          var basePriceUnits = parseFloat(selectedFrame.getAttribute('data-base-price')) || 0;
+          var priceCents = Math.round(basePriceUnits * 100);
+          console.log("Sticky base frame price (units):", basePriceUnits, "=>", priceCents, "cents");
+          
+          if (selectedFrame.getAttribute('data-has-size') === "true" && selectedFrame.dataset.variantPrices) {
+            try {
+              var variantPrices = JSON.parse(selectedFrame.dataset.variantPrices.replace(/\\/g, ''));
+              var selectedSize = null;
+              var selectElem = document.querySelector('select[name="options[Size]"], select[name="options[Größe]"]');
+              if (selectElem) { 
+                selectedSize = selectElem.value; 
+              } else {
+                var radioElem = document.querySelector('input[name="Size"]:checked, input[name="options[Größe]"]:checked');
+                if (radioElem) { selectedSize = radioElem.value; }
+                else {
+                  var customElem = document.querySelector('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value');
+                  if (customElem) { selectedSize = customElem.textContent.trim(); }
+                }
+              }
+              console.log("Sticky selected size:", selectedSize);
+              if (selectedSize && variantPrices[selectedSize] !== undefined) {
+                priceCents = Math.round(parseFloat(variantPrices[selectedSize]) * 100);
+                console.log("Sticky exact match found. Frame price:", priceCents, "cents");
+              } else if (selectedSize) {
+                for (var key in variantPrices) {
+                  if (selectedSize.toLowerCase().indexOf(key.toLowerCase()) !== -1 ||
+                      key.toLowerCase().indexOf(selectedSize.toLowerCase()) !== -1) {
+                    priceCents = Math.round(parseFloat(variantPrices[key]) * 100);
+                    console.log("Sticky partial match found (" + key + "). Frame price:", priceCents, "cents");
+                    break;
+                  }
+                }
+              }
+            } catch (e) {
+              console.warn("Error parsing sticky frame variant prices:", e);
+            }
+          }
+          return priceCents;
+        }
+        
+        function updateCombinedPrice() {
+          var framePriceCents = getSelectedFramePriceCents();
+          var combinedPriceCents = mainPriceCents + framePriceCents;
+          console.log("Sticky combined price (cents):", combinedPriceCents);
+          var priceEls = document.querySelectorAll('#price-{{ section.id }}--sticky .price.proza-libre ins span.amount');
+          priceEls.forEach(function(priceEl) {
+            if (typeof formatMoney === 'function' && window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) {
+              priceEl.innerHTML = '<span class="money">' + formatMoney(combinedPriceCents, window.theme.settings.money_with_currency_format) + '</span>';
+            } else if (Shopify.formatMoney) {
+              priceEl.innerHTML = '<span class="money">' + Shopify.formatMoney(combinedPriceCents, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || {{ shop.money_format | json }}) + '</span>';
+            } else {
+              priceEl.innerHTML = '<span class="money">{{ cart.currency.symbol }}' + (combinedPriceCents / 100).toFixed(2) + '</span>';
+            }
+          });
+          
+          var compareAtEls = document.querySelectorAll('#price-{{ section.id }}--sticky .price.proza-libre del span.amount');
+          if (mainCompareAtCents > mainPriceCents) {
+            var combinedCompareAtCents = mainCompareAtCents + framePriceCents;
+            console.log("Sticky combined compare-at (cents):", combinedCompareAtCents);
+            compareAtEls.forEach(function(compareAtEl) {
+              if (typeof formatMoney === 'function' && window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) {
+                compareAtEl.innerHTML = '<span class="money">' + formatMoney(combinedCompareAtCents, window.theme.settings.money_with_currency_format) + '</span>';
+              } else if (Shopify.formatMoney) {
+                compareAtEl.innerHTML = '<span class="money">' + Shopify.formatMoney(combinedCompareAtCents, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || {{ shop.money_format | json }}) + '</span>';
+              } else {
+                compareAtEl.innerHTML = '<span class="money">{{ cart.currency.symbol }}' + (combinedCompareAtCents / 100).toFixed(2) + '</span>';
+              }
+            });
+          } else {
+            compareAtEls.forEach(function(compareAtEl) {
+              if (compareAtEl.parentElement) { compareAtEl.parentElement.remove(); }
+            });
+          }
+          // Also update the price shown on each sticky frame option label.
+          updateStickyFrameOptionPrices();
+        }
+        
+        function updateStickyFrameOptionPrices() {
+          var selectedSize = null;
+          var selectElem = document.querySelector('select[name="options[Size]"], select[name="options[Größe]"]');
+          if (selectElem) { 
+            selectedSize = selectElem.value; 
+          } else {
+            var radioElem = document.querySelector('input[name="Size"]:checked, input[name="options[Größe]"]:checked');
+            if (radioElem) { selectedSize = radioElem.value; }
+            else {
+              var customElem = document.querySelector('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value');
+              if (customElem) { selectedSize = customElem.textContent.trim(); }
+            }
+          }
+          var stickyFrameInputs = document.querySelectorAll('input[name="sticky-frame-collection"]');
+          stickyFrameInputs.forEach(function(input) {
+            if (input.getAttribute('data-has-size') === "true" && input.dataset.variantPrices) {
+              try {
+                var variantPrices = JSON.parse(input.dataset.variantPrices.replace(/\\/g, ''));
+                var newPriceCents;
+                if (selectedSize && variantPrices[selectedSize] !== undefined) {
+                  newPriceCents = Math.round(parseFloat(variantPrices[selectedSize]) * 100);
+                } else if (selectedSize) {
+                  for (var key in variantPrices) {
+                    if (selectedSize.toLowerCase().includes(key.toLowerCase()) || key.toLowerCase().includes(selectedSize.toLowerCase())) {
+                      newPriceCents = Math.round(parseFloat(variantPrices[key]) * 100);
+                      break;
+                    }
+                  }
+                }
+                if (newPriceCents === undefined) {
+                  var basePriceUnits = parseFloat(input.getAttribute('data-base-price')) || 0;
+                  newPriceCents = Math.round(basePriceUnits * 100);
+                }
+                var label = document.querySelector('label[for="' + input.id + '"]');
+                if (label) {
+                  var priceSpan = label.querySelector('span.price');
+                  if (priceSpan) {
+                    if (typeof formatMoney === 'function' && window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) {
+                      priceSpan.innerHTML = '<span class="money">' + formatMoney(newPriceCents, window.theme.settings.money_with_currency_format) + '</span>';
+                    } else if (Shopify.formatMoney) {
+                      priceSpan.innerHTML = '<span class="money">' + Shopify.formatMoney(newPriceCents, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || {{ shop.money_format | json }}) + '</span>';
+                    } else {
+                      priceSpan.innerHTML = '<span class="money">{{ cart.currency.symbol }}' + (newPriceCents / 100).toFixed(2) + '</span>';
+                    }
+                  }
+                }
+              } catch (e) {
+                console.warn("Error updating sticky frame option price:", e);
+              }
+            }
+          });
+        }
+        
+        function attachStickyListeners(selector, callback) {
+          document.querySelectorAll(selector).forEach(function(el) {
+            el.addEventListener('change', callback);
+            el.addEventListener('click', callback);
+          });
+        }
+        
+        attachStickyListeners('input[name="sticky-frame-collection"]', updateCombinedPrice);
+        attachStickyListeners('select[name="options[Size]"], select[name="options[Größe]"]', updateCombinedPrice);
+        attachStickyListeners('input[name="Size"], input[name="Größe"]', updateCombinedPrice);
+        attachStickyListeners('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value', updateCombinedPrice);
+        
+        // When main product size changes, reset sticky frame to "Ohne Rahmen"
+        attachStickyListeners(
+          'select[name="options[Size]"], select[name="options[Größe]"], input[name="Size"], input[name="Größe"], .custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value',
+          function(){
+            var noFrame = document.querySelector('input[name="sticky-frame-collection"][value="no-frame"]');
+            if (noFrame) {
+              noFrame.checked = true;
+              var label = document.querySelector('#StickyFrameOptionsHeading .selected-frame-option');
+              if (label) { label.textContent = ": Ohne Rahmen"; }
+            }
+            updateCombinedPrice();
+          }
+        );
+        
+        document.addEventListener('product:variant-change', function(e) {
+          if (e.detail && e.detail.variant && e.detail.variant.price) {
+            mainPriceCents = e.detail.variant.price;
+            mainCompareAtCents = e.detail.variant.compare_at_price || 0;
+          }
+          updateCombinedPrice();
+        });
+        
+        var mainVariantSelect = document.querySelector('select[name="id"]');
+        if (mainVariantSelect) {
+          mainVariantSelect.addEventListener('change', function() {
+            var selectedOption = mainVariantSelect.options[mainVariantSelect.selectedIndex];
+            if (selectedOption) {
+              var priceAttr = selectedOption.getAttribute('data-price');
+              var compareAttr = selectedOption.getAttribute('data-compare-at-price');
+              if (priceAttr) { mainPriceCents = Math.round(parseFloat(priceAttr)); }
+              if (compareAttr) { mainCompareAtCents = Math.round(parseFloat(compareAttr)); }
+              else { mainCompareAtCents = 0; }
+            }
+            updateCombinedPrice();
+          });
+        }
+        
+        document.querySelectorAll('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value')
+          .forEach(function(el) {
+            var observer = new MutationObserver(function(mutations) {
+              var noFrame = document.querySelector('input[name="sticky-frame-collection"][value="no-frame"]');
+              if (noFrame) {
+                noFrame.checked = true;
+                var label = document.querySelector('#StickyFrameOptionsHeading .selected-frame-option');
+                if (label) { label.textContent = ": Ohne Rahmen"; }
+              }
+              updateCombinedPrice();
+            });
+            observer.observe(el, { characterData: true, childList: true, subtree: true });
+          });
+        
+        document.addEventListener('DOMContentLoaded', updateCombinedPrice);
+      })();
+    </script>
+    
+    <!-- Sticky Add-to-Cart Override Script -->
+    <script>
+      (function(){
+        var innerForm = document.getElementById('{{ product_form_id }}');
+        if (!innerForm) {
+          console.error("Sticky form not found with id {{ product_form_id }}.");
+          return;
+        }
+        var addToCartBtn = document.getElementById("AddToCartSticky");
+        if (!addToCartBtn) return;
+        
+        addToCartBtn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          var selectedFrame = document.querySelector('.sticky-frame-picker input[name="sticky-frame-collection"]:checked');
+          if (!selectedFrame || selectedFrame.value === "no-frame") {
+            console.log("No sticky frame selected; submitting sticky form normally.");
+            if (innerForm.requestSubmit) { innerForm.requestSubmit(); }
+            else { innerForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true })); }
+            return;
+          }
+          
+          console.log("Sticky frame selected:", selectedFrame.dataset.frameTitle);
+          var mainVariantInput = innerForm.querySelector('input[name="id"]');
+          if (!mainVariantInput) {
+            console.error("Main variant input not found in sticky form.");
+            innerForm.dispatchEvent(new Event("submit", { bubbles: true, cancelable: true }));
+            return;
+          }
+          var mainVariantId = mainVariantInput.value;
+          var quantity = 1;
+          
+          var frameVariantId = selectedFrame.getAttribute('data-default-variant-id');
+          function safeJsonParse(jsonString, fallback) {
+            try { return JSON.parse(jsonString.replace(/\\/g, '')); }
+            catch (err) { console.warn("Error parsing JSON:", err); return fallback; }
+          }
+          var selectedSize = null;
+          var selectElem = document.querySelector('select[name="options[Size]"], select[name="options[Größe]"]');
+          if (selectElem) { selectedSize = selectElem.value; }
+          else {
+            var radioElem = document.querySelector('input[name="Size"]:checked, input[name="options[Größe]"]:checked');
+            if (radioElem) { selectedSize = radioElem.value; }
+            else {
+              var customElem = document.querySelector('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value');
+              if (customElem) { selectedSize = customElem.textContent.trim(); }
+            }
+          }
+          console.log("Sticky main selected size:", selectedSize);
+          if (selectedSize && selectedFrame.dataset.hasSize === "true" && selectedFrame.dataset.variantIdsBySize) {
+            var variantIds = safeJsonParse(selectedFrame.dataset.variantIdsBySize, {});
+            if (variantIds[selectedSize]) {
+              frameVariantId = variantIds[selectedSize];
+              console.log("Sticky exact size match found:", selectedSize, "=>", frameVariantId);
+            } else {
+              for (var key in variantIds) {
+                if (selectedSize.toLowerCase().indexOf(key.toLowerCase()) !== -1 ||
+                    key.toLowerCase().indexOf(selectedSize.toLowerCase()) !== -1) {
+                  frameVariantId = variantIds[key];
+                  console.log("Sticky partial size match found (" + key + ") =>", frameVariantId);
+                  break;
+                }
+              }
+            }
+          }
+          if (!frameVariantId) {
+            console.warn("No valid frame variant ID found; using default value.");
+            frameVariantId = selectedFrame.getAttribute('data-default-variant-id');
+          }
+          
+          var itemsToAdd = [
+            { id: mainVariantId, quantity: quantity },
+            { id: frameVariantId, quantity: quantity, properties: { "Main Product": "{{ product.title | escape }}" } }
+          ];
+          console.log("Sticky add-to-cart items:", itemsToAdd);
+          
+          fetch('/cart/add.js', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
+            body: JSON.stringify({ items: itemsToAdd })
+          })
+          .then(function(response) {
+            if (!response.ok) throw new Error("Failed to add items");
+            return response.json();
+          })
+          .then(function(data) {
+            document.body.classList.add('open-cc');
+            document.body.classList.add('open-cart');
+            var cartDrawer = document.getElementById('Cart-Drawer');
+            if (cartDrawer) {
+              cartDrawer.classList.add('active');
+              cartDrawer.focus();
+              setTimeout(function(){
+                var recommendations = document.body.querySelector('.product-recommendations--full');
+                if(recommendations) { recommendations.classList.add('active'); }
+              }, 100);
+            }
+            dispatchCustomEvent('cart:open');
+            dispatchCustomEvent('cart:toggle');
+            dispatchCustomEvent('cart:drawer:open');
+            dispatchCustomEvent('ajaxCart:open');
+            dispatchCustomEvent('product:added');
+            dispatchCustomEvent('cart:updated');
+            dispatchCustomEvent('cart:refresh');
+          })
+          .catch(function(err) {
+            console.error("Sticky add-to-cart error:", err);
+            alert("Es ist ein Fehler aufgetreten. Bitte versuchen Sie es erneut.");
+          });
+        });
+      })();
+    </script>
+  </div>
+</product-add-to-cart-sticky>

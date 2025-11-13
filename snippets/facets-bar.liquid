@@ -1,0 +1,246 @@
+{%- liquid
+	assign sort_by = results.sort_by | default: results.default_sort_by
+	if results.url
+	  assign results_url = results.url
+	else
+	  assign terms = results.terms | escape
+	  assign results_url = '?q=' | append: terms | append: '&options%5Bprefix%5D=last&sort_by=' | append: sort_by
+	endif
+  -%}
+  {%- if enable_filtering -%}
+  <facet-filters-form class="facets--bar proza-libre{% if facets_desktop == 'sidebar' %} facets--bar-inline{% endif %}">
+  
+	<form id="FacetFiltersForm-bar" class="facets__form">
+	  {%- if results.terms -%}
+		<input type="hidden" name="q" value="{{ results.terms | escape }}">
+		<input name="options[prefix]" type="hidden" value="last">
+	  {%- endif -%}
+	  {% if results.current_vendor or results.current_type %}
+		<input type="hidden" name="q" value="{{ results.current_vendor }}{{ results.current_type }}">
+	  {% endif %}
+	  <div>
+
+		  <a href="#SideFilters" class="facets-toggle" id="Facets-Toggle">{% render 'svg-icons' with 'thb-filter' %} {{ 'products.facets.filter_and_sort' | t }}</a>
+
+	  </div>
+  
+	  <!-- Begin modified filters code -->
+	  {%- for filter in results.filters -%}
+		{%- case filter.type -%}
+		  {% when 'boolean', 'list' %}
+			<!-- Handle filters differently based on operator -->
+			{% if filter.operator == 'OR' %}
+			  <!-- Calculate the number of selected checkboxes -->
+			  {%- assign selected_count = 0 -%}
+			  {%- for value in filter.values -%}
+				{%- if value.active -%}
+				  {%- assign selected_count = selected_count | plus: 1 -%}
+				{%- endif -%}
+			  {%- endfor -%}
+  
+			  <!-- Display checkboxes for 'OR' filters -->
+			  <div class="dropdown-filter">
+				{% if selected_count > 0 %}
+				  <span class="dropdown-filter-count">{{ selected_count }}</span>
+				{% endif %}
+				<button type="button" class="filter-checkboxes-toggle">{{ filter.label | escape }} {% render 'svg-icons' with 'arrow-down' %}</button>
+				<div class="filter-checkboxes dropdown-menu-filter">
+				  {%- for value in filter.values -%}
+					<div class="filter-checkbox">
+					  <input type="checkbox"
+						name="{{ value.param_name }}"
+						value="{{ value.value }}"
+						id="Filter-{{ filter.param_name }}-{{ forloop.index }}"
+						{% if value.active %}checked{% endif %}
+					  >
+					  <label for="Filter-{{ filter.param_name }}-{{ forloop.index }}">
+						{{ value.label | escape }}{% if show_counts %} ({{ value.count }}){% endif %}
+					  </label>
+					</div>
+				  {%- endfor -%}
+				</div>
+			  </div>
+			{% else %}
+			  <!-- Display dropdown for other filters -->
+			  <div class="dropdown-filter">
+				<button type="button" class="filter-checkboxes-toggle">{{ filter.label | escape }} {% render 'svg-icons' with 'arrow-down' %}</button>
+				<div class="filter-dropdown dropdown-menu-filter">
+				  <label for="Filter-{{ filter.param_name }}">{{ filter.label | escape }}</label>
+				  <select name="{{ filter.param_name }}" id="Filter-{{ filter.param_name }}">
+					<!-- Option for no selection -->
+					<option value="">{{ 'Select an option' | t }}</option>
+					{%- for value in filter.values -%}
+					  <option value="{{ value.value }}" {% if value.active %}selected{% endif %}>
+						{{ value.label | escape }}{% if show_counts %} ({{ value.count }}){% endif %}
+					  </option>
+					{%- endfor -%}
+				  </select>
+				</div>
+			  </div>
+			{% endif %}
+		  {% when 'price_range' %}
+			<!-- Implementing price slider -->
+			{%- liquid
+			  assign currencies_using_comma_decimals = 'ANG,ARS,BRL,BYN,BYR,CLF,CLP,COP,CRC,CZK,DKK,EUR,HRK,HUF,IDR,ISK,MZN,NOK,PLN,RON,RUB,SEK,TRY,UYU,VES,VND' | split: ','
+			  assign uses_comma_decimals = false
+			  if currencies_using_comma_decimals contains cart.currency.iso_code
+				assign uses_comma_decimals = true
+			  endif
+  
+			  assign max_value = nil
+			  assign min_value = nil
+			  if uses_comma_decimals
+				if filter.max_value.value
+				  assign max_value = filter.max_value.value | money_without_currency | replace: '.', ''
+				endif
+				if filter.min_value.value
+				  assign min_value = filter.min_value.value | money_without_currency | replace: '.', ''
+				endif
+				assign range_max = filter.range_max | money_without_currency | replace: '.', ''
+			  else
+				if filter.max_value.value
+				  assign max_value = filter.max_value.value | money_without_currency | replace: ',', ''
+				endif
+				if filter.min_value.value
+				  assign min_value = filter.min_value.value | money_without_currency | replace: ',', ''
+				endif
+				assign range_max = filter.range_max | money_without_currency | strip_html | replace: ',', '' | divided_by: 1.00
+			  endif
+			-%}
+			{%- assign max_price_amount = filter.range_max | money | strip_html | escape -%}
+	  
+			<div class="dropdown-filter">
+			  <button type="button" class="filter-checkboxes-toggle">{{ filter.label | escape }} {% render 'svg-icons' with 'arrow-down' %}</button>
+			  <div class="dropdown-menu-filter">
+				<div class="price-range-filter">
+				  <div class="{{ filter.type | escape }} {{ filter.type | escape }}-{{ filter.label | downcase | escape }}">
+					<span class="price-highest">{{ "products.facets.max_price" | t: price: max_price_amount }}</span>
+					<price-slider class="price_slider_wrapper">
+					  <div
+						class="price_slider"
+						data-min-value="{{ min_value }}"
+						data-min-name="filter.v.price.gte"
+						data-min="0"
+						data-max-value="{{ max_value }}"
+						data-max-name="filter.v.price.lte"
+						data-max="{{ range_max }}">
+					  </div>
+					  <div class="price_slider_amount">
+						<div>
+						  <span class="field-currency">{{ cart.currency.symbol }}</span>
+						  <input class="field__input field__input_min"
+							name="{{ filter.min_value.param_name }}"
+							id="Filter-{{ filter.label | escape }}-GTE"
+							value="{{ min_value }}"
+							type="text"
+							placeholder="0"
+						  >
+
+						</div>
+						<div>
+						  <span class="field-currency">{{ cart.currency.symbol }}</span>
+						  <input class="field__input field__input_max"
+							name="{{ filter.max_value.param_name }}"
+							id="Filter-{{ filter.label | escape }}-LTE"
+							value="{{ max_value }}"
+							type="text"
+							placeholder="{{ filter.range_max | money_without_currency }}"
+						  >
+
+						</div>
+					  </div>
+					</price-slider>
+				  </div>
+				</div>
+			  </div>
+			</div>
+		  {%- else -%}
+			<!-- Handle other filter types if necessary -->
+		{%- endcase -%}
+	  {%- endfor -%}
+	  <!-- End modified filters code -->
+  
+	  <div class="thb-filter-sort-count">
+		{%- if enable_sorting -%}
+		  <div class="thb-filter-sort">
+			<div class="select">
+			  {%- assign sort_by = results.sort_by | default: results.default_sort_by -%}
+			  <label for="SortByBar" class="visually-hidden">{{ 'products.facets.sort_by_label' | t }}</label>
+			  <select name="sort_by" class="facet-filters__sort select__select resize-select" id="SortByBar" aria-describedby="a11y-refresh-page-message">
+				{%- for option in results.sort_options -%}
+				  <option value="{{ option.value | escape }}"{% if option.value == sort_by %} selected="selected"{% endif %}>
+					{{ option.name | escape }}
+				  </option>
+				{%- endfor -%}
+			  </select>
+			  <div class="select-arrow">{%- render 'svg-icons' with 'thb-select' -%}</div>
+			</div>
+		  </div>
+		{%- endif -%}
+		<div class="thb-filter-count" id="ProductCount">
+		  <span class="facets__label">
+			{%- if results.results_count -%}
+			  {{ 'search.results_with_count' | t: terms: results.terms, count: results.results_count }}
+			{%- elsif results.products_count == results.all_products_count -%}
+			  {{ 'products.facets.product_count_simple' | t: count: results.products_count }}
+			{%- else -%}
+			  {{ 'products.facets.product_count' | t: product_count: results.products_count, count: results.all_products_count }}
+			{%- endif -%}
+		  </span>
+		  <span class="loading-overlay">
+			{% render 'svg-icons' with 'thb-loading' %}
+		  </span>
+		</div>
+	  </div>
+	</form>
+	{%- if enable_filtering -%}
+	  {% render 'facets-active', results: results, results_url: results_url, filter_color_swatches: filter_color_swatches %}
+	{%- endif -%}
+  </facet-filters-form>
+  
+  <!-- Include your JavaScript code -->
+  <script>
+  document.addEventListener('click', function(event) {
+	var toggle = event.target.closest('.filter-checkboxes-toggle');
+	if (toggle) {
+	  event.preventDefault();
+	  var dropdownMenu = toggle.nextElementSibling;
+	  var dropdownFilter = toggle.closest('.dropdown-filter');
+	  if (dropdownMenu && dropdownMenu.classList.contains('dropdown-menu-filter')) {
+		// Close all other open dropdowns
+		var dropdownMenus = document.querySelectorAll('.dropdown-menu-filter.active');
+		dropdownMenus.forEach(function(menu) {
+		  if (menu !== dropdownMenu) {
+			menu.classList.remove('active');
+			// Remove 'active' class from the parent .dropdown-filter
+			var parentDropdownFilter = menu.closest('.dropdown-filter');
+			if (parentDropdownFilter) {
+			  parentDropdownFilter.classList.remove('active');
+			}
+		  }
+		});
+		// Toggle the clicked dropdown
+		dropdownMenu.classList.toggle('active');
+		// Also toggle the 'active' class on the .dropdown-filter
+		if (dropdownFilter) {
+		  dropdownFilter.classList.toggle('active');
+		}
+	  }
+	} else {
+	  // Close dropdowns when clicking outside
+	  var isClickInside = event.target.closest('.dropdown-filter');
+	  if (!isClickInside) {
+		var dropdownMenus = document.querySelectorAll('.dropdown-menu-filter.active');
+		dropdownMenus.forEach(function(menu) {
+		  menu.classList.remove('active');
+		  // Remove 'active' class from the parent .dropdown-filter
+		  var parentDropdownFilter = menu.closest('.dropdown-filter');
+		  if (parentDropdownFilter) {
+			parentDropdownFilter.classList.remove('active');
+		  }
+		});
+	  }
+	}
+  });
+  </script>
+{%- endif -%}

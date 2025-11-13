@@ -1,0 +1,830 @@
+<div class="variations">
+  <fieldset class="product-form__input product-form__input--framing product-form__input--framing--{{ settings.frame_image_size | default: 'regular' }}" style="display: flex;flex-wrap: wrap;gap: 5px;" data-handle="frames-collection">
+  
+    <div class="form__label proza-libre" id="FrameOptionsHeading">
+      {{ 'products.product.frame_heading' | t }}
+      <span class="selected-frame-option">: {{ 'products.product.no_frame' | t }}</span>
+        {% for block in section.blocks %}
+          {% if block.settings.framing_guide_text != blank %}
+            <modal-opener class="product-popup-modal__opener" data-modal="#PopupModal-Framing-{{ block.id }}">
+              <button id="FramingPopup-{{ block.id }}" class="product-popup-modal__button" type="button" aria-haspopup="dialog">
+                {% comment %} {% render 'svg-icons-inline', icon: block.settings.framing_guide_icon %}
+                <span>{{ block.settings.framing_guide_text }}</span> {% endcomment %}
+                <span>{{ block.settings.framing_guide_text }}
+                  <svg xmlns="http://www.w3.org/2000/svg" style="margin-left:5px;" height="9px" width="9px" viewBox="0 0 6.4 6.3"><g id="Ebene_1-2"><g id="text" style="isolation:isolate;"><g style="isolation:isolate;"><path d="M6.4.1l-.4,4.3h0l-.3-3.2L.4,6.3s-.1,0-.2-.2c-.1-.1-.2-.2-.2-.2L5.1.7,1.9.4h0l4.3-.4h.1v.1h.1Z" style=""></path></g></g></g></svg>
+                </span>
+              </button>
+            </modal-opener>
+            <modal-dialog id="PopupModal-Framing-{{ block.id }}" class="product-popup-modal">
+              <div role="dialog" aria-label="{{ block.settings.framing_guide_text }}" aria-modal="true" class="product-popup-modal__content" tabindex="-1">
+                <div class="product-popup-modal__content-header">
+                  <h5>{{ block.settings.framing_guide_page.title }}</h5>
+                  <button id="ModalClose-Framing-{{ block.id }}" type="button" class="product-popup-modal__toggle" aria-label="{{ 'accessibility.close' | t }}">
+                    {% render 'svg-icons', icon: 'close' %}
+                  </button>
+                </div>
+                <scroll-shadow>
+                  <div class="product-popup-modal__content-info">
+                    {{ block.settings.framing_guide_page.content }}
+                  </div>
+                </scroll-shadow>
+              </div>
+            </modal-dialog>
+            <script src="{{ 'modal-dialog.js' | asset_url }}" defer="defer"></script>
+          {% endif %}
+        {% endfor %}
+    </div>
+
+
+      <!-- No Frame option (default) -->
+      <input type="radio" id="frame-collection-no-frame"
+             name="frame-collection"
+             value="no-frame"
+             class="frame-option-input"
+             data-has-size="false"
+             data-frame-title="{{ 'products.product.no_frame' | t }}"
+             data-base-price="0"
+             checked>
+      <label for="frame-collection-no-frame" style="--option-image: url('{{ 'no-frame.png' | file_url }}');">
+          {%- if settings.no_frame_image != blank -%}
+            <img src="{{ settings.no_frame_image | image_url: width: 72 }}" 
+                 alt="{{ 'products.product.no_frame' | t }}"
+                 loading="lazy"
+                 width="72"
+                 height="72">
+          {%- else -%}
+            <div style="display: flex; align-items: center; justify-content: center; width: 100%; height: 100%; text-align: center; font-size: 12px; color: #666; border: 1px dashed #ccc; padding: 10px;">
+              <span>{{ 'products.product.no_frame' | t }}</span>
+            </div>
+          {%- endif -%}
+          {% if settings.currency_code_enabled %}
+            <span class="price hidden " style="height:0;">{{ cart.currency.symbol }}0,00</span>
+          {% else %}
+            <span class="price hidden " style="height:0;">{{ cart.currency.symbol }}0,00</span>
+          {% endif %}
+      </label>
+
+      {% if product.metafields.custom.square_frame == true %}
+        {% assign frame_products = collections['square-frame'].products %}
+      {% elsif product.metafields.custom.portrait_frame == true %}
+        {% assign frame_products = collections['portrait-frame'].products %}
+      {% elsif product.metafields.custom.landscape_frame == true %}
+        {% assign frame_products = collections['landscape-frame-1'].products %}
+      {% endif %}
+      
+      <!-- Display frame products -->
+      {% for product in frame_products %}
+        {% comment %} Only process if it's not the current product {% endcomment %}
+        {% unless product.id == product_id %}
+          {% assign has_size_option = false %}
+          {% assign size_option_index = -1 %}
+          {% assign is_available = product.available %}
+          {% assign any_variant_available = false %}
+          
+          {% for option in product.options_with_values %}
+            {% assign option_name_lowercase = option.name | downcase %}
+            {% if option_name_lowercase == 'size' or option_name_lowercase == 'größe' or option_name_lowercase == 'taille' or option_name_lowercase == 'taglia' or option_name_lowercase == 'talla' or option_name_lowercase == 'dimensioni' %}
+              {% assign has_size_option = true %}
+              {% assign size_option_index = forloop.index0 %}
+              {% break %}
+            {% endif %}
+          {% endfor %}
+          
+          {% if has_size_option %}
+            {% assign price_data = '{}' %}
+            {% assign variant_id_data = '{}' %}
+            {% assign inventory_data = '{}' %}
+            {% assign size_options = '' %}
+            {% assign available_sizes = '' %}
+            
+            {% for variant in product.variants %}
+              {% if variant.available %}
+                {% assign any_variant_available = true %}
+                {% assign size_value = variant.options[size_option_index] %}
+                {% if available_sizes != "" %}
+                  {% assign available_sizes = available_sizes | append: "," %}
+                {% endif %}
+                {% assign available_sizes = available_sizes | append: size_value %}
+                
+                {% assign formatted_price = variant.price | divided_by: 100.0 | round: 2 %}
+                {% assign price_key = size_value | replace: '"' , '\"' %}
+                {% if price_data == "{}" %}
+                  {% assign price_data = price_data | append: '"' | append: price_key | append: '":' | append: formatted_price %}
+                {% else %}
+                  {% assign price_data = price_data | remove: "}" | append: ',"' | append: price_key | append: '":' | append: formatted_price %}
+                {% endif %}
+                {% assign price_data = price_data | append: "}" %}
+                
+                {% assign variant_id_key = size_value | replace: '"' , '\"' %}
+                {% if variant_id_data == "{}" %}
+                  {% assign variant_id_data = variant_id_data | append: '"' | append: variant_id_key | append: '":' | append: variant.id %}
+                {% else %}
+                  {% assign variant_id_data = variant_id_data | remove: "}" | append: ',"' | append: variant_id_key | append: '":' | append: variant.id %}
+                {% endif %}
+                {% assign variant_id_data = variant_id_data | append: "}" %}
+                
+                {% assign inventory_key = size_value | replace: '"' , '\"' %}
+                {% if inventory_data == "{}" %}
+                  {% assign inventory_data = inventory_data | append: '"' | append: inventory_key | append: '":' | append: variant.inventory_quantity %}
+                {% else %}
+                  {% assign inventory_data = inventory_data | remove: "}" | append: ',"' | append: inventory_key | append: '":' | append: variant.inventory_quantity %}
+                {% endif %}
+                {% assign inventory_data = inventory_data | append: "}" %}
+              {% endif %}
+              
+              {% assign size_value = variant.options[size_option_index] %}
+              {% unless size_options contains size_value %}
+                {% if size_options != "" %}
+                  {% assign size_options = size_options | append: "," %}
+                {% endif %}
+                {% assign size_options = size_options | append: size_value %}
+              {% endunless %}
+            {% endfor %}
+          {% endif %}
+          
+          {%- comment -%}
+            Determine if the option should be disabled.
+            We disable if:
+            - (has size option AND available_sizes is empty)
+            OR product is not available OR no variant is available.
+          {%- endcomment -%}
+          {% assign disable_option = false %}
+          {% if has_size_option and available_sizes == "" %}
+            {% assign disable_option = true %}
+          {% endif %}
+          {% if is_available == false or any_variant_available == false %}
+            {% assign disable_option = true %}
+          {% endif %}
+          
+          <input type="radio" id="frame-collection-{{ product.handle }}"
+                name="frame-collection"
+                value="{{ product.handle }}"
+                data-product-id="{{ product.id }}"
+                data-has-size="{{ has_size_option }}"
+                data-frame-title="{{ product.title }}"
+                data-base-price="{{ product.price | divided_by: 100.0 | round: 2 }}"
+                data-default-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                {% if has_size_option %}
+                  data-size-options="{{ size_options }}"
+                  data-available-sizes="{{ available_sizes }}"
+                  data-variant-prices='{{ price_data }}'
+                  data-variant-ids-by-size='{{ variant_id_data }}'
+                  data-inventory-by-size='{{ inventory_data }}'
+                {% endif %}
+                class="frame-option-input{% if disable_option %} is-disabled{% endif %}"
+                {% if disable_option %}disabled{% endif %}>
+                
+          <label for="frame-collection-{{ product.handle }}"
+                style="--option-image: url('{% if product.metafields.custom.frame_image != blank %}{{ product.metafields.custom.frame_image | image_url: width: 72 }}{% else %}{{ product.featured_image | image_url: width: 72 }}{% endif %}');"
+                class="{% if disable_option %}size-not-available out-of-stock-frame{% endif %}">
+            <img src="{% if product.metafields.custom.frame_image != blank %}{{ product.metafields.custom.frame_image | image_url: width: 72 }}{% else %}{{ product.featured_image | image_url: width: 72 }}{% endif %}" 
+                alt="{{ product.title }}"
+                loading="lazy"
+                width="72"
+                height="72">
+            {% if settings.currency_code_enabled %}
+            <span class="price hidden " style="height:0;">+{{ cart.currency.symbol }}{{ product.price | divided_by: 100.0 | round: 2 }}</span>
+            {% else %}
+            <span class="price hidden " style="height:0;">+{{ cart.currency.symbol }}{{ product.price | divided_by: 100.0 | round: 2 }}</span>
+            {% endif %}
+            {% if has_size_option %}
+              <span class="size-mismatch-indicator" style="display: none; visibility:hidden;" title="{{ 'products.product.unavailable' | t }}"></span>
+            {% endif %}
+            {% if disable_option %}
+              <span class="stock-status" style="display: none; visibility:hidden;" >{{ 'products.product.sold_out' | t }}</span>
+            {% endif %}
+          </label>
+          
+        {% endunless %}
+      {% endfor %}
+
+          
+    </fieldset>
+  </div>
+  
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      console.log('Initializing frame picker...');
+      const form = document.querySelector('form[data-type="add-to-cart-form"]');
+      if (!form) {
+        console.error('Add-to-cart form not found.');
+        return;
+      }
+      const addToCartBtn = form.querySelector('.single-add-to-cart-button');
+      if (!addToCartBtn) {
+        console.error('Add-to-cart button not found.');
+        return;
+      }
+      
+      // Handler to override add-to-cart when a frame is selected
+      const setupDirectFormHandler = () => {
+        addToCartBtn.addEventListener('click', (e) => {
+          e.preventDefault();
+          e.stopPropagation();
+          
+          const selectedFrame = document.querySelector('input[name="frame-collection"]:checked');
+          // If no frame or "Ohne Rahmen" is selected, trigger the regular form submission
+          if (!selectedFrame || selectedFrame.value === 'no-frame') {
+            console.log('No frame selected; using regular form submission.');
+            if (form.requestSubmit) {
+              form.requestSubmit();
+            } else {
+              form.dispatchEvent(new Event('submit', { bubbles: true, cancelable: true }));
+            }
+            return;
+          }
+          
+          console.log('Frame selected:', selectedFrame.dataset.frameTitle);
+          const mainProductVariantInput = form.querySelector('input[name="id"]');
+          if (!mainProductVariantInput) {
+            console.error('Main product variant ID input missing; submitting form.');
+            form.submit();
+            return;
+          }
+          const mainProductVariantId = mainProductVariantInput.value;
+          
+          let currentSize = null;
+          const sizeOption = document.querySelector('select[name="options[Size]"]') ||
+                             document.querySelector('select[name="options[Größe]"]') ||
+                             document.querySelector('select[name="options[Taille]"]') ||
+                             document.querySelector('select[name="options[Taglia]"]') ||
+                             document.querySelector('select[name="options[Talla]"]') ||
+                             document.querySelector('select[name="options[Dimensioni]"]') ||
+                             document.querySelector('input[name="Size"]:checked') ||
+                             document.querySelector('input[name="Größe"]:checked') ||
+                             document.querySelector('input[name="Taille"]:checked') ||
+                             document.querySelector('input[name="Taglia"]:checked') ||
+                             document.querySelector('input[name="Talla"]:checked') ||
+                             document.querySelector('input[name="Dimensioni"]:checked') ||
+                             document.querySelector('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taille]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taglia]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Talla]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Dimensioni]"] .selected-value');
+          if (sizeOption) {
+            currentSize = sizeOption.value || sizeOption.textContent.trim();
+          }
+          console.log('Current size:', currentSize);
+          
+          let frameVariantId = selectedFrame.dataset.defaultVariantId;
+          const safeJsonParse = (jsonString, fallback) => {
+            try {
+              const cleanString = jsonString.replace(/\\/g, '');
+              return JSON.parse(cleanString);
+            } catch (error) {
+              console.warn('JSON parse error:', error);
+              return fallback;
+            }
+          };
+          
+          if (currentSize && selectedFrame.dataset.hasSize === 'true' && selectedFrame.dataset.variantIdsBySize) {
+            const variantIds = safeJsonParse(selectedFrame.dataset.variantIdsBySize, {});
+            console.log('Variant IDs by size:', variantIds);
+            if (variantIds[currentSize]) {
+              frameVariantId = variantIds[currentSize];
+              console.log('Exact match found:', currentSize, '=', frameVariantId);
+            } else {
+              const matchingSize = Object.keys(variantIds).find(size =>
+                currentSize.trim().toLowerCase().includes(size.trim().toLowerCase()) ||
+                size.trim().toLowerCase().includes(currentSize.trim().toLowerCase())
+              );
+              if (matchingSize) {
+                frameVariantId = variantIds[matchingSize];
+                console.log('Partial match found:', matchingSize, '=', frameVariantId);
+              }
+            }
+          }
+          
+          const quantityInput = form.querySelector('input[name="quantity"]');
+          const quantity = quantityInput ? parseInt(quantityInput.value, 10) : 1;
+          addToCartBtn.classList.add('loading');
+          const loadingTimeout = setTimeout(() => addToCartBtn.classList.remove('loading'), 5000);
+          
+          // Capture the main product title via Liquid
+          const mainProductTitle = "{{ product.title | escape }}";
+          
+          const addItemsToCart = (items) => {
+            if (window.Shopify && window.Shopify.theme && window.Shopify.theme.cart) {
+              window.Shopify.theme.cart.addItems(items)
+                .then(() => {
+                  if (window.Shopify.theme.cart.drawer && typeof window.Shopify.theme.cart.drawer.open === 'function') {
+                    window.Shopify.theme.cart.drawer.open();
+                  } else {
+                    openCartDrawer();
+                  }
+                })
+                .catch(error => {
+                  console.error('Error using Shopify theme cart API:', error);
+                  addItemsFallback(items);
+                });
+            } else {
+              addItemsFallback(items);
+            }
+          };
+          
+          const addItemsFallback = (items) => {
+            fetch('/cart/add.js', {
+              method: 'POST',
+              headers: {
+                'Content-Type': 'application/json',
+                'Accept': 'application/json'
+              },
+              body: JSON.stringify({ items })
+            })
+            .then(response => {
+              if (!response.ok) throw new Error('Failed to add items');
+              return response.json();
+            })
+            .then(() => openCartDrawer())
+            .catch(error => {
+              console.error('Error adding items:', error);
+              clearTimeout(loadingTimeout);
+              addToCartBtn.classList.remove('loading');
+              alert('There was an error adding the items to your cart. Please try again.');
+            });
+          };
+          
+          const openCartDrawer = () => {
+            clearTimeout(loadingTimeout);
+            addToCartBtn.classList.remove('loading');
+            console.log('Opening cart drawer...');
+            if (window.openCartDrawer) {
+              window.openCartDrawer();
+            } else if (window.themeCart && window.themeCart.openDrawer) {
+              window.themeCart.openDrawer();
+            } else if (window.ajaxCart && window.ajaxCart.open) {
+              window.ajaxCart.open();
+            } else if (window.ajaxCart && window.ajaxCart.showDrawer) {
+              window.ajaxCart.showDrawer();
+            } else if (window.openCart) {
+              window.openCart();
+            } else {
+              // Fallback: update cart count and force open drawer manually
+              fetch('/cart.js')
+                .then(response => response.json())
+                .then(cart => {
+                  document.body.classList.add('open-cc');
+                  document.body.classList.add('open-cart');
+                  document.getElementById('Cart-Drawer').classList.add('active');
+                  document.getElementById('Cart-Drawer').focus();
+                  setTimeout(() => {
+                    document.body.querySelector('.product-recommendations--full')?.classList.add('active');
+                  });
+                  dispatchCustomEvent('cart:open');
+                  dispatchCustomEvent('cart:toggle');
+                  dispatchCustomEvent('cart:drawer:open');
+                  dispatchCustomEvent('ajaxCart:open');
+                  dispatchCustomEvent('product:added');
+                  dispatchCustomEvent('cart:updated');
+                  dispatchCustomEvent('cart:refresh');
+                })
+                .catch(error => {
+                  console.error('Error fetching cart:', error);
+                  window.location.href = '/cart';
+                });
+            }
+          };
+          
+          // When a frame is selected, add two items.
+          // The second item (frame) gets a property note with the main product title.
+          const randomId = Math.random().toString(36).substring(2, 10); // Generate a random ID
+          const itemsToAdd = [
+            { id: mainProductVariantId, quantity, properties: { "I_ID": randomId } },
+            { id: frameVariantId, quantity, properties: { "{{ 'products.facets.from' | t }}": mainProductTitle, "I_ID": randomId } }
+          ];
+
+          console.log('Adding items:', itemsToAdd);
+          addItemsToCart(itemsToAdd);
+        });
+      };
+      
+      // FrameHandler: synchronizes frame options with the current size
+      // Modified: Expose frameHandler to window for global access.
+      window.frameHandler = new class {
+        constructor() {
+          this.frameInputs = document.querySelectorAll('input[name="frame-collection"]');
+          this.sizeOption = this.findSizeOption();
+          this.initFrames();
+          this.setupEventListeners();
+          this.syncFrameWithCurrentSize();
+        }
+        findSizeOption() {
+          const dropdown = document.querySelector('.custom-dropdown[data-dropdown-id="options[Size]"], .custom-dropdown[data-dropdown-id="options[Größe]"], .custom-dropdown[data-dropdown-id="options[Taille]"], .custom-dropdown[data-dropdown-id="options[Taglia]"], .custom-dropdown[data-dropdown-id="options[Talla]"], .custom-dropdown[data-dropdown-id="options[Dimensioni]"]');
+          if (dropdown) {
+            return {
+              type: 'dropdown',
+              element: dropdown,
+              getValue: () => {
+                const selected = dropdown.querySelector('.selected-value');
+                return selected ? selected.textContent.trim() : null;
+              }
+            };
+          }
+          const radios = document.querySelectorAll('input[name="Size"], input[name="Größe"], input[name="Taille"], input[name="Taglia"], input[name="Talla"], input[name="Dimensioni"]');
+          if (radios.length) {
+            return {
+              type: 'radio',
+              elements: radios,
+              getValue: () => {
+                const checked = document.querySelector('input[name="Size"]:checked, input[name="Größe"]:checked, input[name="Taille"]:checked, input[name="Taglia"]:checked, input[name="Talla"]:checked, input[name="Dimensioni"]:checked');
+                return checked ? checked.value : null;
+              }
+            };
+          }
+          const variantSelector = document.querySelector('select[name="id"]');
+          if (variantSelector) {
+            return {
+              type: 'variant',
+              element: variantSelector,
+              getValue: () => {
+                const selected = variantSelector.options[variantSelector.selectedIndex];
+                const optionText = selected.textContent;
+                const match = optionText.match(/size:\s*(.*?)(?:\s*\/|$)/i) ||
+                             optionText.match(/größe:\s*(.*?)(?:\s*\/|$)/i) ||
+                             optionText.match(/taille:\s*(.*?)(?:\s*\/|$)/i) ||
+                             optionText.match(/taglia:\s*(.*?)(?:\s*\/|$)/i) ||
+                             optionText.match(/talla:\s*(.*?)(?:\s*\/|$)/i) ||
+                             optionText.match(/dimensioni:\s*(.*?)(?:\s*\/|$)/i) ||
+                             optionText.match(/([\d\.]+\s*x\s*[\d\.]+\s*cm)/i);
+                return match ? match[1].trim() : null;
+              }
+            };
+          }
+          return null;
+        }
+        initFrames() {
+          document.querySelectorAll('fieldset[data-handle="frames-collection"] label').forEach(label => {
+            label.style.display = 'inline-block';
+            label.style.visibility = 'visible';
+            label.style.opacity = '1';
+          });
+          this.frameInputs.forEach(input => {
+            // Always start with inputs enabled (unless already marked as disabled by Liquid)
+            if (input.hasAttribute('disabled')) {
+              // leave as is if initially disabled
+            } else {
+              input.disabled = false;
+            }
+            input.addEventListener('change', () => {
+              if (input.checked) {
+                const frameLabel = document.querySelector('.selected-frame-option');
+                if (frameLabel) {
+                  frameLabel.textContent = ': ' + input.dataset.frameTitle;
+                }
+              }
+            });
+          });
+        }
+        setupEventListeners() {
+          if (this.sizeOption) {
+            if (this.sizeOption.type === 'dropdown') {
+              this.sizeOption.element.querySelectorAll('.custom-dropdown-option').forEach(option => {
+                option.addEventListener('click', () => setTimeout(() => this.syncFrameWithCurrentSize(), 100));
+              });
+            } else if (this.sizeOption.type === 'radio') {
+              this.sizeOption.elements.forEach(radio => radio.addEventListener('change', () => this.syncFrameWithCurrentSize()));
+            } else if (this.sizeOption.type === 'variant') {
+              this.sizeOption.element.addEventListener('change', () => this.syncFrameWithCurrentSize());
+            }
+          }
+          const variantForm = document.querySelector('.product-form__input');
+          if (variantForm) {
+            new MutationObserver(() => this.syncFrameWithCurrentSize()).observe(variantForm, { attributes: true, childList: true, subtree: true });
+          }
+        }
+        getCurrentSize() {
+          if (!this.sizeOption) return null;
+          const size = this.sizeOption.getValue();
+          console.log('Selected size:', size);
+          return size;
+        }
+        syncFrameWithCurrentSize() {
+          const currentSize = this.getCurrentSize();
+          // If no size is selected on the main product, disable any frame that requires a size.
+          if (!currentSize) {
+            console.warn('No size selected on main product; disabling frame options with size.');
+            this.frameInputs.forEach(input => {
+              if (input.dataset.hasSize === 'true') {
+                input.disabled = true;
+                const label = input.nextElementSibling;
+                if (label) {
+                  label.classList.add('out-of-stock-frame', 'size-not-available');
+                  if (!label.querySelector('.stock-status')) {
+                    const stockStatus = document.createElement('span');
+                    stockStatus.className = 'stock-status';
+                    stockStatus.textContent = {{ 'products.product.sold_out' | t | json }};
+                    label.appendChild(stockStatus);
+                  }
+                }
+              }
+            });
+            return;
+          }
+          // Otherwise, check if the frame's available sizes match the main product size.
+          this.frameInputs.forEach(input => {
+            if (input.value === 'no-frame') return;
+            if (input.dataset.hasSize !== 'true') return;
+            const availableSizes = input.dataset.availableSizes ? input.dataset.availableSizes.split(',') : [];
+            const sizeOptions = input.dataset.sizeOptions ? input.dataset.sizeOptions.split(',') : [];
+            console.log(`Frame "${input.dataset.frameTitle}" sizes:`, sizeOptions, 'Available:', availableSizes);
+            if (availableSizes.length === 0) {
+              input.disabled = true;
+              const label = input.nextElementSibling;
+              if (label) {
+                label.classList.add('out-of-stock-frame', 'size-not-available');
+                if (!label.querySelector('.stock-status')) {
+                  const stockStatus = document.createElement('span');
+                  stockStatus.className = 'stock-status';
+                  stockStatus.textContent = {{ 'products.product.sold_out' | t | json }};
+                  label.appendChild(stockStatus);
+                }
+              }
+              return;
+            }
+            const sizeAvailable = availableSizes.some(size =>
+              size.trim().toLowerCase() === currentSize.trim().toLowerCase() ||
+              currentSize.trim().toLowerCase().includes(size.trim().toLowerCase()) ||
+              size.trim().toLowerCase().includes(currentSize.trim().toLowerCase())
+            );
+            if (sizeAvailable) {
+              input.disabled = false;
+              if (input.dataset.variantPrices) {
+                const prices = safeJsonParse(input.dataset.variantPrices, {});
+                const matchingSize = Object.keys(prices).find(size =>
+                  size.trim().toLowerCase() === currentSize.trim().toLowerCase() ||
+                  currentSize.trim().toLowerCase().includes(size.trim().toLowerCase()) ||
+                  size.trim().toLowerCase().includes(currentSize.trim().toLowerCase())
+                );
+                if (matchingSize) {
+                  const price = prices[matchingSize];
+                  const priceElement = input.nextElementSibling.querySelector('.price');
+                  if (priceElement) {
+                    const priceCents = Math.round(parseFloat(price) * 100);
+                    if (typeof formatMoney === 'function') {
+                      priceElement.textContent = '+' + formatMoney(priceCents, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || {{ shop.money_format | json }});
+                    } else if (window.Shopify && Shopify.formatMoney) {
+                      priceElement.textContent = '+' + Shopify.formatMoney(priceCents, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || {{ shop.money_format | json }});
+                    } else {
+                      {% if settings.currency_code_enabled %}
+                      priceElement.textContent = '+{{ cart.currency.symbol }}' + (priceCents / 100).toFixed(2);
+                      {% else %}
+                      priceElement.textContent = '+{{ cart.currency.symbol }}' + (priceCents / 100).toFixed(2);
+                      {% endif %}
+                    }
+                  }
+                }
+              }
+              const label = input.nextElementSibling;
+              if (label) {
+                // Remove both classes and hide mismatch indicator so the option re-enables visibly.
+                label.classList.remove('out-of-stock-frame', 'size-not-available');
+                const stockStatus = label.querySelector('.stock-status');
+                if (stockStatus) stockStatus.remove();
+                const mismatchIndicator = label.querySelector('.size-mismatch-indicator');
+                if (mismatchIndicator) mismatchIndicator.style.display = 'none';
+              }
+              input.dataset.matchingSize = currentSize;
+            } else {
+              input.disabled = true;
+              const label = input.nextElementSibling;
+              if (label) {
+                label.classList.add('size-not-available', 'out-of-stock-frame');
+                const mismatchIndicator = label.querySelector('.size-mismatch-indicator');
+                if (mismatchIndicator) mismatchIndicator.style.display = 'block';
+                if (!label.querySelector('.stock-status')) {
+                  const stockStatus = document.createElement('span');
+                  stockStatus.className = 'stock-status';
+                  stockStatus.textContent = {{ 'products.product.sold_out' | t | json }};
+                  label.appendChild(stockStatus);
+                }
+              }
+            }
+          });
+          function safeJsonParse(jsonString, fallback) {
+            try {
+              const cleanString = jsonString.replace(/\\/g, '');
+              return JSON.parse(cleanString);
+            } catch (error) {
+              console.warn('JSON parse error in syncFrameWithCurrentSize:', error);
+              return fallback;
+            }
+          }
+        }
+      }();
+      
+      setupDirectFormHandler();
+      
+    });
+  </script>
+
+
+  <!-- Price changing -->
+  <script>
+    (function(){
+      // Global main product price and compare-at price (in cents) injected via Liquid.
+      var mainPriceCents = {{ product.selected_or_first_available_variant.price }};
+      var mainCompareAtCents = {{ product.selected_or_first_available_variant.compare_at_price | default: 0 }};
+      console.log("Main price (cents):", mainPriceCents, "Compare at (cents):", mainCompareAtCents);
+        
+      /**
+       * Returns the effective frame price (in cents) based on the selected frame radio input.
+       * Reads the base price from data-base-price (in store units) and converts it to cents.
+       * If the frame has size options (data-has-size="true") with JSON pricing (data-variant-prices),
+       * it attempts to match the current size from common selectors.
+       */
+      function getSelectedFramePriceCents() {
+        var selectedFrame = document.querySelector('input[name="frame-collection"]:checked');
+        if (!selectedFrame || selectedFrame.value === 'no-frame') {
+          console.log("No frame selected");
+          return 0;
+        }
+        var basePriceUnits = parseFloat(selectedFrame.getAttribute('data-base-price')) || 0;
+        var priceCents = Math.round(basePriceUnits * 100);
+        console.log("Base frame price (units):", basePriceUnits, "=>", priceCents, "cents");
+        
+        if (selectedFrame.getAttribute('data-has-size') === "true" && selectedFrame.dataset.variantPrices) {
+          try {
+            var variantPrices = JSON.parse(selectedFrame.dataset.variantPrices.replace(/\\/g, ''));
+            var selectedSize = null;
+            // Check for a select element with size options in different languages
+            var selectElem = document.querySelector('select[name="options[Size]"], select[name="options[Größe]"], select[name="options[Taille]"], select[name="options[Taglia]"], select[name="options[Talla]"], select[name="options[Dimensioni]"]');
+            if (selectElem) {
+              selectedSize = selectElem.value;
+            } else {
+              // Check for radio inputs in different languages
+              var radioElem = document.querySelector('input[name="Size"]:checked, input[name="Größe"]:checked, input[name="Taille"]:checked, input[name="Taglia"]:checked, input[name="Talla"]:checked, input[name="Dimensioni"]:checked');
+              if (radioElem) { 
+                selectedSize = radioElem.value; 
+              } else {
+                // Check custom dropdown in different languages
+                var customElem = document.querySelector('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taille]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taglia]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Talla]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Dimensioni]"] .selected-value');
+                if (customElem) { 
+                  selectedSize = customElem.textContent.trim(); 
+                }
+              }
+            }
+            console.log("Selected size:", selectedSize);
+            if (selectedSize && variantPrices[selectedSize] !== undefined) {
+              priceCents = Math.round(parseFloat(variantPrices[selectedSize]) * 100);
+              console.log("Exact match found. Frame price:", priceCents, "cents");
+            } else if (selectedSize) {
+              for (var key in variantPrices) {
+                if (selectedSize.toLowerCase().indexOf(key.toLowerCase()) !== -1 ||
+                    key.toLowerCase().indexOf(selectedSize.toLowerCase()) !== -1) {
+                  priceCents = Math.round(parseFloat(variantPrices[key]) * 100);
+                  console.log("Partial match found (" + key + "). Frame price:", priceCents, "cents");
+                  break;
+                }
+              }
+            }
+          } catch (e) {
+            console.warn("Error parsing frame variant prices:", e);
+          }
+        }
+        return priceCents;
+      }
+        
+      /**
+       * Calculates the combined price by adding the main product price (in cents)
+       * and the effective frame price (in cents), then updates the price element and sale badge.
+       */
+      function updateCombinedPrice() {
+        var framePriceCents = getSelectedFramePriceCents();
+        var combinedPriceCents = mainPriceCents + framePriceCents;
+        console.log("Combined price (cents):", combinedPriceCents);
+        
+        // Update all price elements including add-to-cart button prices
+        var priceElements = document.querySelectorAll('.price.proza-libre ins span.amount, .price.in-add-button .amount');
+        priceElements.forEach(function(priceEl) {
+          if (priceEl && typeof formatMoney === 'function' && window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) {
+            priceEl.innerHTML = '<span class="money">' + formatMoney(combinedPriceCents, window.theme.settings.money_with_currency_format) + '</span>';
+          } else if (priceEl && Shopify.formatMoney) {
+            priceEl.innerHTML = '<span class="money">' + Shopify.formatMoney(combinedPriceCents, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || {{ shop.money_format | json }}) + '</span>';
+          } else if (priceEl) {
+            {% if settings.currency_code_enabled %}
+              priceEl.innerHTML = '<span class="money">{{ cart.currency.symbol }}' + (combinedPriceCents / 100).toFixed(2) + '</span>';
+            {% else %}
+              priceEl.innerHTML = '<span class="money">€' + (combinedPriceCents / 100).toFixed(2) + '</span>';
+            {% endif %}
+          }
+        });
+        
+        // Update all compare-at price elements including add-to-cart button prices
+        var compareAtElements = document.querySelectorAll('.price.proza-libre del span.amount, .price.in-add-button del .amount');
+        if (mainCompareAtCents > mainPriceCents) {
+          // For sale, add frame price to compare-at (if desired).
+          var combinedCompareAtCents = mainCompareAtCents + framePriceCents;
+          console.log("Combined compare-at (cents):", combinedCompareAtCents);
+          compareAtElements.forEach(function(compareAtEl) {
+            if (compareAtEl && typeof formatMoney === 'function' && window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) {
+              compareAtEl.innerHTML = '<span class="money">' + formatMoney(combinedCompareAtCents, window.theme.settings.money_with_currency_format) + '</span>';
+            } else if (compareAtEl && Shopify.formatMoney) {
+              compareAtEl.innerHTML = '<span class="money">' + Shopify.formatMoney(combinedCompareAtCents, (window.theme && window.theme.settings && window.theme.settings.money_with_currency_format) || {{ shop.money_format | json }}) + '</span>';
+            } else if (compareAtEl) {
+              {% if settings.currency_code_enabled %}
+                compareAtEl.innerHTML = '<span class="money">{{ cart.currency.symbol }}' + (combinedCompareAtCents / 100).toFixed(2) + '</span>';
+              {% else %}
+                compareAtEl.innerHTML = '<span class="money">€' + (combinedCompareAtCents / 100).toFixed(2) + '</span>';
+              {% endif %}
+            }
+            // Show compare price
+            var delElement = compareAtEl.closest('del');
+            if (delElement) {
+              delElement.style.display = 'inline';
+            }
+          });
+        } else {
+          // Remove sale badge if not on sale.
+          compareAtElements.forEach(function(compareAtEl) {
+            var delElement = compareAtEl.closest('del');
+            if (delElement) {
+              delElement.style.display = 'none';
+            }
+          });
+        }
+      }
+        
+      // Utility: attach both "change" and "click" events.
+      function attachListeners(selector, callback) {
+        document.querySelectorAll(selector).forEach(function(el) {
+          el.addEventListener('change', callback);
+          el.addEventListener('click', callback);
+        });
+      }
+        
+      // When the main product "Size" changes, force the frame to "Ohne Rahmen"
+      function resetFrameToNoFrame() {
+        const noFrameOption = document.querySelector('input[name="frame-collection"][value="no-frame"]');
+        if (noFrameOption) {
+          noFrameOption.checked = true;
+          const frameLabel = document.querySelector('.selected-frame-option');
+          if (frameLabel) {
+            frameLabel.textContent = ': ' + {{ 'products.product.no_frame' | t | json }};
+          }
+        }
+        // Update frame availability on every size change.
+        if (window.frameHandler && typeof window.frameHandler.syncFrameWithCurrentSize === 'function') {
+          window.frameHandler.syncFrameWithCurrentSize();
+        }
+        updateCombinedPrice();
+      }
+        
+      // Listen on frame radio inputs.
+      attachListeners('input[name="frame-collection"]', updateCombinedPrice);
+        
+      // Listen on size selectors to update combined price...
+      attachListeners('select[name="options[Size]"], select[name="options[Größe]"], select[name="options[Taille]"], select[name="options[Taglia]"], select[name="options[Talla]"], select[name="options[Dimensioni]"]', updateCombinedPrice);
+      attachListeners('input[name="Size"], input[name="Größe"], input[name="Taille"], input[name="Taglia"], input[name="Talla"], input[name="Dimensioni"]', updateCombinedPrice);
+      attachListeners('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taille]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taglia]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Talla]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Dimensioni]"] .selected-value', updateCombinedPrice);
+        
+      // Also, when the main product size changes, reset the frame selection to "Ohne Rahmen"
+      attachListeners('select[name="options[Size]"], select[name="options[Größe]"], select[name="options[Taille]"], select[name="options[Taglia]"], select[name="options[Talla]"], select[name="options[Dimensioni]"], input[name="Size"], input[name="Größe"], input[name="Taille"], input[name="Taglia"], input[name="Talla"], input[name="Dimensioni"], .custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taille]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taglia]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Talla]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Dimensioni]"] .selected-value', resetFrameToNoFrame);
+        
+      // Listen for the custom variant change event.
+      document.addEventListener('product:variant-change', function(e) {
+        if (e.detail && e.detail.variant && e.detail.variant.price) {
+          mainPriceCents = e.detail.variant.price;
+          mainCompareAtCents = e.detail.variant.compare_at_price || 0;
+        }
+        updateCombinedPrice();
+      });
+      
+      // Listen for frames-specific variant change events
+      document.addEventListener('frames:variant-change', function(e) {
+        if (e.detail && e.detail.variant && e.detail.variant.price) {
+          mainPriceCents = e.detail.variant.price;
+          mainCompareAtCents = e.detail.variant.compare_at_price || 0;
+        }
+        updateCombinedPrice();
+      });
+        
+      // Additionally, if a main variant selector exists, update when it changes.
+      var mainVariantSelect = document.querySelector('select[name="id"]');
+      if (mainVariantSelect) {
+        mainVariantSelect.addEventListener('change', function() {
+          var selectedOption = mainVariantSelect.options[mainVariantSelect.selectedIndex];
+          if (selectedOption) {
+            var priceAttr = selectedOption.getAttribute('data-price');
+            var compareAttr = selectedOption.getAttribute('data-compare-at-price');
+            if (priceAttr) {
+              mainPriceCents = Math.round(parseFloat(priceAttr));
+            }
+            if (compareAttr) {
+              mainCompareAtCents = Math.round(parseFloat(compareAttr));
+            } else {
+              mainCompareAtCents = 0;
+            }
+          }
+          updateCombinedPrice();
+        });
+      }
+        
+      // For custom dropdowns, observe changes to textContent.
+      document.querySelectorAll('.custom-dropdown[data-dropdown-id="options[Size]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Größe]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taille]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Taglia]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Talla]"] .selected-value, .custom-dropdown[data-dropdown-id="options[Dimensioni]"] .selected-value')
+        .forEach(function(el) {
+          var observer = new MutationObserver(function(mutations) {
+            resetFrameToNoFrame();
+          });
+          observer.observe(el, { characterData: true, childList: true, subtree: true });
+        });
+        
+      // Update the price on page load.
+      document.addEventListener('DOMContentLoaded', updateCombinedPrice);
+    })();
+  </script>

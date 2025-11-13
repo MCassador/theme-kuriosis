@@ -1,0 +1,167 @@
+{{ 'list-collections.css' | asset_url | stylesheet_tag }}
+{{ 'collection-slider.css' | asset_url | stylesheet_tag }}
+
+{%- liquid
+  assign section_heading = section.settings.heading
+  assign section_description = section.settings.description
+  assign full_width = section.settings.full_width
+  assign disable_top_spacing = section.settings.disable_top_spacing
+  assign disable_bottom_spacing = section.settings.disable_bottom_spacing
+  assign background_color = section.settings.background_color
+	assign text_alignment = section.settings.text_alignment
+-%}
+
+<div class="featured-collection section-spacing{% if disable_top_spacing %} section-spacing--disable-top{% endif %}{% if disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}" style="overflow:hidden;background-color: {{ background_color }};">
+  <div class="row{% if full_width %} full-width-row{% endif %}">
+    <div class="small-12 columns  text-{{ text_alignment }}">
+      {% render 'section-header', section_heading: section_heading, section_description: section_description %}
+      <div class="featured-collection__inner display-type--carousel">
+        <slide-show id="collection-slider-{{ section.id }}" class="products row carousel collection-slider">
+          {%- liquid
+            case section.settings.sort
+              when 'products_high', 'products_low'
+                assign sorted_collections = collections | sort: 'all_products_count'
+              when 'date', 'date_reversed'
+                assign sorted_collections = collections | sort: 'published_at'
+              else
+                assign sorted_collections = collections | sort: 'title'
+            endcase
+
+            if section.settings.sort == 'products_high' or section.settings.sort == 'date_reversed' or section.settings.sort == 'alphabetical_reversed'
+              assign sorted_collections = sorted_collections | reverse
+            endif
+          -%}
+
+          {% for collection in sorted_collections %}
+            <div class="{{ columns_class }} columns carousel__slide">
+              <a href="{{ collection.url }}" class="collection-card">
+                {% if collection.image %}
+                  <img src="{{ collection.image.src | img_url: '100x100' }}" height="100px" width="100px" alt="{{ collection.title }}">
+                {% else %}
+					{{ 'product-1' | placeholder_svg_tag }}
+                {% endif %}
+                <div class="collection-title proza-libre">
+                  <p>{{ collection.title }}</p>
+                </div>
+              </a>
+            </div>
+          {% endfor %}
+
+		  {% render 'slideshow-arrows' %}
+        </slide-show>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Collection Slider",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Shop by Category"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Content alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Add a short description for your collections</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Make section full width",
+      "default": true
+    },
+    {
+      "type": "select",
+      "id": "sort",
+      "label": "Sort collections by",
+      "default": "alphabetical",
+      "options": [
+        { "value": "alphabetical", "label": "Alphabetically, A-Z" },
+        { "value": "alphabetical_reversed", "label": "Alphabetically, Z-A" },
+        { "value": "date_reversed", "label": "Date, new to old" },
+        { "value": "date", "label": "Date, old to new" },
+        { "value": "products_high", "label": "Product count, high to low" },
+        { "value": "products_low", "label": "Product count, low to high" }
+      ]
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#E0DFD6"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "default": 30,
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "%"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_top_spacing",
+      "label": "Remove top spacing",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_bottom_spacing",
+      "label": "Remove bottom spacing",
+      "default": false
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collection Slider",
+      "category": "Collections"
+    }
+  ]
+}
+{% endschema %}
+
+{% javascript %}
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var elem = document.querySelector('#collection-slider-{{ section.id }}');
+  if (elem) {
+    var flkty = new Flickity(elem, {
+      cellAlign: 'center',
+      contain: true,
+      pageDots: false,
+      wrapAround: true,
+      prevNextButtons: true
+    });
+
+    {% if section.settings.show_progress_bar %}
+    // Progress bar
+    var progressBar = elem.parentElement.querySelector('.flickity-progress--bar');
+    flkty.on('scroll', function(progress) {
+      progress = Math.max(0.05, Math.min(1, progress));
+      progressBar.style.width = progress * 100 + '%';
+    });
+    {% endif %}
+  }
+});
+</script>
+{% endjavascript %}

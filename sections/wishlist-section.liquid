@@ -1,0 +1,72 @@
+{%- liquid
+	assign section_heading = section.settings.heading
+	assign section_heading_left = section.settings.heading_left
+	assign section_description = section.settings.description
+	assign section_width = section.settings.section_width
+-%}
+<div class="row {{ section_width }} shadow-images ">
+	<div class="small-12 columns">
+		<div class="wishlist__inner">
+			{% render 'section-header', section_heading: section_heading, section_description: section_description, section_heading_left: section_heading_left %}
+			{% render 'wishlist' %}
+		</div>
+
+	</div>
+</div>
+{% schema %}
+  {
+    "name": "Wishlist",
+		"class": "section-text-with-icons",
+		"settings": [
+			{
+				"type": "text",
+				"id": "heading",
+				"label": "Heading",
+				"default": "Wishlist"
+			  },
+					{
+						"type": "checkbox",
+						"id": "heading_left",
+						"default": false,
+						"label": "Left align heading"
+					},
+			  {
+				"type": "richtext",
+				"id": "description",
+				"label": "Description",
+				"default": "<p>Add a short description for this section</p>"
+			  },
+			{
+				"type": "select",
+				"id": "section_width",
+				"options": [
+					{
+						"value": "grid",
+						"label": "Grid"
+					},
+					{
+						"value": "full-width-row",
+						"label": "Full width"
+					},
+					{
+						"value": "full-width-row-full",
+						"label": "Full width, no spacing"
+					}
+				],
+				"default": "grid",
+				"label": "Section width"
+			},
+		],
+	"presets": [
+		{
+		  "name": "Wishlist"
+		}
+	  ],
+		"enabled_on": {
+			"templates": ["*"],
+			"groups": [
+				"header", "footer"
+			]
+		}
+  }
+{% endschema %}

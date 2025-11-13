@@ -1,0 +1,299 @@
+{% comment %}
+  Calculate delivery date by adding working days to current date
+  Usage: {% render 'working-days-calculation', days: 5, language: 'de' %}
+  Returns: formatted date using localized format
+{% endcomment %}
+
+{%- liquid
+  assign working_days = days | default: 0
+  
+  # MULTIPLE LANGUAGE DETECTION METHODS
+  assign current_language = 'en'
+  
+  # Method 1: Check if language is explicitly passed as parameter
+  if language != blank
+    assign current_language = language
+  # Method 2: Check URL path for language prefix
+  elsif request.path contains '/de/'
+    assign current_language = 'de'
+  elsif request.path contains '/fr/'
+    assign current_language = 'fr'
+  elsif request.path contains '/es/'
+    assign current_language = 'es'
+  elsif request.path contains '/it/'
+    assign current_language = 'it'
+  elsif request.path contains '/nl/'
+    assign current_language = 'nl'
+  elsif request.path contains '/tr/'
+    assign current_language = 'tr'
+  # Method 3: Check localization object
+  elsif localization.language.iso_code != blank
+    assign current_language = localization.language.iso_code
+  # Method 4: Check request locale
+  elsif request.locale.iso_code != blank
+    assign current_language = request.locale.iso_code
+  # Method 5: Check shop locale
+  elsif shop.locale != blank
+    assign current_language = shop.locale
+  endif
+  
+  # Force language to lowercase for consistency
+  assign current_language = current_language | downcase
+  
+  # Calculate delivery date
+  if working_days > 0
+    # Get current date
+    assign current_date = 'now' | date: '%Y-%m-%d'
+    assign delivery_date = current_date
+    
+    # Check if current date is a weekend, if so start from next Monday
+    assign current_day_of_week = current_date | date: '%w'
+    if current_day_of_week == '0'
+      # If today is Sunday, start from Monday
+      assign days_to_add = 1
+      assign delivery_date = current_date | date: '%s' | plus: 86400 | date: '%Y-%m-%d'
+    elsif current_day_of_week == '6'
+      # If today is Saturday, start from Monday
+      assign days_to_add = 2
+      assign delivery_date = current_date | date: '%s' | plus: 172800 | date: '%Y-%m-%d'
+    else
+      assign days_to_add = 0
+    endif
+    
+    # Add working days, skipping weekends (Liquid-compatible approach)
+    assign current_working_days = 0
+    assign max_days_to_check = working_days | plus: 14
+    
+    for i in (1..max_days_to_check)
+      if current_working_days < working_days
+        assign days_to_add = days_to_add | plus: 1
+        assign days_to_add_seconds = days_to_add | times: 86400
+        assign test_date = current_date | date: '%s' | plus: days_to_add_seconds | date: '%Y-%m-%d'
+        assign day_of_week = test_date | date: '%w'
+        
+        # Skip weekends (0 = Sunday, 6 = Saturday)
+        unless day_of_week == '0' or day_of_week == '6'
+          assign current_working_days = current_working_days | plus: 1
+          assign delivery_date = test_date
+        endunless
+      endif
+    endfor
+    
+    # Final check to ensure delivery date is not a weekend
+    assign final_day_of_week = delivery_date | date: '%w'
+    if final_day_of_week == '0'
+      # If delivery date is Sunday, move to Monday
+      assign delivery_date = delivery_date | date: '%s' | plus: 86400 | date: '%Y-%m-%d'
+    elsif final_day_of_week == '6'
+      # If delivery date is Saturday, move to Monday
+      assign delivery_date = delivery_date | date: '%s' | plus: 172800 | date: '%Y-%m-%d'
+    endif
+  else
+    # If no working days specified, use current date
+    assign delivery_date = 'now' | date: '%Y-%m-%d'
+  endif
+  
+  # Get day and month
+  assign day_number = delivery_date | date: '%d' | plus: 0
+  assign month_english = delivery_date | date: '%B'
+  assign month_lower = month_english | downcase
+  
+  # FORCE TRANSLATION BASED ON LANGUAGE
+  case current_language
+    when 'de'
+      case month_lower
+        when 'january'
+          assign month_name = 'Januar'
+        when 'february'
+          assign month_name = 'Februar'
+        when 'march'
+          assign month_name = 'März'
+        when 'april'
+          assign month_name = 'April'
+        when 'may'
+          assign month_name = 'Mai'
+        when 'june'
+          assign month_name = 'Juni'
+        when 'july'
+          assign month_name = 'Juli'
+        when 'august'
+          assign month_name = 'August'
+        when 'september'
+          assign month_name = 'September'
+        when 'october'
+          assign month_name = 'Oktober'
+        when 'november'
+          assign month_name = 'November'
+        when 'december'
+          assign month_name = 'Dezember'
+        else
+          assign month_name = 'Januar'
+      endcase
+      assign final_date = day_number | append: ' ' | append: month_name
+    when 'fr'
+      case month_lower
+        when 'january'
+          assign month_name = 'janvier'
+        when 'february'
+          assign month_name = 'février'
+        when 'march'
+          assign month_name = 'mars'
+        when 'april'
+          assign month_name = 'avril'
+        when 'may'
+          assign month_name = 'mai'
+        when 'june'
+          assign month_name = 'juin'
+        when 'july'
+          assign month_name = 'juillet'
+        when 'august'
+          assign month_name = 'août'
+        when 'september'
+          assign month_name = 'septembre'
+        when 'october'
+          assign month_name = 'octobre'
+        when 'november'
+          assign month_name = 'novembre'
+        when 'december'
+          assign month_name = 'décembre'
+        else
+          assign month_name = 'janvier'
+      endcase
+      assign final_date = day_number | append: ' ' | append: month_name
+    when 'es'
+      case month_lower
+        when 'january'
+          assign month_name = 'enero'
+        when 'february'
+          assign month_name = 'febrero'
+        when 'march'
+          assign month_name = 'marzo'
+        when 'april'
+          assign month_name = 'abril'
+        when 'may'
+          assign month_name = 'mayo'
+        when 'june'
+          assign month_name = 'junio'
+        when 'july'
+          assign month_name = 'julio'
+        when 'august'
+          assign month_name = 'agosto'
+        when 'september'
+          assign month_name = 'septiembre'
+        when 'october'
+          assign month_name = 'octubre'
+        when 'november'
+          assign month_name = 'noviembre'
+        when 'december'
+          assign month_name = 'diciembre'
+        else
+          assign month_name = 'enero'
+      endcase
+      assign final_date = day_number | append: ' de ' | append: month_name
+    when 'it'
+      case month_lower
+        when 'january'
+          assign month_name = 'gennaio'
+        when 'february'
+          assign month_name = 'febbraio'
+        when 'march'
+          assign month_name = 'marzo'
+        when 'april'
+          assign month_name = 'aprile'
+        when 'may'
+          assign month_name = 'maggio'
+        when 'june'
+          assign month_name = 'giugno'
+        when 'july'
+          assign month_name = 'luglio'
+        when 'august'
+          assign month_name = 'agosto'
+        when 'september'
+          assign month_name = 'settembre'
+        when 'october'
+          assign month_name = 'ottobre'
+        when 'november'
+          assign month_name = 'novembre'
+        when 'december'
+          assign month_name = 'dicembre'
+        else
+          assign month_name = 'gennaio'
+      endcase
+      assign final_date = day_number | append: ' ' | append: month_name
+    when 'nl'
+      case month_lower
+        when 'january'
+          assign month_name = 'januari'
+        when 'february'
+          assign month_name = 'februari'
+        when 'march'
+          assign month_name = 'maart'
+        when 'april'
+          assign month_name = 'april'
+        when 'may'
+          assign month_name = 'mei'
+        when 'june'
+          assign month_name = 'juni'
+        when 'july'
+          assign month_name = 'juli'
+        when 'august'
+          assign month_name = 'augustus'
+        when 'september'
+          assign month_name = 'september'
+        when 'october'
+          assign month_name = 'oktober'
+        when 'november'
+          assign month_name = 'november'
+        when 'december'
+          assign month_name = 'december'
+        else
+          assign month_name = 'januari'
+      endcase
+      assign final_date = day_number | append: ' ' | append: month_name
+    when 'tr'
+      case month_lower
+        when 'january'
+          assign month_name = 'Ocak'
+        when 'february'
+          assign month_name = 'Şubat'
+        when 'march'
+          assign month_name = 'Mart'
+        when 'april'
+          assign month_name = 'Nisan'
+        when 'may'
+          assign month_name = 'Mayıs'
+        when 'june'
+          assign month_name = 'Haziran'
+        when 'july'
+          assign month_name = 'Temmuz'
+        when 'august'
+          assign month_name = 'Ağustos'
+        when 'september'
+          assign month_name = 'Eylül'
+        when 'october'
+          assign month_name = 'Ekim'
+        when 'november'
+          assign month_name = 'Kasım'
+        when 'december'
+          assign month_name = 'Aralık'
+        else
+          assign month_name = 'Ocak'
+      endcase
+      assign final_date = day_number | append: ' ' | append: month_name
+    else
+      # English format with ordinal suffix
+      case day_number
+        when 1 or 21 or 31
+          assign ordinal_suffix = 'st'
+        when 2 or 22
+          assign ordinal_suffix = 'nd'
+        when 3 or 23
+          assign ordinal_suffix = 'rd'
+        else
+          assign ordinal_suffix = 'th'
+      endcase
+      assign final_date = month_english | append: ' ' | append: day_number | append: ordinal_suffix
+  endcase
+-%}
+
+{{ final_date }} 

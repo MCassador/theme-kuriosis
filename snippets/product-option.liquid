@@ -1,0 +1,517 @@
+{% if sticky %}
+  {% assign appended = '--sticky' %}
+{% else %}
+  {% assign appended = '' %}
+{% endif %}
+
+{% assign handle = option.name | replace: ' ', '-' | downcase | escape %}
+{% assign base_price = product.price %} <!-- Assign the base price of the product -->
+
+{% case option_type %}
+{% when 'dropdown' %}
+  {% assign selected_value = product.selected_or_first_available_variant.options[forloop.index0] %}
+  <fieldset class="product-form__input product-form__input--dropdown" data-index="option{{ forloop.index }}" data-handle="{{ handle }}">
+    <div class="form__label">{{ option.name }}
+      {{ sizing_link }}{{ material_link }}{{ framing_link }}</div>
+
+    <!-- Hidden Select for Form Submission -->
+    <div class="select" style="display:none;">
+      <select id="Option-{{ section.id }}-{{ forloop.index0 }}" name="options[{{ option.name | escape }}]" form="{{ product_form_id }}">
+        {% for value in option.values %}
+          <option value="{{ value | escape }}" {% if selected_value == value %}selected="selected"{% endif %}>
+            {{ value }}
+          </option>
+        {% endfor %}
+      </select>
+    </div>
+
+    <!-- Custom Dropdown with <ul> for Styling -->
+    <div class="custom-dropdown proza-libre" data-dropdown-id="options[{{ option.name | escape }}]">
+      <button class="custom-dropdown-toggle">
+        <span class="selected-value">{{ selected_value }}</span>
+        <div class="select-arrow">{% render 'svg-icons' with 'thb-select' %}</div>
+      </button>
+      <ul class="custom-dropdown-list">
+        {% for value in option.values %}
+          {% assign option_field = "option" | append: option.position %}
+          {% assign matching_variant = product.variants | where: option_field, value | first %}
+          {% assign price = matching_variant.price %}
+          {% assign compare_price = matching_variant.compare_at_price %}
+          <li data-value="{{ value | escape }}" class="custom-dropdown-option {% if selected_value == value %} selected {% endif %}">
+            <span class="option-value">{{ value }}</span>
+            
+            {% if matching_variant %}
+              {% if option.name == 'Size' %}
+                <span class="price">
+                  {% if compare_price and compare_price > price %}
+                    <del class="small">{{ compare_price | money }}</del> {{ price | money }}
+                  {% else %}
+                    {{ price | money }}
+                  {% endif %}
+                </span>
+              {% elsif option.name == 'Material' %}
+                <!-- Calculate price difference for "Material" option -->
+                {% assign base_material = '' %}
+                {% for option_in_product in product.options_with_values %}
+                  {% if option_in_product.name == 'Material' %}
+                    {% assign base_material = option_in_product.values[0] %}
+                    {% break %}
+                  {% endif %}
+                {% endfor %}
+
+                {% assign base_variant = '' %}
+                {% for variant in product.variants %}
+                  {% if variant.id != matching_variant.id %}
+                    {% assign is_matching = true %}
+                    {% for i in (1..product.options.size) %}
+                      {% assign option_name = product.options[i-1] %}
+                      {% assign variant_option_value = variant.options[i-1] %}
+                      {% if option_name == 'Material' %}
+                        {% if variant_option_value != base_material %}
+                          {% assign is_matching = false %}
+                          {% break %}
+                        {% endif %}
+                      {% else %}
+                        {% assign matching_variant_option_value = matching_variant.options[i-1] %}
+                        {% if variant_option_value != matching_variant_option_value %}
+                          {% assign is_matching = false %}
+                          {% break %}
+                        {% endif %}
+                      {% endif %}
+                    {% endfor %}
+                    {% if is_matching %}
+                      {% assign base_variant = variant %}
+                      {% break %}
+                    {% endif %}
+                  {% endif %}
+                {% endfor %}
+
+                {% if base_variant %}
+                  {% assign price_difference = matching_variant.price | minus: base_variant.price %}
+                {% else %}
+                  {% assign price_difference = matching_variant.price | minus: base_price %}
+                {% endif %}
+
+                {% if price_difference > 0 %}
+                  <span class="price">extra</span>
+                {% else %}
+                  <span class="price">Inklusive</span>
+                {% endif %}
+              {% endif %}
+            {% endif %}
+          </li>
+        {% endfor %}
+      </ul>
+    </div>
+  </fieldset>
+
+{% when 'button' %}
+  <fieldset class="product-form__input product-form__input--block proza-libre" data-index="option{{ forloop.index }}" data-handle="{{ handle }}">
+      <div class="form__label">{{ option.name }}: <span class="form__label__value">{{ option.selected_value }}</span>
+          {{ sizing_link }}{{ material_link }}{{ framing_link }}</div>
+      {% for value in option.values %}
+          {% assign option_field = "option" | append: option.position %}
+          {% assign matching_variant = product.variants | where: option_field, value | first %}
+
+          <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}"
+                 name="{{ option.name | append: appended }}"
+                 value="{{ value | escape }}"
+                 form="{{ product_form_id }}"
+                 {% if option.selected_value == value %}checked{% endif %}
+          >
+          <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}">
+              <span>{{ value }}</span>
+              {% if matching_variant %}
+                {% if option.name == 'Size' %}
+                  <!-- Display only the price for "Size" option -->
+                  <span class="price">{{ matching_variant.price | money }}</span>
+                {% elsif option.name == 'Material' %}
+                  <!-- Calculate price difference for "Material" option -->
+                  {% assign base_material = '' %}
+                  {% for option_in_product in product.options_with_values %}
+                    {% if option_in_product.name == 'Material' %}
+                      {% assign base_material = option_in_product.values[0] %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% assign base_variant = '' %}
+                  {% for variant in product.variants %}
+                    {% if variant.id != matching_variant.id %}
+                      {% assign is_matching = true %}
+                      {% for i in (1..product.options.size) %}
+                        {% assign option_name = product.options[i-1] %}
+                        {% assign variant_option_value = variant.options[i-1] %}
+                        {% if option_name == 'Material' %}
+                          {% if variant_option_value != base_material %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% else %}
+                          {% assign matching_variant_option_value = matching_variant.options[i-1] %}
+                          {% if variant_option_value != matching_variant_option_value %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                      {% if is_matching %}
+                        {% assign base_variant = variant %}
+                        {% break %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if base_variant %}
+                    {% assign price_difference = matching_variant.price | minus: base_variant.price %}
+                  {% else %}
+                    {% assign price_difference = matching_variant.price | minus: base_price %}
+                  {% endif %}
+
+                  {% if price_difference > 0 %}
+                    <span class="price">+ {{ price_difference | money }}</span>
+                  {% else %}
+                    <span class="price">Kostenlos</span>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+          </label>
+      {% endfor %}
+  </fieldset>
+
+{% when 'color' %}
+  {% assign custom_colors = settings.color_swatches | newline_to_br | split: '<br />' %}
+  {% assign key_array = '' %}
+  {% assign val_array = '' %}
+
+  {% for color in custom_colors %}
+      {% assign key = color | split: ':' | first | rstrip %}
+      {% assign value = color | split: ':' | last | lstrip %}
+      {% assign key_array = key_array | append: ',' | append: key %}
+      {% assign val_array = val_array | append: ',' | append: value %}
+  {% endfor %}
+
+  {% assign key_array = key_array | remove_first: ',' | strip_newlines | downcase | split: ',' %}
+  {% assign val_array = val_array | remove_first: ',' | split: ',' %}
+
+  {% assign variant_image_size = '40' %}
+  {% case color_picker_size %}
+      {% when 'large' %}
+          {% assign variant_image_size = '72' %}
+      {% when 'xlarge' %}
+          {% assign variant_image_size = '104' %}
+  {% endcase %}
+  <fieldset class="product-form__input product-form__input--color product-form__input--color--{{ color_picker_size }}" data-use-images="{{ color_picker_use_variants }}" data-index="option{{ forloop.index }}" data-handle="{{ handle }}">
+      <div class="form__label">{{ option.name }}: <span class="form__label__value">{{ option.selected_value }}</span>
+          {{ sizing_link }}{{ material_link }}{{ framing_link }}</div>
+      {% for value in option.values %}
+          {% assign option_field = "option" | append: option.position %}
+          {% assign matching_variant = product.variants | where: option_field, value | first %}
+
+          <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}"
+                 name="{{ option.name | append: appended }}"
+                 value="{{ value | escape }}"
+                 form="{{ product_form_id }}"
+                 {% if option.selected_value == value %}checked{% endif %}
+          >
+          {% assign color_value = value | downcase | escape %}
+          {% for custom_color in key_array %}
+              {% if custom_color == color_value %}
+                  {% assign color_value = val_array[forloop.index0] %}
+              {% endif %}
+          {% endfor %}
+
+          {% assign bg_value = empty %}
+          {% if color_value contains '.' %}
+              {% assign bg_value = color_value | file_url %}
+              {% assign color_value = 'var(--bg-body)' %}
+          {% endif %}
+
+          {% if color_picker_use_variants %}
+              {% assign variant_image = blank %}
+
+              {% for variant in product.variants %}
+                  {% if variant.title contains value %}
+                      {% if variant.image %}
+                          {% assign bg_value = variant.image | image_url: width: variant_image_size %}
+                          {% break %}
+                      {% endif %}
+                  {% endif %}
+              {% endfor %}
+          {% endif %}
+
+          {% if value.swatch.image %}
+              {% assign bg_value = value.swatch.image | image_url: width: variant_image_size %}
+              {% assign swatch_focal_point = value.swatch.image.presentation.focal_point %}
+          {% elsif value.swatch.color %}
+              {% assign color_value = 'rgb(' | append: value.swatch.color.rgb | append: ')' %}
+          {% endif %}
+          <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}" style="--option-color: {{ color_value | downcase | escape }}; {% if bg_value %} --option-color-image: url('{{ bg_value | escape }}');{% endif %}">
+              {{ value }}
+              {% if matching_variant %}
+                {% if option.name == 'Size' %}
+                  <!-- Display only the price for "Size" option -->
+                  <span class="price">{{ matching_variant.price | money }}</span>
+                {% elsif option.name == 'Material' %}
+                  <!-- Calculate price difference for "Material" option -->
+                  {% assign base_material = '' %}
+                  {% for option_in_product in product.options_with_values %}
+                    {% if option_in_product.name == 'Material' %}
+                      {% assign base_material = option_in_product.values[0] %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% assign base_variant = '' %}
+                  {% for variant in product.variants %}
+                    {% if variant.id != matching_variant.id %}
+                      {% assign is_matching = true %}
+                      {% for i in (1..product.options.size) %}
+                        {% assign option_name = product.options[i-1] %}
+                        {% assign variant_option_value = variant.options[i-1] %}
+                        {% if option_name == 'Material' %}
+                          {% if variant_option_value != base_material %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% else %}
+                          {% assign matching_variant_option_value = matching_variant.options[i-1] %}
+                          {% if variant_option_value != matching_variant_option_value %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                      {% if is_matching %}
+                        {% assign base_variant = variant %}
+                        {% break %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if base_variant %}
+                    {% assign price_difference = matching_variant.price | minus: base_variant.price %}
+                  {% else %}
+                    {% assign price_difference = matching_variant.price | minus: base_price %}
+                  {% endif %}
+
+                  {% if price_difference > 0 %}
+                    <span class="price">+ {{ price_difference | money }}</span>
+                  {% else %}
+                    <span class="price">Kostenlos</span>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+          </label>
+      {% endfor %}
+  </fieldset>
+
+
+{% when 'framing' %}
+  {% assign no_frame_image = settings.no_frame_image %}
+  {% assign no_frame_variant = settings.no_frame_image_variant_name %}
+  
+  {% assign oak_frame_image = settings.oak_frame_image %}
+  {% assign oak_frame_variant = settings.oak_frame_image_variant_name %}
+  
+  {% assign brown_frame_image = settings.wooden_frame_image %}
+  {% assign brown_frame_variant = settings.wooden_frame_image_variant_name %}
+  
+  {% assign black_frame_image = settings.black_frame_image %}
+  {% assign black_frame_variant = settings.black_frame_image_variant_name %}
+  
+  {% assign white_frame_image = settings.white_frame_image %}
+  {% assign white_frame_variant = settings.white_frame_image_variant_name %}
+  
+  {% assign magnetic_hanger_image = settings.magnetic_hanger_image %}
+  {% assign magnetic_hanger_variant = settings.magnetic_hanger_image_variant_name %}
+  
+  {% assign frame_image_size = '40' %}
+  {% case settings.frame_image_size %}
+    {% when 'small' %}
+      {% assign frame_image_size = '40' %}
+    {% when 'regular' %}
+      {% assign frame_image_size = '72' %}
+    {% when 'large' %}
+      {% assign frame_image_size = '104' %}
+    {% when 'xlarge' %}
+      {% assign frame_image_size = '144' %}
+  {% endcase %}
+
+  <fieldset class="product-form__input product-form__input--framing product-form__input--framing--{{ frame_image_size }}" data-index="option{{ forloop.index }}" data-handle="{{ handle }}">
+      <div class="form__label">{{ option.name }}: <span class="form__label__value">{{ option.selected_value }}</span>
+          {{ sizing_link }}{{ material_link }}{{ framing_link }}</div>
+      {% for value in option.values %}
+          {% if value == no_frame_variant %}
+              {% assign frame_image_url = no_frame_image | image_url: width: frame_image_size %}
+          {% elsif value == oak_frame_variant %}
+              {% assign frame_image_url = oak_frame_image | image_url: width: frame_image_size %}
+          {% elsif value == brown_frame_variant %}
+              {% assign frame_image_url = brown_frame_image | image_url: width: frame_image_size %}
+          {% elsif value == black_frame_variant %}
+              {% assign frame_image_url = black_frame_image | image_url: width: frame_image_size %}
+          {% elsif value == white_frame_variant %}
+              {% assign frame_image_url = white_frame_image | image_url: width: frame_image_size %}
+          {% elsif value == magnetic_hanger_variant %}
+              {% assign frame_image_url = magnetic_hanger_image | image_url: width: frame_image_size %}
+          {% else %}
+              {% assign frame_image_url = no_frame_image | image_url: width: frame_image_size %}
+          {% endif %}
+
+          {% assign option_field = "option" | append: option.position %}
+          {% assign matching_variant = product.variants | where: option_field, value | first %}
+
+          <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}"
+                 name="{{ option.name | append: appended }}"
+                 value="{{ value | escape }}"
+                 form="{{ product_form_id }}"
+                 {% if option.selected_value == value %}checked{% endif %}
+          >
+          <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}" style="--option-image: url('{{ frame_image_url | escape }}');">
+              <img src="{{ frame_image_url }}" alt="{{ value }}" width="{{ frame_image_size }}" height="{{ frame_image_size }}">
+              {% if matching_variant %}
+                {% if option.name == 'Size' %}
+                  <!-- Display only the price for "Size" option -->
+                  <span class="price">{{ matching_variant.price | money }}</span>
+                {% elsif option.name == 'Material' %}
+                  <!-- Calculate price difference for "Material" option -->
+                  {% assign base_material = '' %}
+                  {% for option_in_product in product.options_with_values %}
+                    {% if option_in_product.name == 'Material' %}
+                      {% assign base_material = option_in_product.values[0] %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% assign base_variant = '' %}
+                  {% for variant in product.variants %}
+                    {% if variant.id != matching_variant.id %}
+                      {% assign is_matching = true %}
+                      {% for i in (1..product.options.size) %}
+                        {% assign option_name = product.options[i-1] %}
+                        {% assign variant_option_value = variant.options[i-1] %}
+                        {% if option_name == 'Material' %}
+                          {% if variant_option_value != base_material %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% else %}
+                          {% assign matching_variant_option_value = matching_variant.options[i-1] %}
+                          {% if variant_option_value != matching_variant_option_value %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                      {% if is_matching %}
+                        {% assign base_variant = variant %}
+                        {% break %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% if base_variant %}
+                    {% assign price_difference = matching_variant.price | minus: base_variant.price %}
+                  {% else %}
+                    {% assign price_difference = matching_variant.price | minus: base_price %}
+                  {% endif %}
+
+                  {% if price_difference > 0 %}
+                    <span class="price">+ {{ price_difference | money }}</span>
+                  {% else %}
+                    <span class="price">Kostenlos</span>
+                  {% endif %}
+                {% endif %}
+              {% endif %}
+          </label>
+      {% endfor %}
+  </fieldset>
+
+{% when 'material' %}
+  {% assign material_box_size = '40' %}
+  {% case settings.material_box_size %}
+    {% when 'small' %}
+      {% assign material_box_size = '40' %}
+    {% when 'regular' %}
+      {% assign material_box_size = '72' %}
+    {% when 'large' %}
+      {% assign material_box_size = '104' %}
+    {% when 'xlarge' %}
+      {% assign material_box_size = '144' %}
+  {% endcase %}
+
+  <fieldset class="product-form__input product-form__input--material product-form__input--material--{{ material_box_size }}" data-index="option{{ forloop.index }}" data-handle="{{ handle }}">
+      <div class="form__label">{{ option.name }}: 
+        {% comment %} <span class="form__label__value">{{ option.selected_value }}</span> {% endcomment %}
+          {{ sizing_link }}{{ material_link }}{{ framing_link }}</div>
+      {% for value in option.values %}
+          {% assign option_field = "option" | append: option.position %}
+          {% assign matching_variant = product.variants | where: option_field, value | first %}
+
+          <input type="radio" id="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}"
+                 name="{{ option.name | append: appended }}"
+                 value="{{ value | escape }}"
+                 form="{{ product_form_id }}"
+                 {% if option.selected_value == value %}checked{% endif %}
+          >
+          <label for="{{ section.id }}-{{ option.position }}-{{ forloop.index0 }}{{ appended }}" class="material-option-box">
+              <span class="material-title">{{ value }}</span>
+              {% if matching_variant %}
+                {% if option.name == 'Size' %}
+                  <!-- Display only the price for "Size" option -->
+                  <span class="price">{{ matching_variant.price | money }}</span>
+                {% elsif option.name == 'Material' %}
+                  <!-- Calculate price difference for "Material" option -->
+                  {% assign base_material = '' %}
+                  {% for option_in_product in product.options_with_values %}
+                    {% if option_in_product.name == 'Material' %}
+                      {% assign base_material = option_in_product.values[0] %}
+                      {% break %}
+                    {% endif %}
+                  {% endfor %}
+
+                  {% assign base_variant = '' %}
+                  {% for variant in product.variants %}
+                    {% if variant.id != matching_variant.id %}
+                      {% assign is_matching = true %}
+                      {% for i in (1..product.options.size) %}
+                        {% assign option_name = product.options[i-1] %}
+                        {% assign variant_option_value = variant.options[i-1] %}
+                        {% if option_name == 'Material' %}
+                          {% if variant_option_value != base_material %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% else %}
+                          {% assign matching_variant_option_value = matching_variant.options[i-1] %}
+                          {% if variant_option_value != matching_variant_option_value %}
+                            {% assign is_matching = false %}
+                            {% break %}
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                      {% if is_matching %}
+                        {% assign base_variant = variant %}
+                        {% break %}
+                      {% endif %}
+                    {% endif %}
+                  {% endfor %}
+{% comment %} 
+                  {% if base_variant %}
+                    {% assign price_difference = matching_variant.price | minus: base_variant.price %}
+                  {% else %}
+                    {% assign price_difference = matching_variant.price | minus: base_price %}
+                  {% endif %}
+
+                  {% if price_difference > 0 %}
+                    <span class="price">+ {{ price_difference | money }}</span>
+                  {% else %}
+                    <span class="price">Kostenlos</span>
+                  {% endif %} {% endcomment %}
+                {% endif %}
+              {% endif %}
+          </label>
+      {% endfor %}
+  </fieldset>
+{% endcase %}
+

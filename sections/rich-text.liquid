@@ -1,0 +1,435 @@
+{{- 'rich-text.css' | asset_url | stylesheet_tag -}}
+{%- liquid
+	assign section_width = section.settings.section_width
+	assign text_width = section.settings.text_width
+	assign text_position = section.settings.text_position
+	assign text_alignment = section.settings.text_alignment
+
+	assign color_bg = section.settings.color_bg | downcase
+	assign color_text = section.settings.color_text
+	assign color_links = section.settings.color_links
+	assign button_background_color = section.settings.button_background_color
+	assign button_text_color = section.settings.button_text_color
+
+	assign disable_top_spacing = section.settings.disable_top_spacing
+	assign disable_bottom_spacing = section.settings.disable_bottom_spacing
+
+	assign solid_button_label = color_bg
+	if color_bg == 'transparent' or color_bg == 'rgba(0,0,0,0)'
+		assign solid_button_label = '#ffffff'
+	endif
+-%}
+
+<div class="row {{ section_width }}">
+	<div class="small-12 columns">
+		<div class="rich-text text-{{ text_alignment }} text-position-{{ text_position }} text-width-{{ text_width }} section-spacing-padding{% if disable_top_spacing %} section-spacing--disable-top{% endif %}{% if disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}{% if section.settings.gradient_background %} gradient-background {% if section.settings.gradient_background_reverse %} reverse{% endif %}{% endif %}"
+			style="{% unless section.settings.gradient_background %}--color-bg: {{ color_bg }};{% endunless %} --color-text: {{ color_text }}; --solid-button-background: {{ button_background_color }}; --outline-button-label: {{ button_text_color }}; --solid-button-label: {{ solid_button_label }}; --bg-body: {{ color_bg }}; --color-accent: {{ color_links }}; --color-accent-rgb:  {{ color_links.rgb | replace: ' ' , ',' }};">
+			<div class="rich-text__inner">
+				{% for block in section.blocks %}
+					{%- case block.type -%}
+						{%- when 'image' -%}
+							{%- if block.settings.image != blank -%}
+								{%- liquid
+									assign image = block.settings.image
+									assign master_width = image.src.width | append: 'x' | append: image.src.height
+									render 'responsive-image', image: image, sizes: master_width, retina: block.settings.retina
+								-%}
+							{%- else -%}
+								<div class="thb-placeholder">
+									{{ 'image' | placeholder_svg_tag: 'placeholder_svg_tag' }}
+								</div>
+							{%- endif -%}
+						{%- when 'subheading' -%}
+							<p class="subheading" {{ block.shopify_attributes }}>{{ block.settings.text }}</p>
+						{%- when 'trustpilot' -%}
+							<div class="trustpilot proza-libre">
+								<div class="trustpilot__stars">
+									{%- render 'svg-icons' with 'star' -%}
+									{%- render 'svg-icons' with 'star' -%}
+									{%- render 'svg-icons' with 'star' -%}
+									{%- render 'svg-icons' with 'star' -%}
+									{%- render 'svg-icons' with 'star' -%}
+									<span>{{ block.settings.bewertungen_tp }}</span>
+								</div>
+								<span class="trustpilot__text">{{ 'general.5starrating' | t }}</span>
+								<div class="trustpilot__tp-logo">
+									<a href="{{ block.settings.link_tp}}" rel="nofollow" aria-label="Link zu Trustpilot" title="Trustpilot Kuriosis" target="_blank">
+										<svg xmlns="http://www.w3.org/2000/svg" width="11.978" height="11.335" viewBox="0 0 11.978 11.335">
+											<path id="Pfad_6543" data-name="Pfad 6543" d="M5.989,8.644l3.689,2.691L8.591,7.985ZM5.986,0,4.577,4.313H0L3.707,6.987,2.3,11.3,6,8.626,8.29,6.986l3.688-2.673H7.4Z" fill="#50b17f"/>
+										</svg>
+										Trustpilot
+									</a>
+								</div>
+							</div>
+						{%- when 'heading' -%}
+							<{{ block.settings.heading_tag }} 
+                {% if block.settings.heading_color %}
+                  style="color:{{ block.settings.heading_color }};"
+                {% endif %}
+                class="{{ block.settings.size }}{% if block.settings.size == 'h1' %} h1-xlarge{% endif %}{% if block.settings.text_center %} text-center{% endif %}" {{ block.shopify_attributes }}>{{ block.settings.text | newline_to_br }}</{{ block.settings.heading_tag }}>
+						{%- when 'text' -%}
+							<div class="rte {{ block.settings.size }}" {{ block.shopify_attributes }}>
+								{{ block.settings.text }}
+								{{ block.settings.custom_liquid }}
+							</div>
+            {%- when 'icons' -%}
+
+              <div class="icon-set proza-libre rich-text-icons">
+                <div class="icon">
+                  <div class="icon__wrap ">
+                    {%- liquid
+                      assign image = block.settings.icon_1
+                      assign sizes = image.src.width | append: 'x' | append: image.src.height
+                      render 'responsive-image', image: image, sizes: sizes
+                      -%}  
+                  </div>
+                  <p>{{ block.settings.icon_1_text }}</p>
+                </div>
+                <div class="icon">
+                  <div class="icon__wrap ">
+                    {%- liquid
+                      assign image = block.settings.icon_2
+                      assign sizes = image.src.width | append: 'x' | append: image.src.height
+                      render 'responsive-image', image: image, sizes: sizes
+                      -%}  
+                  </div>
+        
+                  <p>{{ block.settings.icon_2_text }}</p>
+                </div>
+                <div class="icon">
+                  <div class="icon__wrap ">
+                    {%- liquid
+                      assign image = block.settings.icon_3
+                      assign sizes = image.src.width | append: 'x' | append: image.src.height
+                      render 'responsive-image', image: image, sizes: sizes
+                      -%}  
+                  </div>
+                  <p>{{ block.settings.icon_3_text }}</p>
+                </div>
+                <div class="icon">
+                  <div class="icon__wrap ">
+                    {%- liquid
+                      assign image = block.settings.icon_4
+                      assign sizes = image.src.width | append: 'x' | append: image.src.height
+                      render 'responsive-image', image: image, sizes: sizes
+                      -%}  
+                  </div>
+                  <p>{{ block.settings.icon_4_text }}</p>
+                </div>
+              </div>
+						{%- when 'button' -%}
+							{% if block.settings.link_label != blank %}
+								<a class="button{% if block.settings.button_outline %} outline{%- endif -%}" href="{{ block.settings.link }}" {{ block.shopify_attributes }} style="background-color: {{ button_background_color }}; color: {{ button_text_color }};"><span>{{ block.settings.link_label }}</span></a>
+							{% endif %}
+
+              {% if block.settings.button_outline %}
+
+                <style>
+                  .button.outline:hover{
+                    color:{{ button_background_color }}!important;
+                  }
+
+                </style>
+              {%- endif -%}
+						{%- when 'text-button' -%}
+							{% if block.settings.link_label != blank %}
+								<a class="text-button" href="{{ block.settings.link }}" {{ block.shopify_attributes }}>{{ block.settings.link_label }}</a>
+							{% endif %}
+						{%- when 'custom_liquid' -%}
+							{{ block.settings.custom_liquid }}
+					{%- endcase -%}
+				{% endfor %}
+			</div>
+		</div>
+	</div>
+</div>
+
+{% schema %}
+{
+  "name": "Rich text",
+  "class": "section-rich-text",
+  "settings": [
+    {
+      "type": "select",
+      "id": "section_width",
+      "options": [
+        { "value": "grid", "label": "Grid" },
+        { "value": "full-width-row", "label": "Full width" },
+        { "value": "full-width-row-full", "label": "Full width, no spacing" }
+      ],
+      "default": "grid",
+      "label": "Section width"
+    },
+    {
+      "type": "select",
+      "id": "text_width",
+      "label": "Content width",
+      "options": [
+        { "value": "small", "label": "Small" },
+        { "value": "medium", "label": "Medium" },
+        { "value": "large", "label": "Large" },
+        { "value": "xlarge", "label": "Extra large" },
+        { "value": "grid", "label": "Grid" }
+      ],
+      "default": "medium"
+    },
+    {
+      "type": "select",
+      "id": "text_position",
+      "label": "Content position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "select",
+      "id": "text_alignment",
+      "label": "Content alignment",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "center"
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text",
+      "default": "#151515"
+    },
+    {
+      "type": "color",
+      "id": "color_links",
+      "label": "Links",
+      "default": "#151515"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_top_spacing",
+      "default": false,
+      "label": "Remove top spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_bottom_spacing",
+      "default": false,
+      "label": "Remove bottom spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "gradient_background",
+      "label": "Enable gradient background",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "gradient_background_reverse",
+      "label": "Reverse gradient background",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image",
+      "name": "Image",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "checkbox",
+          "id": "retina",
+          "label": "Enable retina",
+          "default": true
+        }
+      ]
+    },
+    {
+      "type": "icons",
+      "name": "Icon Set",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "icon_1",
+          "label": "Icon 1",
+          "info": "Upload the first icon (e.g., 50x50 PNG or SVG)"
+        },
+        {
+          "type": "text",
+          "id": "icon_1_text",
+          "label": "Text for Icon 1",
+          "default": "Placeholder for Icon 1"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_2",
+          "label": "Icon 2",
+          "info": "Upload the second icon (e.g., 50x50 PNG or SVG)"
+        },
+        {
+          "type": "text",
+          "id": "icon_2_text",
+          "label": "Text for Icon 2",
+          "default": "Placeholder for Icon 2"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_3",
+          "label": "Icon 3",
+          "info": "Upload the third icon (e.g., 50x50 PNG or SVG)"
+        },
+        {
+          "type": "text",
+          "id": "icon_3_text",
+          "label": "Text for Icon 3",
+          "default": "Placeholder for Icon 3"
+        },
+        {
+          "type": "image_picker",
+          "id": "icon_4",
+          "label": "Icon 4",
+          "info": "Upload the fourth icon (e.g., 50x50 PNG or SVG)"
+        },
+        {
+          "type": "text",
+          "id": "icon_4_text",
+          "label": "Text for Icon 4",
+          "default": "Placeholder for Icon 4"
+        }
+      ]
+    },
+    {
+      "type": "subheading",
+      "name": "Subheading",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Subheading for this section" }
+      ]
+    },
+    {
+      "type": "heading",
+      "name": "Heading",
+      "settings": [
+        { "type": "text", "id": "text", "label": "Text", "default": "Talk about your brand" },
+        { "type": "select", "id": "size", "label": "Size", "options": [ { "value": "h1", "label": "Extra Large" }, { "value": "h2", "label": "Large" }, { "value": "h3", "label": "Medium" }, { "value": "h4", "label": "Small" } ], "default": "h3" },
+          {
+            "type": "select",
+            "id": "heading_tag",
+            "label": "Heading tag",
+            "options": [
+              {
+                "value": "h1",
+                "label": "h1"
+              },
+              {
+                "value": "h2",
+                "label": "h2"
+              },
+              {
+                "value": "h3",
+                "label": "h3"
+              },
+              {
+                "value": "h4",
+                "label": "h4"
+              },
+              {
+                "value": "h5",
+                "label": "h5"
+              },
+              {
+                "value": "h6",
+                "label": "h6"
+              },
+              {
+                "value": "p",
+                "label": "p"
+              }
+            ],
+            "default": "h3"
+          },
+          {
+            "type": "color",
+            "id": "heading_color",
+            "label": "Color"
+          },
+        { "type": "checkbox", "id": "text_center", "label": "Text center", "default": false }
+      ]
+    },
+    {
+      "type": "text",
+      "name": "Text",
+      "settings": [
+        { "type": "richtext", "id": "text", "label": "Content", "default": "<p>Share information about your brand with your customers.</p>" },
+        { "type": "liquid", "id": "custom_liquid", "label": "Custom liquid" },
+        { "type": "select", "id": "size", "label": "Size", "options": [ { "value": "text-size-large", "label": "Large" }, { "value": "text-size-regular", "label": "Medium" }, { "value": "text-size-small", "label": "Small" } ], "default": "text-size-regular" }
+      ]
+    },
+    {
+      "type": "button",
+      "name": "Button",
+      "settings": [
+        { "id": "link_label", "type": "text", "label": "Label", "default": "Learn More" },
+        { "id": "link", "type": "url", "label": "Link" },
+        { "type": "checkbox", "id": "button_outline", "label": "Use outline button style", "default": false }
+      ]
+    },
+    {
+      "type": "text-button",
+      "name": "Link",
+      "settings": [
+        { "id": "link_label", "type": "text", "label": "Label", "default": "Learn More" },
+        { "id": "link", "type": "url", "label": "Link" }
+      ]
+    },
+    {
+      "type": "trustpilot",
+      "name": "Trustpilot",
+      "settings": [
+        { "id": "bewertungen_tp", "type": "text", "label": "Anzahl der Bewertungen", "default": "1.300+" },
+        { "id": "link_tp", "type": "url", "label": "Link zum Trustpilot" }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom liquid",
+      "settings": [
+        { "type": "liquid", "id": "custom_liquid", "label": "Custom liquid" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Rich text",
+      "blocks": [ { "type": "subheading" }, { "type": "heading" }, { "type": "text" }, { "type": "button" } ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

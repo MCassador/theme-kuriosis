@@ -1,0 +1,285 @@
+{{- 'testimonials.css' | asset_url | stylesheet_tag -}}
+{%- liquid
+	assign full_width = section.settings.full_width
+	assign text_size = section.settings.text_size
+	assign pagination = section.settings.pagination
+	assign autoplay = section.settings.autoplay
+	assign color_bg = section.settings.color_bg
+	assign color_text = section.settings.color_text
+	assign disable_top_spacing = section.settings.disable_top_spacing
+	assign disable_bottom_spacing = section.settings.disable_bottom_spacing
+
+	if autoplay
+		assign autoplay = section.settings.autoplay_length | times: 1000
+	endif
+-%}
+<div class="row{% if full_width %} full-width-row-full{% endif %}" data-reviews-section-trustpilot>
+	{% if section.settings.count_reviews != blank %}
+		<div class="small-12">
+			<div class="text-center reviews-container-count">
+				<span class="h1">{{ section.settings.count_reviews }}{{ section.settings.textcustomers }}</span>
+	
+				<div class="reviews-container-count__row">
+					<div class="reviews-container-count__row-stars">
+						{%- render 'svg-icons' with 'star' -%}
+						{%- render 'svg-icons' with 'star' -%}
+						{%- render 'svg-icons' with 'star' -%}
+						{%- render 'svg-icons' with 'star' -%}
+						{%- render 'svg-icons' with 'star' -%}
+					</div>
+		
+				</div>
+	
+			</div>
+		</div>
+	{%- endif -%}
+
+
+	<div class="small-12">
+		<div class="testimonials section-spacing-padding{% if disable_top_spacing %} section-spacing--disable-top{% endif %}{% if disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}" style="--color-bg:{{ color_bg }}; --color-text:{{ color_text }}; --dot-speed: {{ autoplay | divided_by: 1000 | append: 's' }};">
+			<div class="testimonials__inner text-{{ text_size }}">
+				<slide-show class="testimonials__carousel carousel custom-dots" data-autoplay="{{ autoplay }}" data-dots="true" data-align="left" data-dot-style="{{ pagination }}">
+
+					<div class="testimonials__testimonial carousel__slide first-slide proza-libre" {{ block.shopify_attributes }}>
+						<div class="testimonials__testimonial-inner">
+							<h4 style="margin-bottom: 0;">{{ section.settings.text_excellent }}</h4>
+							<div class="testimonials__testimonial-inner__row-stars">
+								{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+								{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+								{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+								{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+								{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+							</div>
+							<p style="font-size: 0.8125rem;line-height: 1.4;" class="proza-libre">{{ section.settings.text_customers_reviews }}</p>
+							<div class="trustpilot__tp-logo">
+								  <svg xmlns="http://www.w3.org/2000/svg" width="13" height="13" viewBox="0 0 11.978 11.335">
+									<path id="Pfad_6543" data-name="Pfad 6543" d="M5.989,8.644l3.689,2.691L8.591,7.985ZM5.986,0,4.577,4.313H0L3.707,6.987,2.3,11.3,6,8.626,8.29,6.986l3.688-2.673H7.4Z" fill="#50b17f"/>
+									</svg>
+								   Trustpilot
+							  </div>
+						</div>
+					</div>
+					{%- for block in section.blocks -%}
+						<div class="testimonials__testimonial carousel__slide" {{ block.shopify_attributes }}>
+							<div class="testimonials__testimonial-inner">
+								<div class="testimonials__testimonial-inner__row-stars">
+									{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+									{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+									{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+									{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+									{%- render 'svg-icons' with 'single-trustpilot-star' -%}
+								</div>
+								<p class="proza-libre" style="font-size: 0.8125rem;line-height: 1.4;">{{ block.settings.text | newline_to_br }}</p>
+								{%- if block.settings.author != empty -%}
+								<div class="testimonials__author proza-libre">
+									{{- block.settings.author -}}
+								</div>
+								{%- endif -%}
+							</div>
+						</div>
+					{%- endfor -%}
+					{%- if section.blocks.size > 1 and pagination != 'none' -%}
+						{%- if pagination == 'logos' -%}
+						  <scroll-shadow>
+						{%- endif -%}
+						<ol class="flickity-page-dots dot-style--{{ pagination }}">
+						  {%- for block in section.blocks -%}
+						  <li class="dot" aria-label="{{ forloop.index }}">
+							{%- if pagination == 'dots' -%}
+							  {%- render 'svg-icons' with 'thb-pagination-dot' -%}
+							{%- elsif pagination == 'logos' -%}
+							  {%- liquid
+								if block.settings.image != blank
+								  assign image = block.settings.image
+								  assign master_width = image.src.width | append: 'x' | append: image.src.height
+								  assign width = '375x' | append: ',' | append: master_width
+								  render 'responsive-image', image: image, sizes: width, retina: true
+								endif
+							  -%}
+							{%- endif -%}
+						  </li>
+						  {%- endfor -%}
+						</ol>
+						{%- if pagination == 'logos' -%}
+						  </scroll-shadow>
+						{%- endif -%}
+					  {%- endif -%}
+				</slide-show>
+			</div>
+		</div>
+	</div>
+</div>
+{% schema %}
+  {
+    "name": "Testimonials",
+		"class": "section-testimonials",
+    "settings": [
+			{
+        "type": "checkbox",
+        "id": "full_width",
+        "label": "Make section full width",
+        "default": true
+      },
+	  {
+		"id": "link_tp",
+		"type": "url",
+		"label": "Link zum Trustpilot"
+	  },
+	  {
+		"type": "text",
+		"id": "text_excellent",
+		"label": "Text excellent",
+		"default": "Excellent"
+	  },
+	  {
+		"id": "count_reviews",
+		"type": "text",
+		"label": "Count of the reviews",
+		"default": "1500+"
+	},
+	  {
+		"type": "richtext",
+		"id": "textcustomers",
+		"label": "Text customers",
+		"default": "<p>zufriedene Kunden haben uns 5 Sterne gegeben.</p>"
+	  },
+	  {
+		"type": "text",
+		"id": "text_customers_reviews",
+		"label": "Text customers reviews",
+		"default": "Based on 1.600 reviews"
+	  },
+      {
+        "type": "select",
+        "id": "text_size",
+        "label": "Text size",
+        "default": "medium",
+        "options": [
+          { "value": "small", "label": "Small" },
+          { "value": "medium", "label": "Medium" },
+          { "value": "large", "label": "Large" }
+        ]
+      },
+	  {
+		"type": "select",
+		"id": "pagination",
+		"label": "Pagination",
+		"default": "dots",
+		"options": [
+		  { "value": "dots", "label": "Dots" },
+		  { "value": "logos", "label": "Logos" },
+		  { "value": "none", "label": "None" }
+		]
+	  },
+			{
+        "type": "checkbox",
+        "id": "autoplay",
+        "label": "Auto-rotate slides",
+        "default": true
+      },
+			{
+				"type": "range",
+				"id": "autoplay_length",
+				"min": 3,
+				"max": 10,
+				"step": 1,
+				"unit": "s",
+				"label": "Change slides every",
+				"default": 5
+			},
+			{
+	      "type": "header",
+	      "content": "Colors"
+	    },
+			{
+        "type": "color",
+        "id": "color_bg",
+        "label": "Background",
+        "default": "transparent"
+      },
+			{
+        "type": "color",
+        "id": "color_text",
+        "label": "Text",
+        "default": "#151515"
+      },
+			{
+	      "type": "header",
+	      "content": "Spacing"
+	    },
+			{
+				"type": "checkbox",
+				"id": "disable_top_spacing",
+				"default": false,
+				"label": "Remove top spacing"
+			},
+			{
+				"type": "checkbox",
+				"id": "disable_bottom_spacing",
+				"default": false,
+				"label": "Remove bottom spacing"
+			}
+    ],
+    "blocks": [
+      {
+        "type": "quote",
+        "name": "Testimonial",
+        "settings": [
+					{
+						"type": "image_picker",
+						"id": "image",
+						"label": "Logo"
+					},
+					{
+						"type": "select",
+						"id": "stars",
+						"options": [
+							{ "value": "", "label": "None" },
+							{ "value": "3", "label": "3 out of 5" },
+							{ "value": "3.5", "label": "3.5 out of 5" },
+							{ "value": "4", "label": "4 out of 5" },
+							{ "value": "4.5", "label": "4.5 out of 5" },
+							{ "value": "5", "label": "5 out of 5" }
+						],
+						"default": "",
+						"label": "Star rating"
+					},
+          {
+            "type": "textarea",
+            "id": "text",
+            "label": "Text",
+            "default": "Add your customer or client quote here to showcase them."
+          },
+          {
+            "id": "author",
+            "type": "text",
+            "label": "Author",
+						"default": "Testimonial author"
+          }
+        ]
+      }
+    ],
+    "presets": [
+      {
+        "name": "Testimonials",
+				"blocks": [
+	        {
+	          "type": "quote"
+	        },
+	        {
+	          "type": "quote"
+	        },
+	        {
+	          "type": "quote"
+	        }
+	      ]
+      }
+    ],
+		"enabled_on": {
+			"templates": ["*"],
+			"groups": [
+				"header", "footer"
+			]
+		}
+  }
+{% endschema %}

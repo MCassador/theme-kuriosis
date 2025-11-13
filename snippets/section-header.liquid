@@ -1,0 +1,66 @@
+{%- if section_heading != blank or section_description != blank -%}
+	<div class="section-header section-header-left--{{ section_heading_left }}">
+		<div class="section-header--content {{ section.settings.header_alignment_mobile }} {{ section.settings.header_alignment_large }}">
+			<div class="{{ section.settings.header_alignment_mobile }} {{ section.settings.header_alignment_large }}">
+				{%- if section_heading -%}
+					{% if section.settings.heading_tag %}
+						<{{ section.settings.heading_tag }} class="h3" style="color: {{ section.settings.heading_color }};">{{ section_heading }}</{{ section.settings.heading_tag }}>
+					{% else %}
+						<h3 class="h3" style="color: {{ section.settings.heading_color }};">{{ section_heading }}</h3>
+					{% endif %}
+				{%- endif -%}
+				{%- if section_description != blank -%}
+					<div class="rte" style="color: {{ section.settings.text_color }};">
+						{{ section_description }}
+					</div>
+				{%- endif -%}
+			</div>
+
+			{%- if blocks -%}
+			<scroll-shadow>
+				<collection-tabs class="collection-tabs__list" data-target="product-grid-{{ section_id }}">
+					{%- for block in blocks -%}
+						{%- if block.settings.collection != blank -%}
+							<button type="button" data-collection="{{ block.settings.collection.handle }}" class="collection-tabs__list-link{% if forloop.first == true %} active{% endif %}" {{ block.shopify_attributes }}>{{ block.settings.collection.title }}</button>
+						{%- else -%}
+							<button type="button" data-collection="collection-{{ block.id }}" class="collection-tabs__list-link{% if forloop.first == true %} active{% endif %}" {{ block.shopify_attributes }}>Collection {{ forloop.index }}</button>
+						{%- endif -%}
+						{%- unless forloop.last -%} <span>/</span>{%- endunless -%}
+					{%- endfor -%}
+				</collection-tabs>
+			</scroll-shadow>
+			{%- endif -%}
+		</div>
+
+		{%- if blocks and section_heading_button -%}
+		<div class="section-header--button has--tabs text-right">
+			{%- for block in blocks -%}
+				{%- if block.settings.collection != blank -%}
+					<a class="text-button linked-to-tab{% if forloop.first == true %} active{% endif %}" href="{{ block.settings.collection.url }}">{{ 'sections.featured_collection.shop_collection' | t: collection: block.settings.collection.title }} {%- render 'svg-icons' with 'arrow-up' -%}</a>
+				{%- else -%}
+					<a class="text-button linked-to-tab{% if forloop.first == true %} active{% endif %}" href="#">{{ 'sections.featured_collection.shop_collection' | t: collection: 'Collection' }} {%- render 'svg-icons' with 'arrow-up' -%}</a>
+				{%- endif -%}
+			{%- endfor -%}
+		</div>
+		{%- elsif section_heading_button -%}
+		<div class="section-header--button text-right">
+			
+			{%- if section.settings.custom_link != blank -%}
+				<a class="text-button" href="{{  section.settings.custom_link.url }}">
+					{%- if section.settings.custom_link_heading != blank -%}
+						{{ section.settings.custom_link_heading }}
+					{%- else -%}
+					{{ 'sections.featured_collection.shop_collection' | t: collection: section_heading_button.title }} 
+					{%- endif -%}
+					{%- render 'svg-icons' with 'arrow-up' -%}</a>
+			{%- else -%}
+			<a class="text-button" href="{{ section_heading_button.url }}">{{ 'sections.featured_collection.shop_collection' | t: collection: section_heading_button.title }} {%- render 'svg-icons' with 'arrow-up' -%}</a>
+			{%- endif -%}
+		</div>
+		{%- elsif section_heading_button_blog -%}
+		<div class="section-header--button text-right">
+			<a class="text-button" href="{{ section_heading_button_blog.url }}">{{ 'sections.featured_blog.view_all' | t }} {%- render 'svg-icons' with 'arrow-up' -%}</a>
+		</div>
+		{%- endif -%}
+	</div>
+{%- endif -%}

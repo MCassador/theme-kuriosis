@@ -1,0 +1,444 @@
+{{ 'featured-collection.css' | asset_url | stylesheet_tag }}
+{{ 'product-grid.css' | asset_url | stylesheet_tag }}
+{%- liquid
+  assign section_heading = section.settings.heading
+  assign section_heading_left = section.settings.heading_left
+  assign section_description = section.settings.description
+  assign full_width = section.settings.full_width
+  assign display_type = section.settings.display_type
+  assign columns_desktop = section.settings.columns_desktop
+  assign featured_collection = section.settings.collection
+  assign show_view_all = section.settings.show_view_all
+  assign product_limit = section.settings.product_limit
+  assign mobile_swipe = section.settings.mobile_swipe
+  assign show_progress_bar = section.settings.show_progress_bar
+  assign disable_top_spacing = section.settings.disable_top_spacing
+  assign disable_bottom_spacing = section.settings.disable_bottom_spacing
+  assign columns_class = 'small-6 medium-6 large-4'
+  case columns_desktop
+    when 2
+      assign columns_class = 'small-8 medium-4'
+    when 3
+      assign columns_class = 'small-8 medium-4'
+    when 4
+      assign columns_class = 'small-8 medium-4 large-4'
+    when 5
+      assign columns_class = 'small-8 medium-4 large-25'
+    when 6
+      assign columns_class = 'small-8 medium-4 large-2'
+  endcase
+
+  if featured_collection.all_products_count > product_limit
+    assign more_in_collection = true
+  endif
+
+  if show_view_all and more_in_collection
+    assign section_heading_button = featured_collection
+  endif
+
+  if display_type == 'carousel'
+    assign element = 'slide-show'
+  else
+    assign element = 'div'
+  endif
+-%}
+<div class="featured-collection{% if mobile_swipe %} swipe-on-mobile{% endif %} section-spacing{% if disable_top_spacing %} section-spacing--disable-top{% endif %}{% if disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}" style="background-color: {{ section.settings.background_color }};">
+  <div class="row{% if full_width %} full-width-row{% endif %}{% if section.settings.show_shadow %} shadow-images{% endif %}">
+    <div class="small-12 columns">
+      {% render 'section-header', section_heading: section_heading, section_description: section_description, section_heading_left: section_heading_left, section_heading_button: section_heading_button %}
+      <div class="featured-collection__inner display-type--{{ display_type }}">
+        <{{ element }} id="product-grid-{{ section.id }}" class="products row {{ display_type }}">
+          {%- comment -%}
+          Render the Promotion block as the first item
+          {%- endcomment -%}
+          {%- assign promotion_block = section.blocks | where: 'type', 'promotion' | first -%}
+          {%- if promotion_block != blank -%}
+            <div class="small-8 medium-5 large-25 columns {% if display_type == 'carousel' %}carousel__slide{% endif %}"
+			>
+              <div class="product-card"
+							
+                style="
+                padding:10px;
+                {% if promotion_block.settings.color_bg %}
+                background-color:{{ promotion_block.settings.color_bg }};
+                {% endif %}
+                {% if promotion_block.settings.color_text %}
+                color:{{ promotion_block.settings.color_text }};
+                {% endif %}
+                "
+				
+				{{ promotion_block.shopify_attributes }} >
+                <figure class="aproduct-featured-image">
+                  {%- if promotion_block.settings.image -%}
+                    {%- liquid
+                      assign sizes = promotion_block.settings.image.width | append: 'x' | append: promotion_block.settings.image.height
+                    -%}
+                    {%- render 'responsive-image', image: promotion_block.settings.image, sizes: sizes -%}
+                  {%- else -%}
+                    {{ 'image' | placeholder_svg_tag: 'placeholder_svg_tag' }}
+                  {%- endif -%}
+                  <div class="promotion-featured-collection-content text-{{ promotion_block.settings.text_alignment }}">
+                    {% if promotion_block.settings.title != blank %}
+                      <h4 style="{% if promotion_block.settings.color_text %}
+                        color:{{ promotion_block.settings.color_text }};
+                        {% endif %}">{{ promotion_block.settings.title }}</h4>
+                    {% endif %}
+                    {% if promotion_block.settings.text != blank %}
+                      <p>{{ promotion_block.settings.text }}</p>
+                    {% endif %}
+                    {% if promotion_block.settings.link_label != blank %}
+                      {%- liquid
+                        assign button_class = 'button white'
+                        if promotion_block.settings.use_text_button
+                          assign button_class = 'text-button white'
+                        endif
+                      -%}
+                      <a class="{{ button_class }}"{% if promotion_block.settings.link == blank %} role="link" aria-disabled="true"{% else %} href="{{ promotion_block.settings.link }}"{% endif %}><span>{{ promotion_block.settings.link_label }}</span></a>
+                    {% endif %}
+                    {% if promotion_block.settings.block_link != blank %}
+                      <a href="{{ promotion_block.settings.block_link }}" class="gallery__item-content-link" target="_blank"></a>
+                    {% endif %}
+                  </div>
+                </figure>
+              </div>
+            </div>
+          {%- endif -%}
+
+          {%- comment -%}
+          Adjust product limit if promotion block is present
+          {%- endcomment -%}
+          {%- if promotion_block != blank -%}
+            {%- assign adjusted_product_limit = product_limit | minus: 1 -%}
+          {%- else -%}
+            {%- assign adjusted_product_limit = product_limit -%}
+          {%- endif -%}
+
+          {%- if featured_collection != blank -%}
+            {%- for product in featured_collection.products limit: adjusted_product_limit -%}
+              <div class="{{ columns_class }} columns {% if display_type == 'carousel' %}carousel__slide{% endif %}">
+                {% render 'product-card', product_card_product: product %}
+              </div>
+            {%- endfor -%}
+          {%- else -%}
+            {%- for i in (1..adjusted_product_limit) -%}
+              <div class="{{ columns_class }} columns {% if display_type == 'carousel' %}carousel__slide{% endif %}">
+                {% render 'product-card' %}
+              </div>
+            {%- endfor -%}
+          {%- endif -%}
+
+          {%- if display_type == 'carousel' -%}
+            {%- if product_limit > columns_desktop -%}
+              {%- render 'slideshow-arrows' -%}
+            {%- endif -%}
+          {%- endif -%}
+        </{{ element }}>
+        {%- if display_type == 'carousel' and show_progress_bar -%}
+          <div class="flickity-progress">
+            <div class="flickity-progress--bar"></div>
+          </div>
+        {%- endif -%}
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured collection",
+  "class": "section-featured-collection",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured Collection"
+    },
+    {
+      "type": "select",
+      "id": "heading_tag",
+      "label": "Heading tag",
+      "options": [
+        {
+          "value": "h1",
+          "label": "h1"
+        },
+        {
+          "value": "h2",
+          "label": "h2"
+        },
+        {
+          "value": "h3",
+          "label": "h3"
+        },
+        {
+          "value": "h4",
+          "label": "h4"
+        },
+        {
+          "value": "h5",
+          "label": "h5"
+        },
+        {
+          "value": "h6",
+          "label": "h6"
+        },
+        {
+          "value": "p",
+          "label": "p"
+        }
+      ],
+      "default": "h3"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_shadow",
+      "default": false,
+      "label": "Show the shadow"
+    },
+    {
+      "type": "select",
+      "id": "header_alignment_mobile",
+      "label": "Header Alignment (Mobile)",
+      "default": "text-center",
+      "options": [
+        { "label": "Left", "value": "text-left" },
+        { "label": "Center", "value": "text-center" },
+        { "label": "Right", "value": "text-right" }
+      ]
+    },
+    {
+      "type": "select",
+      "id": "header_alignment_large",
+      "label": "Header Alignment (Large)",
+      "default": "large-text-left",
+      "options": [
+        { "label": "Left", "value": "large-text-left" },
+        { "label": "Center", "value": "large-text-center" },
+        { "label": "Right", "value": "large-text-right" }
+      ]
+    },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Describe your featured collection here</p>"
+    },
+    {
+      "type": "checkbox",
+      "id": "full_width",
+      "label": "Make section full width",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Collection"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "url",
+      "id": "custom_link",
+      "label": "Custom link for the collection",
+      "default": "/"
+    },
+    {
+      "type": "text",
+      "id": "custom_link_heading",
+      "label": "Custom link heading",
+      "default": "To the collection"
+    },
+    {
+      "type": "select",
+      "id": "display_type",
+      "options": [
+        {
+          "value": "grid",
+          "label": "Grid"
+        },
+        {
+          "value": "carousel",
+          "label": "Carousel"
+        }
+      ],
+      "default": "grid",
+      "label": "Display type"
+    },
+    {
+      "type": "range",
+      "id": "product_limit",
+      "min": 2,
+      "max": 30,
+      "step": 1,
+      "label": "Maximum products to show",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "columns_desktop",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 6,
+      "label": "Number of columns on desktop"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "default": true,
+      "label": "Enable \"View all\" button if collection has more products than shown"
+    },
+    {
+      "type": "header",
+      "content": "Grid"
+    },
+    {
+      "type": "checkbox",
+      "id": "mobile_swipe",
+      "default": true,
+      "label": "Enable swipe on mobile"
+    },
+    {
+      "type": "header",
+      "content": "Carousel"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_progress_bar",
+      "label": "Show progress bar",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_top_spacing",
+      "default": false,
+      "label": "Remove top spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_bottom_spacing",
+      "default": false,
+      "label": "Remove bottom spacing"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#E0DFD6"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "promotion",
+      "name": "Promotion",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "default": "Promotion",
+          "label": "Heading"
+        },
+        {
+          "type": "textarea",
+          "id": "text",
+          "default": "Advertise a promotion or a sale",
+          "label": "Description"
+        },
+        {
+          "id": "link_label",
+          "type": "text",
+          "label": "Button label",
+          "default": "Explore",
+          "info": "Leave the label blank to hide the button."
+        },
+        {
+          "id": "link",
+          "type": "url",
+          "label": "Button link"
+        },
+        {
+          "type": "checkbox",
+          "id": "use_text_button",
+          "label": "Use text button",
+          "default": false
+        },
+        {
+          "id": "block_link",
+          "type": "url",
+          "label": "Link",
+          "info": "This will allow you to set a link to the promotion"
+        },
+        {
+          "type": "header",
+          "content": "Layout"
+        },
+        {
+          "type": "select",
+          "id": "text_alignment",
+          "options": [
+            {
+              "value": "left",
+              "label": "Left"
+            },
+            {
+              "value": "center",
+              "label": "Center"
+            },
+            {
+              "value": "right",
+              "label": "Right"
+            }
+          ],
+          "default": "center",
+          "label": "Content alignment"
+        },
+        {
+          "type": "header",
+          "content": "Colors"
+        },
+		{
+			"type": "color",
+			"id": "color_bg",
+			"label": "Background",
+			"default": "transparent"
+		  },
+		  {
+			"type": "color",
+			"id": "color_text",
+			"label": "Text",
+			"default": "#151515"
+		  },
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured collection",
+      "blocks": [
+        {
+          "type": "promotion"
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": [
+      "header", "footer"
+    ]
+  }
+}
+
+{% endschema %}

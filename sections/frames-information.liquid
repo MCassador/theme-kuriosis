@@ -1,0 +1,198 @@
+{{- 'rich-text.css' | asset_url | stylesheet_tag -}}
+{%- liquid
+  assign color_bg = section.settings.color_bg | downcase
+  assign color_text = section.settings.color_text
+  assign color_links = section.settings.color_links
+
+  assign disable_top_spacing = section.settings.disable_top_spacing
+  assign disable_bottom_spacing = section.settings.disable_bottom_spacing
+
+  assign solid_button_label = color_bg
+  if color_bg == 'transparent' or color_bg == 'rgba(0,0,0,0)'
+    assign solid_button_label = '#ffffff'
+  endif
+-%}
+
+<div class="{% if section.settings.gradient_background %} gradient-background{% if section.settings.gradient_background_reverse %} reverse{% endif %}{% endif %}">
+  <div class="columns" style="{% unless section.settings.gradient_background %}--color-bg: {{ color_bg }};{% endunless %} --color-text: {{ color_text }}; --solid-button-background: {{ section.settings.button_background_color }}; --outline-button-label: {{ section.settings.button_text_color }}; --solid-button-label: {{ solid_button_label }}; --bg-body: {{ color_bg }}; --color-accent: {{ color_links }}; --color-accent-rgb:  {{ color_links.rgb | replace: ' ' , ',' }};">
+    <div class="rich-text section-spacing-padding{% if disable_top_spacing %} section-spacing--disable-top{% endif %}{% if disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}">
+      <div class="row">
+        <div class="small-12 medium-5 large-4">
+          {% if section.settings.image != blank %}
+            {%- liquid
+              assign image = section.settings.image
+              assign master_width = image.width | append: 'x' | append: image.height
+              render 'responsive-image', image: image, sizes: master_width, retina: section.settings.retina
+            -%}
+          {% else %}
+            <div class="thb-placeholder">
+              {{ 'image' | placeholder_svg_tag: 'placeholder_svg_tag' }}
+            </div>
+          {% endif %}
+        </div>
+
+        <div class="small-12 medium-6 medium-offset-1">
+          <h2 class="h3" style="margin-top:50px;">{{ section.settings.heading }}</h2>
+          <div class="collapsible-content__inner proza-libre">
+            {% for block in section.blocks %}
+              {% case block.type %}
+                {% when 'accordion_item' %}
+                  <collapsible-row class="accordion" {{ block.shopify_attributes }}>
+                    <details id="Details-{{ forloop.index }}-{{ section.id }}" {% if block.settings.open %}open{% endif %}>
+                      <summary>
+                        {{ block.settings.title }}
+                        <span></span>
+                      </summary>
+                      <div class="collapsible__content accordion__content rte" id="Accordion-{{ forloop.index }}-{{ section.id }}">
+                        {{ block.settings.content }}
+                      </div>
+                    </details>
+                  </collapsible-row>
+                {% when 'custom_liquid' %}
+                  <div class="small-12">
+                    {{ block.settings.custom_liquid }}
+                  </div>
+              {% endcase %}
+            {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Frames information",
+  "class": "section-rich-text",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Test"
+    },
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "checkbox",
+      "id": "retina",
+      "label": "Enable retina",
+      "default": true
+    },
+    {
+      "type": "color",
+      "id": "color_bg",
+      "label": "Background",
+      "default": "transparent"
+    },
+    {
+      "type": "color",
+      "id": "color_text",
+      "label": "Text",
+      "default": "#151515"
+    },
+    {
+      "type": "color",
+      "id": "color_links",
+      "label": "Links",
+      "default": "#151515"
+    },
+    {
+      "type": "color",
+      "id": "button_background_color",
+      "label": "Button background color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_top_spacing",
+      "default": false,
+      "label": "Remove top spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "disable_bottom_spacing",
+      "default": false,
+      "label": "Remove bottom spacing"
+    },
+    {
+      "type": "checkbox",
+      "id": "gradient_background",
+      "label": "Enable gradient background",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "gradient_background_reverse",
+      "label": "Reverse gradient background",
+      "default": false
+    }
+  ],
+  "blocks": [
+    {
+      "type": "accordion_item",
+      "name": "Accordion Item",
+      "settings": [
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title"
+        },
+        {
+          "type": "richtext",
+          "id": "content",
+          "label": "Content"
+        },
+        {
+          "type": "checkbox",
+          "id": "open",
+          "label": "Open by default",
+          "default": false
+        }
+      ]
+    },
+    {
+      "type": "custom_liquid",
+      "name": "Custom liquid",
+      "settings": [
+        { "type": "liquid", "id": "custom_liquid", "label": "Custom liquid" }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Frames information",
+      "blocks": [
+        {
+          "type": "accordion_item",
+          "settings": {
+            "title": "Accordion Item 1",
+            "content": "<p>Content for the first accordion item.</p>"
+          }
+        },
+        {
+          "type": "accordion_item",
+          "settings": {
+            "title": "Accordion Item 2",
+            "content": "<p>Content for the second accordion item.</p>"
+          }
+        }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["*"],
+    "groups": ["header", "footer"]
+  }
+}
+{% endschema %}

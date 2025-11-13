@@ -1,0 +1,196 @@
+{%- liquid
+	assign section_heading = section.settings.heading
+	assign section_description = section.settings.description
+	assign full_width = section.settings.full_width
+	assign disable_top_spacing = section.settings.disable_top_spacing
+	assign disable_bottom_spacing = section.settings.disable_bottom_spacing
+-%}
+<div class="featured-artist section-spacing{% if disable_top_spacing %} section-spacing--disable-top{% endif %}{% if disable_bottom_spacing %} section-spacing--disable-bottom{% endif %}"
+     style="background-color: {{ section.settings.background_color }}; background-image: url({{ section.settings.background_image | img_url: 'master' }}); background-size: cover; background-position: center; text-align: center;background-repeat:no-repeat;display:flex;
+	 flex-direction:column;align-items:center;justify-content:flex-end;">
+  <style>
+    @media (max-width: 767px) {
+      .featured-artist {
+        min-height: {{ section.settings.min_height_mobile }}px;
+      }
+    }
+	@media (min-width: 768px) {
+		.featured-artist {
+			min-height: {{ section.settings.min_height_desktop }}px;
+		}
+	  }
+  </style>
+	<div class="row{% if full_width %} full-width-row{% endif %}">
+		{%- if section_heading != blank or section_description != blank -%}
+		<div class="small-12 columns">
+			{%- if section_heading -%}
+				{% assign heading_tag = section.settings.heading_tag | default: 'h2' %}
+				<{{ heading_tag }} class="h2" style="color: {{ section.settings.heading_color }};">{{ section_heading }}</{{ heading_tag }}>
+			{%- endif -%}
+			{%- if section_description != blank -%}
+				<div class="rte h3" style="color: {{ section.settings.text_color }};">
+					{{ section_description }}
+				</div>
+			{%- endif -%}
+			
+			{%- if section.settings.button_text != blank and section.settings.button_url != blank -%}
+			  <div class="button-overflow-container">
+			    <a href="{{ section.settings.button_url }}" title="{{ section.settings.button_text }}" class="button white"><span>{{ section.settings.button_text }}</span></a>
+			  </div>
+			{%- endif -%}
+		</div>
+	{%- endif -%}
+	</div>
+</div>
+
+{% schema %}
+{
+  "name": "Featured artist",
+  "class": "section-featured-artist",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Featured artist"
+    },
+	{
+		"type": "select",
+		"id": "heading_tag",
+		"label": "Heading tag",
+		"options": [
+		  {
+			"value": "h1",
+			"label": "h1"
+		  },
+		  {
+			"value": "h2",
+			"label": "h2"
+		  },
+		  {
+			"value": "h3",
+			"label": "h3"
+		  },
+		  {
+			"value": "h4",
+			"label": "h4"
+		  },
+		  {
+			"value": "h5",
+			"label": "h5"
+		  },
+		  {
+			"value": "h6",
+			"label": "h6"
+		  },
+		  {
+			"value": "p",
+			"label": "p"
+		  }
+		],
+		"default": "h3"
+	  },
+    {
+      "type": "richtext",
+      "id": "description",
+      "label": "Description",
+      "default": "<p>Describe your featured artist here</p>"
+    },
+		{
+			"type": "checkbox",
+			"id": "full_width",
+			"label": "Make section full width",
+			"default": true
+		},
+		{
+			"type": "header",
+			"content": "Artist"
+		},
+		{
+			"type": "text",
+			"id": "button_text",
+			"label": "Button Text",
+			"default": "Learn More"
+		},
+		{
+			"type": "url",
+			"id": "button_url",
+			"label": "Button URL"
+		},
+		{
+			"type": "image_picker",
+			"id": "background_image",
+			"label": "Background Image"
+		},
+		{
+      "type": "header",
+      "content": "Colors"
+    },
+		{
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading Color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text Color",
+      "default": "#000000"
+    },
+		{
+      "type": "header",
+      "content": "Spacing"
+    },
+		{
+			"type": "checkbox",
+			"id": "disable_top_spacing",
+			"default": false,
+			"label": "Remove top spacing"
+		},
+		{
+			"type": "checkbox",
+			"id": "disable_bottom_spacing",
+			"default": false,
+			"label": "Remove bottom spacing"
+		},
+		{
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "range",
+      "id": "min_height_desktop",
+      "label": "Minimum Height (Desktop)",
+      "default": 400,
+      "min": 100,
+      "max": 1000,
+      "step": 10,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "min_height_mobile",
+      "label": "Minimum Height (Mobile)",
+      "default": 300,
+      "min": 100,
+      "max": 1000,
+      "step": 10,
+      "unit": "px"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured artist"
+    }
+  ],
+	"enabled_on": {
+		"templates": ["*"],
+		"groups": [
+			"header", "footer"
+		]
+	}
+}
+{% endschema %}

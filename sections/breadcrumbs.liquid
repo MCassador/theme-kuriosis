@@ -1,0 +1,98 @@
+{{- 'breadcrumbs.css' | asset_url | stylesheet_tag -}}
+<scroll-shadow>
+  <nav class="breadcrumbs proza-libre" aria-label="breadcrumbs">
+    {%- comment -%} IDs of collections to exclude (e.g., "All Posters") {%- endcomment -%}
+    {%- assign excluded_collection_ids = "635940634947,635940831555,643454796099" | split: "," -%}
+
+    {%- comment -%} Determine collection to show on product pages (skip excluded) {%- endcomment -%}
+    {%- assign product_collection = nil -%}
+    {%- if template contains 'product' -%}
+      {%- if collection -%}
+        {%- assign collection_id_str = collection.id | append: '' -%}
+        {%- unless excluded_collection_ids contains collection_id_str -%}
+          {%- assign product_collection = collection -%}
+        {%- endunless -%}
+      {%- endif -%}
+
+      {%- if product_collection == nil and product and product.collections and product.collections.size > 0 -%}
+        {%- for c in product.collections -%}
+          {%- assign c_id = c.id | append: '' -%}
+          {%- unless excluded_collection_ids contains c_id -%}
+            {%- assign product_collection = c -%}
+            {%- break -%}
+          {%- endunless -%}
+        {%- endfor -%}
+      {%- endif -%}
+    {%- endif -%}
+
+    <a href="{{ routes.root_url }}" title="{{ 'sections.breadcrumbs.home' | t | escape }}">{{ 'sections.breadcrumbs.home' | t }}</a>
+
+    {%- comment -%} COLLECTION & PRODUCT PATHS {%- endcomment -%}
+    {%- if template contains 'collection' and collection -%}
+      <i>/</i>
+      <a href="{{ routes.all_products_collection_url }}" title="Products">Products</a>
+      {%- assign current_collection_id = collection.id | append: '' -%}
+      {%- unless excluded_collection_ids contains current_collection_id -%}
+        <i>/</i>
+        <span>{{ collection.title | escape }}</span>
+      {%- endunless -%}
+
+    {%- elsif template contains 'product' -%}
+      <i>/</i>
+      <a href="{{ routes.all_products_collection_url }}" title="Products">Products</a>
+      {%- if product_collection -%}
+        <i>/</i>
+        <a href="{{ product_collection.url }}" title="{{ product_collection.title | escape }}">{{ product_collection.title | escape }}</a>
+      {%- endif -%}
+      <i>/</i>
+      {{ product.title | escape }}
+    {%- endif -%}
+
+    {%- comment -%} OTHER TEMPLATES {%- endcomment -%}
+    {% if template contains 'cart' %}
+      <i>/</i>
+      {{ 'sections.breadcrumbs.cart' | t }}
+    {% endif %}
+
+    {% if template contains 'blog' %}
+      {% if current_tags %}
+        <i>/</i>
+        <a href="{{ blog.url }}" title="{{ blog.title | escape }}">{{ blog.title }}</a>
+        <i>/</i>
+        {{ current_tags }}
+      {% else %}
+        <i>/</i>
+        {{ blog.title }}
+      {% endif %}
+    {% endif %}
+
+    {% if template contains 'article' %}
+      <i>/</i>
+      <a href="{{ blog.url }}" title="{{ blog.title | escape }}">{{ blog.title }}</a>
+      <i>/</i>
+      {{ article.title }}
+    {% endif %}
+
+    {% if template contains 'page' %}
+      <i>/</i>
+      {{ page.title }}
+    {% endif %}
+
+    {% if template contains 'search' %}
+      <i>/</i>
+      {{ 'sections.breadcrumbs.search' | t }}
+    {% endif %}
+
+    {% if template contains 'customers' %}
+      <i>/</i>
+      {{ 'sections.breadcrumbs.my_account' | t }}
+    {% endif %}
+  </nav>
+</scroll-shadow>
+
+{% schema %}
+{
+  "name": "Breadcrumbs",
+  "class": "section-breadcrumbs"
+}
+{% endschema %}
