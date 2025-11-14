@@ -47,7 +47,9 @@ class WishlistDrawer {
 		};
 
 		// Bind the close function to click capture and other events
-		this.addEventListener("click", this.onClick.bind(this));
+		if (this.addEventListener) {
+			this.addEventListener("click", this.onClick.bind(this));
+		}
 		document.addEventListener("panel:close", this.onClick.bind(this));
 
 		if (!this.cc.hasAttribute("initialized")) {

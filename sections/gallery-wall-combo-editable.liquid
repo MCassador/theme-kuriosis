@@ -8,49 +8,8 @@
     cartUrl: '{{ routes.cart_url }}',
     moneyFormat: {{ shop.money_format | json }},
     frameCollection: {{ section.settings.frame_collection | default: '' | json }},
-    productCollection: {{ section.settings.product_collection | default: '' | json }},
     products: [
-      {%- comment -%} Prioridade 1: Se tem coleção selecionada, usa produtos da coleção {%- endcomment -%}
-      {% if section.settings.product_collection != blank and collections[section.settings.product_collection] %}
-        {% for product_item in collections[section.settings.product_collection].products %}
-          {% assign combo_product = product_item %}
-          {% if combo_product %}
-            {
-              id: {{ combo_product.id | json }},
-              handle: {{ combo_product.handle | json }},
-              title: {{ combo_product.title | json }},
-              price: {{ combo_product.price | json }},
-              priceFormatted: {{ combo_product.price | money | json }},
-              image: {{ combo_product.featured_image | img_url: '600x600' | json }},
-              url: {{ combo_product.url | json }},
-              productType: {{ section.settings.default_product_type | default: 'Tela' | json }},
-              variants: [
-                {% for variant in combo_product.variants %}
-                  {
-                    id: {{ variant.id | json }},
-                    price: {{ variant.price | json }},
-                    priceFormatted: {{ variant.price | money | json }},
-                    available: {{ variant.available | json }},
-                    option1: {{ variant.option1 | json }},
-                    option2: {{ variant.option2 | json }},
-                    option3: {{ variant.option3 | json }}
-                  }{% unless forloop.last %},{% endunless %}
-                {% endfor %}
-              ],
-              options: [
-                {% for option in combo_product.options_with_values %}
-                  {
-                    name: {{ option.name | json }},
-                    position: {{ option.position | json }},
-                    values: {{ option.values | json }}
-                  }{% unless forloop.last %},{% endunless %}
-                {% endfor %}
-              ]
-            }{% unless forloop.last %},{% endunless %}
-          {% endif %}
-        {% endfor %}
-      {%- comment -%} Prioridade 2: Se não tem coleção, usa product_list {%- endcomment -%}
-      {% elsif section.settings.product_list != blank %}
+      {% if section.settings.product_list != blank %}
         {% for product_item in section.settings.product_list %}
           {% assign combo_product = product_item %}
           {% if combo_product %}
@@ -147,14 +106,12 @@
     <div class="combo-image-section" data-combo-main-image="{{ main_image_url }}">
       <div class="combo-main-image-wrapper{% if section.settings.enable_zoom %} zoomable{% endif %}">
         {% if section.settings.main_image %}
-          <div class="combo-main-image" id="combo-main-image-container">
-            <img src="{{ main_image_url }}" 
-                 alt="{{ section.settings.title | escape }}" 
-                 id="combo-main-image"
-                 class="combo-main-image-img"
-                 data-main-image-url="{{ main_image_url }}"
-                 loading="eager">
-          </div>
+          <img src="{{ main_image_url }}" 
+               alt="{{ section.settings.title | escape }}" 
+               id="combo-main-image"
+               class="combo-main-image"
+               data-main-image-url="{{ main_image_url }}"
+               loading="eager">
           {% if section.settings.enable_zoom %}
             <div class="zoom-icon">
               <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -164,26 +121,20 @@
             </div>
           {% endif %}
         {% else %}
-          <div class="combo-main-image">
-            <div class="placeholder-image">
-              {{ 'product-1' | placeholder_svg_tag }}
-              <p>Adicione uma imagem principal nas configurações</p>
-            </div>
+          <div class="placeholder-image">
+            {{ 'product-1' | placeholder_svg_tag }}
+            <p>Adicione uma imagem principal nas configurações</p>
           </div>
         {% endif %}
       </div>
       
       {% comment %} Título e Descrição {% endcomment %}
-      {% if section.settings.title != blank or section.settings.description != blank %}
-        <div class="combo-image-info">
-          {% if section.settings.title != blank %}
-            <h1 class="combo-title">{{ section.settings.title }}</h1>
-          {% endif %}
-          {% if section.settings.description != blank %}
-            <div class="combo-description">{{ section.settings.description }}</div>
-          {% endif %}
-        </div>
-      {% endif %}
+      <div class="combo-image-info">
+        <h1 class="combo-title">{{ section.settings.title | default: 'Gallery Wall Combo' }}</h1>
+        {% if section.settings.description != blank %}
+          <div class="combo-description">{{ section.settings.description }}</div>
+        {% endif %}
+      </div>
     </div>
 
     {% comment %} Painel de Personalização (Lado Direito) {% endcomment %}
@@ -208,9 +159,8 @@
 
         {% comment %} Lista de Produtos do Combo {% endcomment %}
         <div class="combo-products-list" id="combo-products-list">
-          {%- comment -%} Prioridade 1: Se tem coleção selecionada, usa produtos da coleção {%- endcomment -%}
-          {% if section.settings.product_collection != blank and collections[section.settings.product_collection] %}
-            {% for product_item in collections[section.settings.product_collection].products %}
+          {% if section.settings.product_list != blank %}
+            {% for product_item in section.settings.product_list %}
               {% assign combo_product = product_item %}
               {% if combo_product %}
                 {% assign product_type = section.settings.default_product_type | default: 'Tela' %}
@@ -668,9 +618,9 @@
           {% endif %}
 
           {% comment %} Mensagem se não houver produtos {% endcomment %}
-          {% if section.settings.product_collection == blank and section.settings.product_list == blank and section.blocks.size == 0 %}
+          {% if section.settings.product_list == blank and section.blocks.size == 0 %}
             <div class="combo-empty">
-              <p>Adicione produtos usando uma das opções: 1) Selecione uma coleção, 2) Selecione múltiplos produtos, ou 3) Use o botão "Add block" para adicionar produtos individuais.</p>
+              <p>Adicione produtos usando o botão "Add block" no editor do tema ou selecione múltiplos produtos na seção "Seleção Rápida de Produtos".</p>
             </div>
           {% endif %}
         </div>
@@ -703,47 +653,7 @@
           
           {% comment %} Lista de produtos igual ao carrinho {% endcomment %}
           <div class="buy-all-items-list">
-            {%- comment -%} Prioridade 1: Se tem coleção selecionada, usa produtos da coleção {%- endcomment -%}
-            {% if section.settings.product_collection != blank and collections[section.settings.product_collection] %}
-              {% for product_item in collections[section.settings.product_collection].products %}
-                {% assign combo_product = product_item %}
-                {% if combo_product %}
-                  {% assign product_type = section.settings.default_product_type | default: 'Tela' %}
-                  {%- liquid
-                    assign default_variant = combo_product.selected_or_first_available_variant
-                    assign default_size = ''
-                    assign default_material = ''
-                    for option in combo_product.options_with_values
-                      if option.name == 'Size'
-                        assign default_size = option.values.first
-                      endif
-                      if option.name == 'Material'
-                        assign default_material = option.values.first
-                      endif
-                    endfor
-                  -%}
-                  <div class="buy-all-item" data-product-id="{{ combo_product.id }}">
-                    <div class="buy-all-item-image">
-                      {% if combo_product.featured_image %}
-                        <img src="{{ combo_product.featured_image | img_url: '150x150' }}" alt="{{ combo_product.title }}" loading="lazy">
-                      {% else %}
-                        <div class="placeholder-image">{{ 'product-1' | placeholder_svg_tag }}</div>
-                      {% endif %}
-                    </div>
-                    <div class="buy-all-item-details">
-                      <div class="buy-all-item-type">{{ product_type | upcase }}</div>
-                      <div class="buy-all-item-title">{{ combo_product.title }}</div>
-                      {% if default_size != blank %}<div class="buy-all-item-size">Size: {{ default_size }}</div>{% endif %}
-                      {% if default_material != blank %}<div class="buy-all-item-material">Material: {{ default_material }}</div>{% endif %}
-                      <div class="buy-all-item-price">
-                        <span class="price-amount" data-product-id="{{ combo_product.id }}">{{ default_variant.price | money }}</span>
-                      </div>
-                    </div>
-                  </div>
-                {% endif %}
-              {% endfor %}
-            {%- comment -%} Prioridade 2: Se não tem coleção, usa product_list {%- endcomment -%}
-            {% elsif section.settings.product_list != blank %}
+            {% if section.settings.product_list != blank %}
               {% for product_item in section.settings.product_list %}
                 {% assign combo_product = product_item %}
                 {% if combo_product %}
@@ -871,13 +781,13 @@
       "type": "text",
       "id": "title",
       "label": "Título do Combo",
-      "info": "Digite o título do combo (ex: Natal Gallery Wall)"
+      "default": "Mindful embrace parede de quadros"
     },
     {
       "type": "richtext",
       "id": "description",
       "label": "Descrição",
-      "info": "Digite a descrição do combo"
+      "default": "<p>Uma parede de quadros com quatro ilustrações em tons suaves. Uma das peças tem texto verde. Perfeita para criar um ambiente acolhedor e relaxante.</p>"
     },
     {
       "type": "image_picker",
@@ -908,23 +818,17 @@
       "content": "Seleção Rápida de Produtos"
     },
     {
-      "type": "collection",
-      "id": "product_collection",
-      "label": "Select Collection",
-      "info": "Selecione uma coleção de produtos (igual ao Gallery Builder). Se usar esta opção, todos os produtos da coleção serão usados."
-    },
-    {
       "type": "product_list",
       "id": "product_list",
       "label": "Selecionar Múltiplos Produtos",
-      "info": "OU selecione produtos individuais. Se usar coleção, esta opção será ignorada."
+      "info": "Selecione vários produtos de uma vez. Se usar esta opção, os produtos dos blocos individuais serão ignorados."
     },
     {
       "type": "text",
       "id": "default_product_type",
       "label": "Tipo Padrão dos Produtos",
       "default": "Tela",
-      "info": "Tipo aplicado a todos os produtos da lista/coleção (Ex: Tela, Pôster, Moldura)"
+      "info": "Tipo aplicado a todos os produtos da lista (Ex: Tela, Pôster, Moldura)"
     },
     {
       "type": "collection",

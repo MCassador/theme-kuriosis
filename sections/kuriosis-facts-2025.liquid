@@ -15,10 +15,6 @@
   <div class="row">
     <div class="small-12">
 
-      {%- if section.settings.show_breadcrumbs -%}
-        {%- render 'breadcrumbs' -%}
-      {%- endif -%}
-
       <div class="heading-top">
         {%- if section.settings.heading -%}
           <{{ section.settings.heading_tag }} style="color: {{ text_color }}!important;" class="h2">
@@ -326,12 +322,6 @@
   "class": "kuriosis-facts-2025",
   "max_blocks": 3,
   "settings": [
-    {
-      "type": "checkbox",
-      "id": "show_breadcrumbs",
-      "default": false,
-      "label": "Show Breadcrumbs"
-    },
     {
       "type": "select",
       "id": "heading_tag",
