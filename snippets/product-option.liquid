@@ -7,6 +7,101 @@
 {% assign handle = option.name | replace: ' ', '-' | downcase | escape %}
 {% assign base_price = product.price %} <!-- Assign the base price of the product -->
 
+{% comment %} Renderizar Product Type apenas uma vez, na primeira opção {% endcomment %}
+{% if forloop.first %}
+  {% comment %} Botão "Stretched Canvas" - só aparece se o metafield estiver configurado (produto Art Print) {% endcomment %}
+  {% assign stretched_canvas_metafield = product.metafields.custom.framed_canvas_product %}
+  {% assign stretched_canvas_url = '' %}
+
+  {% comment %} Só processa se o metafield existir {% endcomment %}
+  {% if stretched_canvas_metafield != blank %}
+    {% assign stretched_canvas_product = stretched_canvas_metafield.value %}
+    
+    {% if stretched_canvas_product != blank %}
+      {% if stretched_canvas_product.url != blank %}
+        {% assign stretched_canvas_url = stretched_canvas_product.url %}
+      {% elsif stretched_canvas_product.handle != blank %}
+        {% assign stretched_canvas_url = '/products/' | append: stretched_canvas_product.handle %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% comment %} Botão "Art Print" - só aparece se o metafield estiver configurado (produto Stretched Canvas) {% endcomment %}
+  {% assign art_print_metafield = product.metafields.custom.art_print_product %}
+  {% assign art_print_url = '' %}
+
+  {% comment %} Só processa se o metafield existir {% endcomment %}
+  {% if art_print_metafield != blank %}
+    {% assign art_print_product = art_print_metafield.value %}
+    
+    {% if art_print_product != blank %}
+      {% if art_print_product.url != blank %}
+        {% assign art_print_url = art_print_product.url %}
+      {% elsif art_print_product.handle != blank %}
+        {% assign art_print_url = '/products/' | append: art_print_product.handle %}
+      {% endif %}
+    {% endif %}
+  {% endif %}
+
+  {% comment %} Verificar qual botão deve estar selecionado baseado no produto atual {% endcomment %}
+  {% assign is_art_print_selected = false %}
+  {% assign is_stretched_canvas_selected = false %}
+
+  {% comment %} Mostrar botões APENAS se os metafields existirem E as URLs foram encontradas {% endcomment %}
+  {% if stretched_canvas_metafield != blank and stretched_canvas_url != '' or art_print_metafield != blank and art_print_url != '' %}
+    {% assign material_box_size = '40' %}
+    {% case settings.material_box_size %}
+      {% when 'small' %}
+        {% assign material_box_size = '40' %}
+      {% when 'regular' %}
+        {% assign material_box_size = '72' %}
+      {% when 'large' %}
+        {% assign material_box_size = '104' %}
+      {% when 'xlarge' %}
+        {% assign material_box_size = '144' %}
+    {% endcase %}
+    
+    <fieldset class="product-form__input product-form__input--material product-form__input--material--{{ material_box_size }}" style="margin-bottom: 16px;">
+      <div class="form__label">Product Type:</div>
+      {% comment %} Art Print primeiro {% endcomment %}
+      {% if art_print_metafield != blank and art_print_url != '' %}
+        {% assign art_print_id = 'product-type-art-print-' | append: section.id %}
+        {% assign art_print_product_handle = '' %}
+        {% if art_print_product.handle != blank %}
+          {% assign art_print_product_handle = art_print_product.handle %}
+        {% endif %}
+        <input type="radio" id="{{ art_print_id }}" {% if is_art_print_selected %}checked{% endif %} style="display: none;">
+        <label for="{{ art_print_id }}" 
+               class="product-type-button material-option-box{% if is_art_print_selected %} selected{% endif %}" 
+               data-product-type-url="{{ art_print_url }}"
+               data-product-type="art-print"
+               data-target-handle="{{ art_print_product_handle }}"
+               data-current-handle="{{ product.handle }}">
+          <span class="material-title">Art Print</span>
+        </label>
+      {% endif %}
+      
+      {% comment %} Stretched Canvas segundo {% endcomment %}
+      {% if stretched_canvas_metafield != blank and stretched_canvas_url != '' %}
+        {% assign stretched_canvas_id = 'product-type-stretched-canvas-' | append: section.id %}
+        {% assign stretched_canvas_product_handle = '' %}
+        {% if stretched_canvas_product.handle != blank %}
+          {% assign stretched_canvas_product_handle = stretched_canvas_product.handle %}
+        {% endif %}
+        <input type="radio" id="{{ stretched_canvas_id }}" {% if is_stretched_canvas_selected %}checked{% endif %} style="display: none;">
+        <label for="{{ stretched_canvas_id }}" 
+               class="product-type-button material-option-box{% if is_stretched_canvas_selected %} selected{% endif %}" 
+               data-product-type-url="{{ stretched_canvas_url }}"
+               data-product-type="stretched-canvas"
+               data-target-handle="{{ stretched_canvas_product_handle }}"
+               data-current-handle="{{ product.handle }}">
+          <span class="material-title">Stretched Canvas</span>
+        </label>
+      {% endif %}
+    </fieldset>
+  {% endif %}
+{% endif %}
+
 {% case option_type %}
 {% when 'dropdown' %}
   {% assign selected_value = product.selected_or_first_available_variant.options[forloop.index0] %}
@@ -566,6 +661,7 @@
           </label>
       {% endfor %}
   </fieldset>
+  
   <script src="{{ 'material-redirect.js' | asset_url }}" defer></script>
 {% endcase %}
 
